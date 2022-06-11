@@ -1,14 +1,13 @@
 package org.novinomad.picasso.domain.entities.impl;
 
-import com.sun.istack.NotNull;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
-import org.novinomad.picasso.commons.utils.CommonCollectionUtils;
 import org.novinomad.picasso.domain.entities.IDriver;
 
 import javax.persistence.*;
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.HashSet;
+import java.util.Objects;
+import java.util.Set;
 
 @Entity
 @Getter
@@ -18,6 +17,7 @@ import java.util.stream.Collectors;
 public class Driver extends Employee implements IDriver {
 
     @ElementCollection(fetch = FetchType.EAGER)
+    @CollectionTable(indexes = @Index(columnList = "brandName, modelName"))
     Set<Car> cars = new HashSet<>();
 
     public Driver(String name) {
@@ -25,9 +25,13 @@ public class Driver extends Employee implements IDriver {
     }
 
     //region equals, hashCode, toString
+
+
     @Override
     public String toString() {
-        return super.toString() + String.format("\tcars: %s\n", CommonCollectionUtils.toString("|", cars));
+        return super.toString().replace("}","") +
+                ", cars=" + cars +
+                '}';
     }
 
     @Override
@@ -52,10 +56,14 @@ public class Driver extends Employee implements IDriver {
     @AllArgsConstructor
     @NoArgsConstructor
     @Embeddable
-    @Table(indexes = @Index(columnList = "number"))
     public static class Car {
+
+        private static final Class<Car> clazz = Car.class;
+
         String brandName;
         String modelName;
+
+        @Column(unique = true)
         String number;
 
         @Override
@@ -73,21 +81,15 @@ public class Driver extends Employee implements IDriver {
 
         @Override
         public String toString() {
-            return brandName + "," + modelName + "," + number;
-        }
-
-        public static Car fromString(@NotNull String carString) throws IllegalArgumentException {
-            String[] arr = carString.split(",");
-            try {
-                return new Car(String.valueOf(arr[0]),  String.valueOf(arr[1]),  String.valueOf(arr[2]));
-            } catch (ArrayIndexOutOfBoundsException e) {
-                String exceptionMessage = String.format("Unable to build Car from following string: %s", carString);
-                throw new IllegalArgumentException(exceptionMessage);
-            }
+            return "Car{" +
+                    "brandName='" + brandName + '\'' +
+                    ", modelName='" + modelName + '\'' +
+                    ", number='" + number + '\'' +
+                    '}';
         }
     }
 
-    public static class CarsToStringConverter implements AttributeConverter<Collection<Car>, String> {
+    /*public static class CarsToStringConverter implements AttributeConverter<Collection<Car>, String> {
 
         private static final String delimiter = ",";
 
@@ -105,6 +107,6 @@ public class Driver extends Employee implements IDriver {
                     .map(Car::fromString)
                     .collect(Collectors.toSet());
         }
-    }
+    }*/
     //endregion
 }

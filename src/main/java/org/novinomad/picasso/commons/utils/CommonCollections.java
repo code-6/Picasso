@@ -5,7 +5,7 @@ import lombok.experimental.UtilityClass;
 import java.util.Collection;
 
 @UtilityClass
-public class CommonCollectionUtils {
+public class CommonCollections {
 
     public static <T> String toString(String delimiter, Collection<T> collection) {
         StringBuilder sb = new StringBuilder();

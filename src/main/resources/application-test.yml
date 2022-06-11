@@ -11,7 +11,6 @@ spring:
 
   jpa:
     database-platform: org.hibernate.dialect.${PCS_HIBERNATE_DIALECT:H2Dialect}
-    show-sql: true
     hibernate:
       ddl-auto: ${PCS_DDL_AUTO:update}
 
@@ -27,6 +26,6 @@ spring:
 
 logging:
   level:
-    org.novinomad.picasso: debug
+    org.novinomad.picasso: info
     org.hibernate.SQL: error
 

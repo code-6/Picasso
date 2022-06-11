@@ -4,7 +4,7 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.FieldDefaults;
-import org.hibernate.Hibernate;
+import org.novinomad.picasso.commons.PrettyPrintable;
 
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -16,7 +16,7 @@ import java.util.Objects;
 @FieldDefaults(level = AccessLevel.PROTECTED)
 @Getter
 @Setter
-public abstract class AbstractEntity {
+public abstract class AbstractEntity implements PrettyPrintable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -24,7 +24,9 @@ public abstract class AbstractEntity {
 
     @Override
     public String toString() {
-        return String.format("%s:\n\tid: %d\n", this.getClass().getSimpleName(), id);
+        return this.getClass().getSimpleName() +"{" +
+                "id=" + id +
+                '}';
     }
 
     @Override

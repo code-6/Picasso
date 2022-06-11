@@ -2,6 +2,7 @@ package org.novinomad.picasso.domain.entities.impl;
 
 import lombok.*;
 import lombok.experimental.FieldDefaults;
+import org.apache.commons.lang3.RandomUtils;
 import org.novinomad.picasso.domain.entities.IGuide;
 
 import javax.persistence.*;
@@ -17,12 +18,21 @@ public class Guide extends Employee implements IGuide {
 
     @Enumerated(EnumType.STRING)
     @ElementCollection(fetch = FetchType.EAGER)
+    @CollectionTable(indexes = @Index(columnList = "languages"))
     Set<Language> languages = new HashSet<>();
 
+    public Guide(String name) {
+        super(name);
+    }
+
     //region equals, hashCode, toString
+
+
     @Override
     public String toString() {
-        return super.toString() + String.format("\tlanguages: %s\n", languages);
+        return super.toString().replace("}", "") +
+                ", languages=" + languages +
+                '}';
     }
 
     @Override
@@ -65,6 +75,34 @@ public class Guide extends Employee implements IGuide {
                         String exceptionMessage = String.format("Language constant not present for name: %s", name);
                         return new IllegalArgumentException(exceptionMessage);
                     });
+        }
+
+        public static Language random() {
+            Language[] languages = values();
+            int langIndex = RandomUtils.nextInt(0, languages.length - 1);
+            return languages[langIndex];
+        }
+        public static Set<Language> randomSet() {
+            return randomSet(1, 0);
+        }
+
+        public static Set<Language> randomSet(int minCount, int maxCount) {
+
+            maxCount = Math.abs(maxCount);
+
+            int maxAvailableLangCount = values().length;
+
+            if(minCount < 1 || minCount > maxCount) minCount = 1;
+
+            if(maxCount > maxAvailableLangCount || maxCount < minCount) maxCount = maxAvailableLangCount;
+
+            int langCountToReturn = RandomUtils.nextInt(minCount, maxCount);
+
+            Set<Language> languages = new HashSet<>();
+
+            while(languages.size() < langCountToReturn) languages.add(Language.random());
+
+            return languages;
         }
     }
 

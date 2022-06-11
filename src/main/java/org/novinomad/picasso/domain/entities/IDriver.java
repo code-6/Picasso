@@ -21,6 +21,10 @@ public interface IDriver {
         getCars().addAll(cars);
     }
 
+    default void addCar(String brandName, String modelName, String number) {
+        addCar(new Driver.Car(brandName, modelName, number));
+    }
+
     default void removeCar(Driver.Car car) {
         getCars().removeIf(lang -> lang.equals(car));
     }

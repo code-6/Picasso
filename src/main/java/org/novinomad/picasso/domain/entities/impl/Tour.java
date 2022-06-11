@@ -1,15 +1,14 @@
 package org.novinomad.picasso.domain.entities.impl;
 
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import lombok.experimental.FieldDefaults;
 import org.hibernate.annotations.Nationalized;
+import org.novinomad.picasso.domain.entities.ITour;
 import org.novinomad.picasso.domain.entities.base.AbstractEntity;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.Objects;
 import java.util.Set;
 
@@ -17,12 +16,13 @@ import java.util.Set;
 @Getter
 @Setter
 @NoArgsConstructor
+@AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @Table(indexes = {
         @Index(columnList = "startDate, endDate", name = "tour_date_range_idx"),
         @Index(columnList = "name", name = "tour_name_idx")
 })
-public class Tour extends AbstractEntity {
+public class Tour extends AbstractEntity implements ITour {
 
     @Nationalized
     String name;
@@ -37,6 +37,10 @@ public class Tour extends AbstractEntity {
 
     @ElementCollection
     Set<String> files;
+
+    public int getDaysCount() {
+        return (int) ChronoUnit.DAYS.between(startDate, endDate);
+    }
 
     //region equals, hashCode, toString
     @Override
@@ -55,15 +59,12 @@ public class Tour extends AbstractEntity {
 
     @Override
     public String toString() {
-        return super.toString() + String.format("""
-                \tname: %s
-                \tstartDate: %s
-                \tendDate: %s
-                
-                """,
-                name,
-                startDate,
-                endDate);
+        return super.toString().replace("}", "") +
+                ", name='" + name + '\'' +
+                ", startDate=" + startDate +
+                ", endDate=" + endDate +
+                ", files=" + files +
+                '}';
     }
 
     //endregion

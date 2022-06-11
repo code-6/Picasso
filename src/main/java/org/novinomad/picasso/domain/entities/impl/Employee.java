@@ -25,7 +25,9 @@ public class Employee extends AbstractEntity {
 
     @Override
     public String toString() {
-        return super.toString() + String.format("\tname: %s\n", name);
+        return super.toString().replace("}","") +
+                ", name='" + name + '\'' +
+                '}';
     }
 
     @Override
@@ -41,11 +43,4 @@ public class Employee extends AbstractEntity {
     public int hashCode() {
         return Objects.hash(super.hashCode(), name);
     }
-
-    //region NESTED CLASSES
-    public enum Type {
-        DRIVER,
-        GUIDE
-    }
-    //endregion
 }
