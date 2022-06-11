@@ -1,0 +1,32 @@
+server:
+  host: ${PCS_SERVER_HOST:localhost}
+  port: ${PCS_SERVER_PORT:8080}
+  servlet:
+    session:
+      timeout: ${PCS_SERVLET_SESSION_TIMEOUT:5m}
+
+spring:
+  main:
+    lazy-initialization: true
+
+  jpa:
+    database-platform: org.hibernate.dialect.${PCS_HIBERNATE_DIALECT:H2Dialect}
+    show-sql: true
+    hibernate:
+      ddl-auto: ${PCS_DDL_AUTO:update}
+
+  datasource:
+    driver-class-name: ${PCS_DB_DRIVER_CLASS:org.h2.Driver}
+    url: ${PCS_DB_URL:jdbc:h2:file:./db/picasso_db;AUTO_SERVER=true;MODE=MYSQL}
+    username: ${PCS_DB_USERNAME:picasso}
+    password: password
+
+    hikari:
+      connection-timeout: 60000
+      maximum-pool-size: 5
+
+logging:
+  level:
+    org.novinomad.picasso: debug
+    org.hibernate.SQL: error
+
