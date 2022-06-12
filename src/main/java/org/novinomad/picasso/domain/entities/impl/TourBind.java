@@ -1,14 +1,22 @@
 package org.novinomad.picasso.domain.entities.impl;
 
 import com.sun.istack.NotNull;
-import lombok.*;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import lombok.experimental.FieldDefaults;
+import org.novinomad.picasso.commons.IRange;
 import org.novinomad.picasso.domain.entities.base.AbstractEntity;
 import org.novinomad.picasso.exceptions.TourBindException;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Objects;
+
+import static org.novinomad.picasso.commons.utils.CommonDateUtils.ISO_8601;
 
 @Entity
 @Getter
@@ -16,7 +24,7 @@ import java.util.Objects;
 @NoArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @Table(indexes = @Index(columnList = "tour_id,employee_id,startDate,endDate", unique = true))
-public class TourBind extends AbstractEntity {
+public class TourBind extends AbstractEntity implements IRange {
 
     @OneToOne
     Employee employee;
@@ -24,9 +32,11 @@ public class TourBind extends AbstractEntity {
     @OneToOne
     Tour tour;
 
+    @DateTimeFormat(pattern = ISO_8601)
     @Column(nullable = false)
     LocalDateTime startDate;
 
+    @DateTimeFormat(pattern = ISO_8601)
     @Column(nullable = false)
     LocalDateTime endDate;
 
@@ -41,14 +51,14 @@ public class TourBind extends AbstractEntity {
         this.endDate = endDate;
 
         if(!isDatesValid())
-            throw new TourBindException(employee, tour, startDate, endDate, "out of tour date range");
+            throw new TourBindException(employee, tour, getDateRange(), "out of tour date range");
     }
 
     boolean isDatesValid() {
         LocalDateTime tourStartDate = tour.getStartDate();
         LocalDateTime tourEndDate = tour.getEndDate();
 
-        return startDate.isAfter(tourEndDate) || endDate.isBefore(tourStartDate);
+        return !startDate.isAfter(tourEndDate) || !endDate.isBefore(tourStartDate);
     }
 
     //region equals, hashCode, toString
@@ -69,12 +79,18 @@ public class TourBind extends AbstractEntity {
 
     @Override
     public String toString() {
+        DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern(ISO_8601);
         return super.toString().replace("}", "") +
                 ", tour=" + tour +
                 ", employee=" + employee +
-                ", startDate=" + startDate +
-                ", endDate=" + endDate +
+                ", startDate=" + startDate.format(dateTimeFormatter) +
+                ", endDate=" + endDate.format(dateTimeFormatter) +
                 '}';
+    }
+
+    @Override
+    public String toStringFull() {
+        return toString();
     }
 
     //endregion

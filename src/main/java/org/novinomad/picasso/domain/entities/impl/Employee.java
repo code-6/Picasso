@@ -23,6 +23,9 @@ public class Employee extends AbstractEntity {
     @Column(nullable = false)
     String name;
 
+    @Enumerated(EnumType.STRING)
+    Type type;
+
     @Override
     public String toString() {
         return super.toString().replace("}","") +
@@ -42,5 +45,18 @@ public class Employee extends AbstractEntity {
     @Override
     public int hashCode() {
         return Objects.hash(super.hashCode(), name);
+    }
+
+    @Override
+    public String toStringFull() {
+        return super.toString().replace("}","") +
+                ", type='" + type.name() + '\'' +
+                ", name='" + name + '\'' +
+                '}';
+    }
+
+    public enum Type {
+        DRIVER,
+        GUIDE;
     }
 }

@@ -21,7 +21,12 @@ public class Driver extends Employee implements IDriver {
     Set<Car> cars = new HashSet<>();
 
     public Driver(String name) {
-        super(name);
+        super(name, Type.DRIVER);
+    }
+
+    public Driver(Long id, String name) {
+        this(name);
+        this.id = id;
     }
 
     //region equals, hashCode, toString
@@ -29,6 +34,11 @@ public class Driver extends Employee implements IDriver {
 
     @Override
     public String toString() {
+        return super.toString();
+    }
+
+    @Override
+    public String toStringFull() {
         return super.toString().replace("}","") +
                 ", cars=" + cars +
                 '}';

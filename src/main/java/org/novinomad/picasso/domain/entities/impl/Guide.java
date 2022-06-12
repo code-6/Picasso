@@ -22,7 +22,12 @@ public class Guide extends Employee implements IGuide {
     Set<Language> languages = new HashSet<>();
 
     public Guide(String name) {
-        super(name);
+        super(name, Type.GUIDE);
+    }
+
+    public Guide(Long id, String name) {
+        this(name);
+        this.id = id;
     }
 
     //region equals, hashCode, toString
@@ -30,6 +35,11 @@ public class Guide extends Employee implements IGuide {
 
     @Override
     public String toString() {
+        return super.toString();
+    }
+
+    @Override
+    public String toStringFull() {
         return super.toString().replace("}", "") +
                 ", languages=" + languages +
                 '}';

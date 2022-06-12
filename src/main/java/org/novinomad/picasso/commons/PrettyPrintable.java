@@ -10,4 +10,6 @@ public interface PrettyPrintable {
                 .replaceAll(", ", ",\n\t")
                 .replace("}", "\n}");
     }
+
+    String toStringFull();
 }

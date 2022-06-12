@@ -2,15 +2,18 @@ package org.novinomad.picasso.services.impl;
 
 import com.github.javafaker.Faker;
 import lombok.AccessLevel;
+import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.RandomUtils;
 import org.novinomad.picasso.commons.utils.CarUtils;
+import org.novinomad.picasso.commons.utils.CommonDateUtils;
+import org.novinomad.picasso.exceptions.base.PicassoException;
+import org.novinomad.picasso.services.IDevEnvInitializer;
 import org.novinomad.picasso.domain.entities.impl.*;
 import org.novinomad.picasso.exceptions.TourBindException;
 import org.novinomad.picasso.repositories.DriverRepository;
 import org.novinomad.picasso.repositories.GuideRepository;
-import org.novinomad.picasso.repositories.TourBindRepository;
 import org.novinomad.picasso.repositories.TourRepository;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
@@ -20,20 +23,16 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
 
-import static org.novinomad.picasso.commons.utils.DateUtils.dateToLocalDateTime;
-import static org.novinomad.picasso.commons.utils.DateUtils.localDateTimeToDate;
+import static org.novinomad.picasso.commons.utils.CommonDateUtils.dateToLocalDateTime;
+import static org.novinomad.picasso.commons.utils.CommonDateUtils.localDateTimeToDate;
 
-@Slf4j
 @Service
+@Slf4j
 @FieldDefaults(level = AccessLevel.PRIVATE)
-@Profile(value = {"dev", "test"})
-public class TourBindDevService extends TourBindService {
-
+@RequiredArgsConstructor
+@Profile({"dev", "test"})
+public class DevEnvInitializer implements IDevEnvInitializer {
     static final LocalDate CURRENT_DATE = LocalDate.now();
-    static final int CURRENT_YEAR = CURRENT_DATE.getYear();
-    static final int CURRENT_MONTH = CURRENT_DATE.getYear();
-    static final int PREV_MONTH = CURRENT_MONTH - 1;
-    static final int NEXT_MONTH = CURRENT_MONTH + 1;
     static final int NEXT_MONTH_MAX_DAY = CURRENT_DATE.plusMonths(1).lengthOfMonth();
     static final int EMPLOYEES_COUNT_TO_CREATE = 10;
     static final int TOURS_COUNT_TO_CREATE = 15;
@@ -44,84 +43,28 @@ public class TourBindDevService extends TourBindService {
     static final Date maxDate;
 
     static {
-        Calendar instance = Calendar.getInstance();
-        instance.set(CURRENT_YEAR, PREV_MONTH, 1, 0, 0, 0);
-
-        minDate = instance.getTime();
-
-        instance.set(CURRENT_YEAR, NEXT_MONTH + 1, 1, 0, 0, 0);
-
-        maxDate = instance.getTime();
+        minDate = CommonDateUtils.localDateTimeToDate(CURRENT_DATE.minusMonths(1).atStartOfDay());
+        maxDate = CommonDateUtils.localDateTimeToDate(CURRENT_DATE.plusMonths(2).atStartOfDay());
     }
 
     final Faker faker;
     final GuideRepository guideRepository;
     final DriverRepository driverRepository;
     final TourRepository tourRepository;
-
-    public TourBindDevService(TourBindRepository tourBindRepository,
-                              Faker faker,
-                              GuideRepository guideRepository,
-                              DriverRepository driverRepository,
-                              TourRepository tourRepository) {
-        super(tourBindRepository);
-        this.faker = faker;
-        this.guideRepository = guideRepository;
-        this.driverRepository = driverRepository;
-        this.tourRepository = tourRepository;
-    }
-
+    final TourBindService tourBindService;
 
     @PostConstruct
     void init() {
-        log.info("start initialize DB");
-        createBindings();
-        log.info("end initialize DB");
-    }
-
-    List<Guide> createGuides() {
-        log.info("start create guides");
-        List<Guide> guides = new ArrayList<>();
-        final int maxLanguagesCount = 3;
-        final int minLanguagesCount = 1;
-
-        for (int i = 0; i < EMPLOYEES_COUNT_TO_CREATE; i++) {
-            final String guideName = faker.name().fullName();
-            Guide guide = new Guide(guideName);
-            guide.addLanguage(Guide.Language.randomSet(minLanguagesCount, maxLanguagesCount));
-            try {
-                Guide savedGuide = guideRepository.save(guide);
-                log.debug("created new {}", savedGuide);
-                guides.add(savedGuide);
-            } catch (Exception e) {
-                log.error("Unable to create: {} because: {}", guide, e.getMessage(), e);
-            }
+        log.info("initialize DB with test data");
+        try {
+            createTourBindings();
+        } catch (PicassoException e) {
+            log.error("unable to initialize DB with test data because: {}", e.getMessage());
         }
-        return guides;
     }
 
-    List<Driver> createDrivers() {
-        log.info("start create drivers");
-        List<Driver> drivers = new ArrayList<>();
-        final int maxCarsCount = 3;
-        final int minCarsCount = 1;
-
-        for (int i = 0; i < EMPLOYEES_COUNT_TO_CREATE; i++) {
-            final String driverName = faker.name().fullName();
-            Driver driver = new Driver(driverName);
-            driver.addCar(CarUtils.randomSet(minCarsCount, maxCarsCount));
-            try {
-                Driver savedDriver = driverRepository.save(driver);
-                log.debug("created new {}", savedDriver);
-                drivers.add(savedDriver);
-            } catch (Exception e) {
-                log.error("Unable to create: {} because: {}", driver, e.getMessage(), e);
-            }
-        }
-        return drivers;
-    }
-
-    List<Tour> createTours() {
+    @Override
+    public List<Tour> createTours() {
         log.info("start create tours");
         List<Tour> tours = new ArrayList<>();
         for (int i = 0; i < TOURS_COUNT_TO_CREATE; i++) {
@@ -158,12 +101,64 @@ public class TourBindDevService extends TourBindService {
         return tours;
     }
 
-    List<TourBind> createBindings() {
+    @Override
+    public List<Driver> createDrivers() {
+        log.info("start create drivers");
+        List<Driver> drivers = new ArrayList<>();
+        final int maxCarsCount = 3;
+        final int minCarsCount = 1;
+
+        for (int i = 0; i < EMPLOYEES_COUNT_TO_CREATE; i++) {
+            final String driverName = faker.name().fullName();
+            Driver driver = new Driver(driverName);
+            driver.addCar(CarUtils.randomSet(minCarsCount, maxCarsCount));
+            try {
+                Driver savedDriver = driverRepository.save(driver);
+                log.debug("created new {}", savedDriver);
+                drivers.add(savedDriver);
+            } catch (Exception e) {
+                log.error("Unable to create: {} because: {}", driver, e.getMessage(), e);
+            }
+        }
+        return drivers;
+    }
+
+    @Override
+    public List<Guide> createGuides() {
+        log.info("start create guides");
+        List<Guide> guides = new ArrayList<>();
+        final int maxLanguagesCount = 3;
+        final int minLanguagesCount = 1;
+
+        for (int i = 0; i < EMPLOYEES_COUNT_TO_CREATE; i++) {
+            final String guideName = faker.name().fullName();
+            Guide guide = new Guide(guideName);
+            guide.addLanguage(Guide.Language.randomSet(minLanguagesCount, maxLanguagesCount));
+            try {
+                Guide savedGuide = guideRepository.save(guide);
+                log.debug("created new {}", savedGuide);
+                guides.add(savedGuide);
+            } catch (Exception e) {
+                log.error("Unable to create: {} because: {}", guide, e.getMessage(), e);
+            }
+        }
+        return guides;
+    }
+
+    @Override
+    public List<TourBind> createTourBindings(List<Tour> tours, List<Employee> employees) throws PicassoException {
         log.info("start create bindings");
         List<TourBind> bindings = new ArrayList<>();
-        List<Tour> tours = createTours();
-        List<Driver> drivers = createDrivers();
-        List<Guide> guides = createGuides();
+
+        List<Driver> drivers = employees.stream()
+                .filter(e -> Employee.Type.DRIVER.equals(e.getType()))
+                .map(Driver.class::cast)
+                .toList();
+
+        List<Guide> guides = employees.stream()
+                .filter(e -> Employee.Type.GUIDE.equals(e.getType()))
+                .map(Guide.class::cast)
+                .toList();
 
         int totalTours = tours.size();
         int totalGuides = guides.size();
@@ -186,9 +181,9 @@ public class TourBindDevService extends TourBindService {
                     endDate = tour.getEndDate();
                 TourBind tourBindDriver = new TourBind(driver, tour, startDate, endDate);
                 TourBind tourBindGuide = new TourBind(guide, tour, startDate, endDate);
-                TourBind save1 = getTourBindRepository().save(tourBindDriver);
+                TourBind save1 = tourBindService.save(tourBindDriver);
                 log.debug("created new {}", save1);
-                TourBind save2 = getTourBindRepository().save(tourBindGuide);
+                TourBind save2 = tourBindService.save(tourBindGuide);
                 log.debug("created new {}", save2);
                 bindings.add(save1);
                 bindings.add(save2);
@@ -201,5 +196,4 @@ public class TourBindDevService extends TourBindService {
         }
         return bindings;
     }
-
 }

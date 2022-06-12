@@ -11,7 +11,7 @@ public class PicassoException extends Exception {
         super(CommonMessageFormat.format(message, args));
     }
 
-    public PicassoException(String message, Throwable cause, Object ... args) {
+    public PicassoException(Throwable cause, String message, Object ... args) {
         super(CommonMessageFormat.format(message, args), cause);
     }
 
@@ -19,8 +19,8 @@ public class PicassoException extends Exception {
         super(cause);
     }
 
-    public PicassoException(String message,
-                            Throwable cause,
+    public PicassoException(Throwable cause,
+                            String message,
                             boolean enableSuppression,
                             boolean writableStackTrace,
                             Object ... args)

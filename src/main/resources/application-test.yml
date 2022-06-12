@@ -16,7 +16,7 @@ spring:
 
   datasource:
     driver-class-name: ${PCS_DB_DRIVER_CLASS:org.h2.Driver}
-    url: ${PCS_DB_URL:jdbc:h2:file:./db/picasso_db;AUTO_SERVER=true;MODE=MYSQL}
+    url: ${PCS_DB_URL:jdbc:h2:file:./db/picasso_test_db;DB_CLOSE_ON_EXIT=FALSE;AUTO_SERVER=true;MODE=MYSQL;CLOSE_ON_}
     username: ${PCS_DB_USERNAME:picasso}
     password: password
 
