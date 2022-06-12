@@ -1,10 +1,9 @@
-package org.novinomad.picasso.domain.repositories;
+package org.novinomad.picasso.repositories;
 
 import com.github.javafaker.Faker;
 import org.junit.jupiter.api.*;
 import org.novinomad.picasso.domain.entities.impl.Driver;
 import org.novinomad.picasso.domain.entities.impl.Employee;
-import org.novinomad.picasso.repositories.DriverRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
@@ -19,10 +18,10 @@ import static org.junit.jupiter.api.Assertions.*;
 @TestPropertySource(locations = "classpath:application-test.yml")
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class DriverRepositoryTest {
+class EmployeeRepositoryTest {
 
     @Autowired
-    DriverRepository driverRepository;
+    EmployeeRepository employeeRepository;
 
     @Autowired
     Faker faker;
@@ -37,7 +36,7 @@ class DriverRepositoryTest {
         Driver driver = new Driver(name);
 
         assertDoesNotThrow(() -> {
-            savedEmployee = driverRepository.save(driver);
+            savedEmployee = employeeRepository.save(driver);
 
             System.out.println(savedEmployee);
 
@@ -58,7 +57,7 @@ class DriverRepositoryTest {
         driver.addCar("Mazda", "RX-7", String.valueOf(faker.number().numberBetween(1000, 9999)));
 
         assertDoesNotThrow(() -> {
-            savedEmployee = driverRepository.save(driver);
+            savedEmployee = employeeRepository.save(driver);
 
             System.out.println(savedEmployee);
 
@@ -72,7 +71,7 @@ class DriverRepositoryTest {
     @Order(3)
     void shouldReturnAllDrivers() {
         assertDoesNotThrow(() -> {
-            List<Driver> drivers = driverRepository.findAll();
+            List<Employee> drivers = employeeRepository.findAll();
 
             assertFalse(drivers.isEmpty());
         });

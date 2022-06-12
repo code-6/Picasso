@@ -4,6 +4,7 @@ server:
   servlet:
     session:
       timeout: ${PCS_SERVLET_SESSION_TIMEOUT:5m}
+    context-path: /picasso
 
 spring:
   profiles:
