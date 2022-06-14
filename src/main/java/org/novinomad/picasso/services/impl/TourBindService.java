@@ -8,6 +8,7 @@ import org.novinomad.picasso.commons.LocalDateTimeRange;
 import org.novinomad.picasso.domain.entities.impl.Employee;
 import org.novinomad.picasso.domain.entities.impl.Tour;
 import org.novinomad.picasso.domain.entities.impl.TourBind;
+import org.novinomad.picasso.dto.TourBindDTO;
 import org.novinomad.picasso.exceptions.TourBindException;
 import org.novinomad.picasso.exceptions.base.PicassoException;
 import org.novinomad.picasso.repositories.EmployeeRepository;
@@ -39,7 +40,7 @@ public class TourBindService implements ITourBindService {
      * 2. Intersects with dates of other tours.
      * */
     @Override
-    public TourBind bind(Employee employee, Tour tour, LocalDateTime startDate, LocalDateTime endDate) throws TourBindException {
+    public TourBind bind(Employee employee, Tour tour, LocalDateTime startDate, LocalDateTime endDate) throws PicassoException {
         try {
             TourBind tourBind = new TourBind(employee, tour, startDate, endDate);
 
@@ -53,8 +54,8 @@ public class TourBindService implements ITourBindService {
                         );
                 throw new TourBindException(employee, tour, tourBind.getDateRange(), overlapsToursAndRanges);
             }
-            return tourBind;
-        } catch (TourBindException e) {
+            return save(tourBind);
+        } catch (PicassoException e) {
             log.error(e.getMessage(), e);
             throw e;
         }
@@ -146,5 +147,16 @@ public class TourBindService implements ITourBindService {
     @Override
     public List<TourBind> get() {
         return tourBindRepository.findAll();
+    }
+
+    @Override
+    public List<TourBindDTO> getForTimeLine(LocalDateTime tourStartDate, LocalDateTime tourEndDate) {
+        List<TourBind> byTourDateRange = tourBindRepository.findByTourDateRange(tourStartDate, tourEndDate);
+
+        return byTourDateRange.stream()
+                .collect(Collectors.groupingBy(TourBind::getTour))
+                .entrySet().stream()
+                .map(e -> new TourBindDTO(e.getKey(), e.getValue()))
+                .collect(Collectors.toList());
     }
 }

@@ -2,8 +2,11 @@ package org.novinomad.picasso.domain.entities.impl;
 
 import lombok.*;
 import lombok.experimental.FieldDefaults;
+import org.apache.commons.lang3.StringUtils;
+import org.codehaus.groovy.util.StringUtil;
 import org.hibernate.annotations.Nationalized;
 import org.novinomad.picasso.commons.IRange;
+import org.novinomad.picasso.commons.utils.CommonDateUtils;
 import org.novinomad.picasso.domain.entities.ITour;
 import org.novinomad.picasso.domain.entities.base.AbstractEntity;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -94,6 +97,24 @@ public class Tour extends AbstractEntity implements ITour, IRange {
                 ", endDate=" + endDate.format(dateTimeFormatter) +
                 ", files=" + files +
                 '}';
+    }
+
+    public String getEndDate(String format) {
+        if(endDate == null) return "";
+
+        if(StringUtils.isEmpty(format))
+            format = ISO_8601;
+
+        return endDate.format(DateTimeFormatter.ofPattern(format));
+    }
+
+    public String getStartDate(String format) {
+        if(startDate == null) return "";
+
+        if(StringUtils.isEmpty(format))
+            format = ISO_8601;
+
+        return startDate.format(DateTimeFormatter.ofPattern(format));
     }
     //endregion
 

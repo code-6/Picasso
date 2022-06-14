@@ -8,13 +8,13 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.RandomUtils;
 import org.novinomad.picasso.commons.utils.CarUtils;
 import org.novinomad.picasso.commons.utils.CommonDateUtils;
-import org.novinomad.picasso.exceptions.base.PicassoException;
-import org.novinomad.picasso.services.IDevEnvInitializer;
 import org.novinomad.picasso.domain.entities.impl.*;
 import org.novinomad.picasso.exceptions.TourBindException;
+import org.novinomad.picasso.exceptions.base.PicassoException;
 import org.novinomad.picasso.repositories.DriverRepository;
 import org.novinomad.picasso.repositories.GuideRepository;
 import org.novinomad.picasso.repositories.TourRepository;
+import org.novinomad.picasso.services.IDevEnvInitializer;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 
@@ -37,8 +37,8 @@ public class DevEnvInitializer implements IDevEnvInitializer {
     static final int EMPLOYEES_COUNT_TO_CREATE = 10;
     static final int TOURS_COUNT_TO_CREATE = 15;
     static final int BINDINGS_COUNT_TO_CREATE = 60;
-    static final int MAX_TOUR_DAYS_COUNT = 15;
-    static final int MIN_TOUR_DAYS_COUNT = 3;
+    static final int MAX_TOUR_DAYS_COUNT = 20;
+    static final int MIN_TOUR_DAYS_COUNT = 10;
     static final Date minDate;
     static final Date maxDate;
 

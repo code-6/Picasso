@@ -25,7 +25,7 @@ public class TourController {
     @GetMapping
     public ModelAndView get() {
 
-        ModelAndView modelAndView = new ModelAndView("tours");
+        ModelAndView modelAndView = new ModelAndView("tour/tourList");
 
         List<Tour> tours = tourService.get();
 

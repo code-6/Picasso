@@ -17,4 +17,12 @@ public interface TourBindRepository extends JpaRepository<TourBind, Long> {
     List<TourBind> findOverlapsBinds(Long employeeId,
                                      LocalDateTime newBindStartDate,
                                      LocalDateTime newBindEndDate);
+
+    @Query(nativeQuery = true, value = """
+            select tb.*
+            from TOUR_BIND tb
+            join TOUR t on tb.tour_id = t.id and t.start_date >= :tourStartDate and t.end_date <= :tourEndDate
+            order by t.START_DATE, t.END_DATE, tb.START_DATE, tb.END_DATE      
+            """)
+    List<TourBind> findByTourDateRange(LocalDateTime tourStartDate, LocalDateTime tourEndDate);
 }

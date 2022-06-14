@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{fragments/layout}">
+<head>
+    <meta charset="UTF-8">
+    <title>PCS - Tours</title>
+
+    <link rel="stylesheet" type="text/css" th:href="@{/webjars/datatables/css/jquery.dataTables.css}">
+</head>
+<body class="sb-nav-fixed">
+<div class="container-fluid px-4" layout:fragment="content">
+    <div class="card mb-4">
+        <div class="card-header">
+            <i class="fas fa-table me-1"></i>
+            Tours
+        </div>
+        <div class="card-body">
+            <table id="toursTable" class="cell-border compact stripe hover">
+                <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Start date</th>
+                    <th>End date</th>
+                    <th>Description</th>
+                    <th>Management</th>
+                </tr>
+                </thead>
+                <tfoot>
+                <tr>
+                    <th>Name</th>
+                    <th>Start date</th>
+                    <th>End date</th>
+                    <th>Description</th>
+                    <th>Management</th>
+                </tr>
+                </tfoot>
+                <tbody>
+
+                <tr th:each="tour : ${tours}">
+                    <td><span th:text="${tour.name}"></span></td>
+                    <td><span th:text="${tour.getStartDate('yyyy-MM-dd hh:mm')}"></span></td>
+                    <td><span th:text="${tour.getEndDate('yyyy-MM-dd hh:mm')}"></span></td>
+                    <td><span th:text="${tour.description}"></span></td>
+                    <td>
+                        <a class="nav-link collapsed" href="#">
+                            <div class="sb-nav-link-icon" title="Edit this tour"><i
+                                    class="fa-solid fa-pen-to-square"></i></div>
+                        </a>
+                    </td>
+                </tr>
+
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<div th:fragment="scripts">
+    <script type="text/javascript" charset="utf8" th:src="@{/webjars/datatables/js/jquery.dataTables.js}"></script>
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $('#toursTable').DataTable({
+                paging: true,
+                searching: true,
+                ordering: true,
+                columnDefs: [{
+                    targets: 3,
+                    render: function (data, type, row) {
+                        return data.length > 80 ?
+                            data.substr(0, 80) + '…' :
+                            data;
+                    }
+                }]
+            });
+        });
+    </script>
+</div>
+
+</body>
+</html>

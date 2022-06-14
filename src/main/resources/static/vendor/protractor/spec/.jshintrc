@@ -1,0 +1,14 @@
+{
+  "strict": false,
+  "esversion": 6,
+  "predef": [
+    "protractor",
+    "browser",
+    "by",
+    "element",
+    "it",
+    "describe",
+    "beforeEach",
+    "afterEach"
+  ]
+}

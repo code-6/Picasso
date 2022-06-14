@@ -1,0 +1,44 @@
+body {
+  font-family: Helvetica, Arial, san-sarif;
+  font-size: 2em;
+}
+
+h1 {
+  text-align: center;
+}
+
+ol {
+  position: relative;
+  padding: 0;
+}
+
+li {
+  width: 18%;
+  padding: 3%;
+  display: block;
+  text-align: center;
+  position: absolute;
+  top: 0;
+  margin: auto;
+}
+
+li.left {
+  left: 0;
+}
+
+li.left.mid {
+  left: 20%;
+}
+
+li.mid{
+  left : 40%;
+}
+
+li.right.mid {
+  left: 60%;
+}
+
+li.right {
+  left: 80%;
+}
+

@@ -11,6 +11,7 @@ import java.util.Date;
 public class CommonDateUtils {
 
     public static final String ISO_8601 = "yyyy-MM-dd hh:mm:ss";
+    public static final String ISO_8601_WITHOUT_SECONDS = "yyyy-MM-dd hh:mm";
 
     public static LocalDateTime dateToLocalDateTime(Date dateToConvert) {
         return dateToConvert.toInstant()

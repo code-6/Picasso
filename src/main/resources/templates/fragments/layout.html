@@ -37,5 +37,9 @@
 <script th:src="@{/webjars/font-awesome/js/all.js}" crossorigin="anonymous"></script>
 <script th:src="@{/webjars/sweetalert2/dist/sweetalert2.all.min.js}" crossorigin="anonymous"></script>
 <!--    common dependencies-->
+
+<!--page specific dependencies-->
+<div th:include="~{this :: scripts}"></div>
+<!--page specific dependencies-->
 </body>
 </html>

@@ -8,6 +8,7 @@ import lombok.Setter;
 import lombok.experimental.FieldDefaults;
 import org.novinomad.picasso.commons.IRange;
 import org.novinomad.picasso.domain.entities.base.AbstractEntity;
+import org.novinomad.picasso.dto.DTO;
 import org.novinomad.picasso.exceptions.TourBindException;
 import org.springframework.format.annotation.DateTimeFormat;
 

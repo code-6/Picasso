@@ -28,6 +28,7 @@ dependencies {
     implementation group: 'org.apache.commons', name: 'commons-lang3', version: '3.12.0'
     implementation group: 'com.github.javafaker', name: 'javafaker', version: '1.0.2'
     implementation group: 'org.yaml', name: 'snakeyaml', version: '1.29'
+    implementation group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310', version: '2.13.3'
 
     // frontend
     implementation group: 'org.webjars', name: 'webjars-locator', version: '0.45'
