@@ -25,7 +25,7 @@
 
         let ganttChart = new JSGantt.GanttChart(document.getElementById('GanttChartDIV'), 'day');
 
-        // configure ganttChart
+        // configure ganttChart columns
         ganttChart.setShowRes(0);
         ganttChart.setShowDur(0);
         ganttChart.setShowComp(0);
@@ -36,46 +36,32 @@
         ganttChart.setShowCost(0);
         ganttChart.setShowDeps(0);
 
+        // add vertical scroll
+        ganttChart.setTotalHeight('300px')
+
+        // configure ganttChart date columns width
         ganttChart.setDayColWidth(22);
 
+        // configure ganttChart date format
         ganttChart.setDayMajorDateDisplayFormat('yyyy.mon.dd');
         ganttChart.setDateTaskTableDisplayFormat('yyyy.mon.dd');
 
+        // configure ganttChart tooltip information
+        ganttChart.setShowTaskInfoRes(0)
+
+        // add data to chart
         $.each(ganttDataJsonArray, function(index, data) {
            ganttChart.AddTaskItemObject(data);
         });
 
+        /*ganttChart.setEventClickRow(function (task) {
+            alert(task);
+        });*/
+
+        ganttChart.setTotalHeight(document.documentElement.clientWidth);
+
         ganttChart.Draw();
     </script>
-<!--    <script type="text/javascript" charset="utf8" th:src="@{/vendor/google-charts/loader.js}"></script>-->
-<!--    <script type="text/javascript">-->
-<!--        google.charts.load('current', {'packages':['timeline']});-->
-<!--        google.charts.setOnLoadCallback(drawChart);-->
-
-<!--        /*<![CDATA[*/-->
-<!--        const timelineData = [[${#vars.myVar}]];-->
-<!--        console.log('timeline data' + timelineData);-->
-<!--        /*]]>*/-->
-<!--        function drawChart() {-->
-
-<!--            const container = document.getElementById('toursTimeline');-->
-<!--            const chart = new google.visualization.Timeline(container);-->
-<!--            const dataTable = new google.visualization.DataTable();-->
-
-<!--            dataTable.addColumn({ type: 'string', id: 'Employee' });-->
-<!--            dataTable.addColumn({ type: 'date', id: 'Start' });-->
-<!--            dataTable.addColumn({ type: 'date', id: 'End' });-->
-
-<!--            const rows = [];-->
-
-<!--            timelineData.forEach(function(data, i) {-->
-<!--               console.log(data);-->
-<!--            });-->
-<!--            dataTable.addRows(timelineData);-->
-
-<!--            chart.draw(dataTable);-->
-<!--        }-->
-<!--    </script>-->
 </div>
 </body>
 </html>

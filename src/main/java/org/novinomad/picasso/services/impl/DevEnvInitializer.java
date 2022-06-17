@@ -35,7 +35,7 @@ public class DevEnvInitializer implements IDevEnvInitializer {
     static final LocalDate CURRENT_DATE = LocalDate.now();
     static final int NEXT_MONTH_MAX_DAY = CURRENT_DATE.plusMonths(1).lengthOfMonth();
     static final int EMPLOYEES_COUNT_TO_CREATE = 10;
-    static final int TOURS_COUNT_TO_CREATE = 15;
+    static final int TOURS_COUNT_TO_CREATE = 100;
     static final int BINDINGS_COUNT_TO_CREATE = 60;
     static final int MAX_TOUR_DAYS_COUNT = 20;
     static final int MIN_TOUR_DAYS_COUNT = 10;

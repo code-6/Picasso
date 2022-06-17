@@ -575,6 +575,13 @@ progress {
   margin-right: 0.5rem;
 }
 
+.driver-icon {
+  background: url('/static/img/driver-icon.ico');
+  height: 20px;
+  width: 20px;
+  display: block;
+}
+
 .initialism {
   font-size: 0.875em;
   text-transform: uppercase;

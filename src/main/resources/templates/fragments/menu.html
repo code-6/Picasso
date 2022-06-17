@@ -1,9 +1,9 @@
 <div th:fragment="menu" id="layoutSidenav_nav">
-    <nav class="sb-sidenav accordion sb-sidenav-dark" id="sidenavAccordion">
+    <nav class="sb-sidenav accordion sb-sidenav-light" id="sidenavAccordion">
         <div class="sb-sidenav-menu">
             <div class="nav">
                 <a class="nav-link" th:href="@{/calendar}">
-                    <div class="sb-nav-link-icon"><i class="fa-solid fa-calendar-lines"></i></div>
+                    <div class="sb-nav-link-icon"><i class="fa-solid fa-calendar-range"></i></div>
                     Calendar
                 </a>
                 <div class="sb-sidenav-menu-heading">Management</div>
@@ -17,15 +17,22 @@
                 </a>
                 <div class="collapse" id="collapseLayouts" aria-labelledby="headingOne" data-bs-parent="#sidenavAccordion">
                     <nav class="sb-sidenav-menu-nested nav">
-                        <a class="nav-link" th:href="@{/tour/create}">Create</a>
-                        <a class="nav-link" th:href="@{/tour}">List</a>
+                        <a class="nav-link" th:href="@{/tour/create}">
+                            <div class="sb-nav-link-icon"><i class="fa-solid fa-plus"></i></div>Create
+                        </a>
+
+                        <a class="nav-link" th:href="@{/tour}">
+                            <div class="sb-nav-link-icon"><i class="fa-solid fa-list"></i></div>List
+                        </a>
                     </nav>
                 </div>
                 <a class="nav-link collapsed" href="#" data-bs-toggle="collapse" data-bs-target="#collapsePages"
                    aria-expanded="false" aria-controls="collapsePages">
-                    <div class="sb-nav-link-icon"><i class="fas fa-book-open"></i></div>
+                    <div class="sb-nav-link-icon"><i class="fa-solid fa-people-group"></i></div>
                     Employees
-                    <div class="sb-sidenav-collapse-arrow"><i class="fa-solid fa-people-group"></i></div>
+                    <div class="sb-sidenav-collapse-arrow">
+                        <i class="fas fa-angle-down"></i>
+                    </div>
                 </a>
                 <div class="collapse" id="collapsePages" aria-labelledby="headingTwo"
                      data-bs-parent="#sidenavAccordion">
@@ -33,42 +40,67 @@
                         <a class="nav-link collapsed" href="#" data-bs-toggle="collapse"
                            data-bs-target="#pagesCollapseDrivers" aria-expanded="false"
                            aria-controls="pagesCollapseDrivers">
+                            <div class="sb-nav-link-icon"><i class="driver-icon"></i></div>
                             Drivers
-                            <div class="sb-sidenav-collapse-arrow"><i class="fa-solid fa-user-tie"></i></div>
+                            <div class="sb-sidenav-collapse-arrow">
+                                <i class="fas fa-angle-down"></i>
+                            </div>
+
                         </a>
                         <div class="collapse" id="pagesCollapseDrivers" aria-labelledby="headingOne"
                              data-bs-parent="#sidenavAccordionPages">
                             <nav class="sb-sidenav-menu-nested nav">
-                                <a class="nav-link" th:href="@{/driver/create}">Create</a>
-                                <a class="nav-link" th:href="@{/driver/list}">List</a>
+                                <a class="nav-link" th:href="@{/driver/create}">
+                                    <div class="sb-nav-link-icon"><i class="fa-solid fa-plus"></i></div>Create
+                                </a>
+
+                                <a class="nav-link" th:href="@{/driver}">
+                                    <div class="sb-nav-link-icon"><i class="fa-solid fa-list"></i></div>List
+                                </a>
                             </nav>
                         </div>
 
                         <a class="nav-link collapsed" href="#" data-bs-toggle="collapse"
                            data-bs-target="#pagesCollapseGuides" aria-expanded="false"
                            aria-controls="pagesCollapseGuides">
+                            <div class="sb-nav-link-icon"><i class="fa-solid fa-person-hiking"></i></div>
                             Guides
-                            <div class="sb-sidenav-collapse-arrow"><i class="fa-solid fa-person-hiking"></i></div>
+                            <div class="sb-sidenav-collapse-arrow">
+                                <i class="fas fa-angle-down"></i>
+                            </div>
                         </a>
                         <div class="collapse" id="pagesCollapseGuides" aria-labelledby="headingOne"
                              data-bs-parent="#sidenavAccordionPages">
                             <nav class="sb-sidenav-menu-nested nav">
-                                <a class="nav-link" th:href="@{/guide/create}">Create</a>
-                                <a class="nav-link" th:href="@{/guide/list}">List</a>
+                                <a class="nav-link" th:href="@{/guide/create}">
+                                    <div class="sb-nav-link-icon"><i class="fa-solid fa-plus"></i></div>Create
+                                </a>
+
+                                <a class="nav-link" th:href="@{/guide}">
+                                    <div class="sb-nav-link-icon"><i class="fa-solid fa-list"></i></div>List
+                                </a>
                             </nav>
                         </div>
 
                         <a class="nav-link collapsed" href="#" data-bs-toggle="collapse"
                            data-bs-target="#pagesCollapseUsers" aria-expanded="false"
                            aria-controls="pagesCollapseUsers">
+                            <div class="sb-nav-link-icon"><i class="fa-thin fa-user"></i></div>
                             Users
-                            <div class="sb-sidenav-collapse-arrow"><i class="fa-thin fa-user"></i></div>
+                            <div class="sb-sidenav-collapse-arrow">
+                                <i class="fas fa-angle-down"></i>
+                            </div>
                         </a>
                         <div class="collapse" id="pagesCollapseUsers" aria-labelledby="headingOne"
                              data-bs-parent="#sidenavAccordionPages">
                             <nav class="sb-sidenav-menu-nested nav">
-                                <a class="nav-link" th:href="@{/user/create}">Create</a>
-                                <a class="nav-link" th:href="@{/user/list}">List</a>
+                                <a class="nav-link" th:href="@{/user/create}">
+                                    <div class="sb-nav-link-icon"><i class="fa-solid fa-plus"></i></div>Create
+                                </a>
+
+                                <a class="nav-link" th:href="@{/user}">
+                                    <div class="sb-nav-link-icon"><i class="fa-solid fa-list"></i></div>List
+                                </a>
                             </nav>
                         </div>
                     </nav>

@@ -39,6 +39,8 @@ dependencies {
     implementation group: 'org.webjars', name: 'jquery', version: '3.6.0'
     implementation group: 'org.webjars', name: 'jquery-easing', version: '1.4.1'
     implementation group: 'org.webjars.npm', name: 'sweetalert2', version: '11.4.14'
+//    implementation 'org.webjars:bootstrap-datepicker:1.9.0'
+    implementation group: 'org.webjars', name: 'bootstrap-daterangepicker', version: '3.1'
     runtimeOnly group: 'org.webjars', name: 'bootstrap-select', version: '1.13.18'
 
 

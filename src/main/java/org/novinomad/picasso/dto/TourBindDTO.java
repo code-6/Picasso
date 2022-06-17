@@ -20,7 +20,7 @@ public class TourBindDTO implements DTO<Task>{
     Tour tour;
     List<TourBind> binds = new ArrayList<>();
 
-    private static final String tourNameWithIcon = "<a href=\"#\"><i class=\"fa-solid fa-earth-asia\"></i> %s</a>";
+    private static final String tourNameWithIcon = "<a href=\"http://localhost:8080/picasso/api/tour/1\"><i class=\"fa-solid fa-earth-asia\"></i> %s</a>";
     private static final String guideNameWithIcon = "<a href=\"#\"><i class=\"fa-solid fa-person-hiking\"></i> %s</a>";
     private static final String driverNameWithIcon = "<a href=\"#\"><i class=\"fa-solid fa-user-tie\"></i> %s</a>";
 

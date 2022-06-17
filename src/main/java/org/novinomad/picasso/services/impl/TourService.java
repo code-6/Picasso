@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.novinomad.picasso.domain.entities.impl.Tour;
+import org.novinomad.picasso.dto.filters.TourFilter;
 import org.novinomad.picasso.exceptions.base.PicassoException;
 import org.novinomad.picasso.repositories.TourRepository;
 import org.novinomad.picasso.services.ITourService;
@@ -99,5 +100,15 @@ public class TourService implements ITourService {
     @Override
     public List<Tour> get() {
         return tourRepository.findAll();
+    }
+
+    @Override
+    public List<Tour> get(TourFilter tourFilter) {
+        try {
+            return tourRepository.findByFilter(tourFilter.getStartDate(), tourFilter.getEndDate(), tourFilter.getTourName());
+        } catch (Exception e) {
+            log.error("unable to get Tours by filter: {} because: {}", tourFilter, e.getMessage(), e);
+            throw e;
+        }
     }
 }

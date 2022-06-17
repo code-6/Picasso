@@ -57,7 +57,7 @@ public class Task implements ITask {
     boolean milestone = false;
 
     @JsonProperty("pRes")
-    String resourceName;
+    String resourceName = "";
 
     @JsonProperty("pComp")
     Double completionPercent = 0d;
