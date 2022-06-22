@@ -15,6 +15,7 @@ import javax.persistence.*;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
+import java.util.Locale;
 import java.util.Objects;
 import java.util.Set;
 
@@ -83,8 +84,8 @@ public class Tour extends AbstractEntity implements ITour, IRange {
         DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern(ISO_8601);
         return super.toString().replace("}", "") +
                 ", name='" + name + '\'' +
-                ", startDate=" + startDate.format(dateTimeFormatter) +
-                ", endDate=" + endDate.format(dateTimeFormatter) +
+                ", startDate=" + (startDate == null ? null : startDate.format(dateTimeFormatter)) +
+                ", endDate=" + (endDate == null ? null : endDate.format(dateTimeFormatter)) +
                 '}';
     }
 
@@ -93,8 +94,8 @@ public class Tour extends AbstractEntity implements ITour, IRange {
         DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern(ISO_8601);
         return super.toString().replace("}", "") +
                 ", name='" + name + '\'' +
-                ", startDate=" + startDate.format(dateTimeFormatter) +
-                ", endDate=" + endDate.format(dateTimeFormatter) +
+                ", startDate=" + (startDate == null ? null : startDate.format(dateTimeFormatter)) +
+                ", endDate=" + (endDate == null ? null : endDate.format(dateTimeFormatter)) +
                 ", files=" + files +
                 '}';
     }
@@ -105,7 +106,7 @@ public class Tour extends AbstractEntity implements ITour, IRange {
         if(StringUtils.isEmpty(format))
             format = ISO_8601;
 
-        return endDate.format(DateTimeFormatter.ofPattern(format));
+        return endDate.format(DateTimeFormatter.ofPattern(format, Locale.ENGLISH));
     }
 
     public String getStartDate(String format) {
@@ -114,7 +115,7 @@ public class Tour extends AbstractEntity implements ITour, IRange {
         if(StringUtils.isEmpty(format))
             format = ISO_8601;
 
-        return startDate.format(DateTimeFormatter.ofPattern(format));
+        return startDate.format(DateTimeFormatter.ofPattern(format, Locale.ENGLISH));
     }
     //endregion
 

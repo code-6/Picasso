@@ -8,4 +8,7 @@ import java.util.List;
 public interface IEmployeeService extends ICrud<Employee> {
 
     List<Employee> get(Employee.Type... types);
+    default List<Employee> get(List<Employee.Type> types) {
+        return get( types.toArray(Employee.Type[] :: new) );
+    }
 }

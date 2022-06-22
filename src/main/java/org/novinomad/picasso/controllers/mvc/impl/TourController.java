@@ -7,11 +7,13 @@ import lombok.extern.slf4j.Slf4j;
 import org.h2.engine.Mode;
 import org.novinomad.picasso.domain.entities.impl.Tour;
 import org.novinomad.picasso.dto.filters.TourFilter;
+import org.novinomad.picasso.exceptions.base.PicassoException;
 import org.novinomad.picasso.services.ITourService;
 import org.novinomad.picasso.services.impl.TourService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
@@ -27,24 +29,55 @@ import java.util.Optional;
 @Controller
 @RequestMapping("/tour")
 public class TourController {
-
     final ITourService tourService;
 
+    static final String TOUR_PAGE = "tour/tourPage";
+
     @GetMapping
-    public ModelAndView list(Model model) {
+    public ModelAndView list(TourFilter tourFilter) {
 
-        ModelAndView modelAndView = new ModelAndView("tour/tourPage");
+        tourFilter = Optional.ofNullable(tourFilter).orElse(new TourFilter());
 
-        TourFilter filter = (TourFilter) Optional.ofNullable(model.getAttribute("filter"))
-                .orElse(new TourFilter());
+        List<Tour> tours = tourService.get(tourFilter);
 
-        List<Tour> tours = tourService.get(filter);
+        log.debug("GET /tour requested. Filter: {} return tours count: {}", tourFilter, tours.size());
 
-        modelAndView.addObject("filter", filter);
+        ModelAndView modelAndView = new ModelAndView(TOUR_PAGE);
         modelAndView.addObject("tour", new Tour());
         modelAndView.addObject("tours", tours);
-
+        modelAndView.addObject("tourFilter", tourFilter);
         return modelAndView;
+    }
+
+    @PostMapping
+    public String save(Tour tour, Model model) {
+
+        try {
+            tour = tourService.save(tour);
+        } catch (PicassoException e) {
+            model.addAttribute("exception", e.getMessage());
+        }
+
+        TourFilter tourFilter = (TourFilter) model.getAttribute("filter");
+
+        tourFilter = Optional.ofNullable(tourFilter).orElse(new TourFilter());
+
+
+        List<Tour> tours = tourService.get(tourFilter);
+
+        log.debug("POST /tour requested. Tour: {} Filter: {}  return tours count: {}",tour, tourFilter, tours.size());
+
+        model.addAttribute("filter", tourFilter);
+        model.addAttribute("tours", tours);
+        model.addAttribute("tour", tour);
+
+        return TOUR_PAGE;
+    }
+
+    @GetMapping("/test")
+    public String test(Model model) {
+        model.addAttribute("testAttr", "test attr value");
+        return TOUR_PAGE;
     }
 
 }

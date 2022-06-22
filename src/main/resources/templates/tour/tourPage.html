@@ -9,6 +9,7 @@
 
     <link rel="stylesheet" type="text/css" th:href="@{/webjars/datatables/css/jquery.dataTables.css}">
     <link rel="stylesheet" type="text/css" th:href="@{/webjars/bootstrap-daterangepicker/css/bootstrap-daterangepicker.css}" />
+    <link rel="stylesheet" type="text/css" th:href="@{/webjars/bootstrap-select/css/bootstrap-select.min.css}" />
 </head>
 <body class="sb-nav-fixed">
 <div layout:fragment="content">
@@ -26,12 +27,12 @@
                     aria-controls="tourForm" onclick="$('#toursTableOptions').removeClass('show')">
                 Create new tour
             </button>
-            <div class="collapse" id="toursTableOptions" th:object="${filter}">
+            <div class="collapse" id="toursTableOptions" th:object="${tourFilter}">
                 <div class="card card-body">
                     <div class="mb-3">
-                        <input type="text" id="filterStartDate" th:field="${filter.startDate}" />
-                        <input type="text" id="filterEndDate"  th:field="${filter.endDate}" />
-                        <input type="text" id="tourNameFilter" placeholder="type tour name" th:field="${filter.tourName}"/>
+                        <input type="text" id="filterStartDate" th:field="${tourFilter.startDate}" />
+                        <input type="text" id="filterEndDate"  th:field="${tourFilter.endDate}" />
+                        <input type="text" id="tourNameFilter" placeholder="type tour name" th:field="${tourFilter.tourName}"/>
                         <button type="button" class="btn-sm btn-outline-success btn-block">Show</button>
                     </div>
                 </div>
@@ -111,6 +112,7 @@
     <script type="text/javascript" charset="utf8" th:src="@{/webjars/datatables/js/jquery.dataTables.js}"></script>
     <script type="text/javascript" charset="utf8" th:src="@{/webjars/momentjs/min/moment.min.js}"></script>
     <script type="text/javascript" th:src="@{/webjars/bootstrap-daterangepicker/js/bootstrap-daterangepicker.js}"></script>
+    <script type="text/javascript" th:src="@{/webjars/bootstrap-select/js/bootstrap-select.js}"></script>
     <script type="text/javascript">
         $(document).ready(function () {
             $('#toursTable').DataTable({

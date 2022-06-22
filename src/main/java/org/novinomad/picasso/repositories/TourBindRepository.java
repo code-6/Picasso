@@ -19,10 +19,16 @@ public interface TourBindRepository extends JpaRepository<TourBind, Long> {
                                      LocalDateTime newBindEndDate);
 
     @Query(nativeQuery = true, value = """
-            select tb.*
+            select tb.id, tb.tour_id, tb.employee_id, tb.start_date, tb.end_date
             from TOUR_BIND tb
-            join TOUR t on tb.tour_id = t.id and t.start_date >= :tourStartDate and t.end_date <= :tourEndDate
-            order by t.START_DATE, t.END_DATE, tb.START_DATE, tb.END_DATE      
+            join TOUR t on tb.tour_id = t.id
+            left join EMPLOYEE e on tb.EMPLOYEE_ID = e.ID
+            where (:startDate is null or t.start_date >= :startDate)
+            and (:endDate is null or t.end_Date <= :endDate)
+            and (:tourIds is null or t.id in (:tourIds))
+            and (:employeeIds is null or e.id in (:employeeIds))
+            group by tb.id, tb.tour_id, tb.employee_id, tb.start_date, tb.end_date
+            order by t.START_DATE, tb.START_DATE, t.END_DATE, tb.END_DATE      
             """)
-    List<TourBind> findByTourDateRange(LocalDateTime tourStartDate, LocalDateTime tourEndDate);
+    List<TourBind> findByDatesTourEmployee(LocalDateTime startDate, LocalDateTime endDate, List<Long> tourIds, List<Long> employeeIds);
 }

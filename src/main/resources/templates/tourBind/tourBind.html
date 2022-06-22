@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{fragments/layout}">
+<head>
+    <meta charset="UTF-8">
+    <title>PCS</title>
+
+    <!-- Latest compiled and minified CSS -->
+    <link th:href="@{/vendor/jsgantt-improved/dist/jsgantt.css}" rel="stylesheet" type="text/css"/>
+
+    <link rel="stylesheet" type="text/css"
+          th:href="@{/webjars/bootstrap-daterangepicker/css/bootstrap-daterangepicker.css}"/>
+
+    <link rel="stylesheet" type="text/css" th:href="@{/webjars/bootstrap-select/dist/css/bootstrap-select.min.css}"/>
+
+    <style>
+        .card-body {
+            padding: 0 1rem 1rem;
+        }
+    </style>
+</head>
+<body class="sb-nav-fixed">
+
+<div layout:fragment="content">
+    <div class="card mb-4">
+        <div class="card-header">
+            <div class="row gx-5">
+                <div class="col">
+                    <i class="fas fa-table me-1"></i>
+                    Gantt chart
+                    <a class="btn btn-sm btn-link" data-toggle="collapse" href="#tourBindFilter" role="button"
+                       aria-expanded="false" aria-controls="tourBindFilter">
+                        Filters
+                    </a>
+                    <button type="button" class="btn btn-sm btn-link">Create</button>
+                </div>
+            </div>
+        </div>
+        <div class="card-body">
+
+            <div class="collapse" th:classappend="${tourBindFilter.hideFilterForm} ? '' : 'show'" id="tourBindFilter" >
+                <form th:object="${tourBindFilter}" th:action="@{/}" th:method="get">
+                    <div class="row g-2">
+
+                        <div class="col-md">
+                            <label for="filterStartDate">Start date</label>
+                            <input type="text" class="form-control date-picker" id="filterStartDate"
+                                   th:field="*{startDate}" name="startDate">
+                        </div>
+
+                        <div class="col-md">
+                            <label for="filterEndDate">End date</label>
+                            <input type="text" class="form-control date-picker" id="filterEndDate"
+                                   th:field="*{endDate}" name="endDate">
+                        </div>
+
+                        <div class="col-md">
+                            <label for="tourSelect">Tour</label>
+                            <select id="tourSelect" class="form-control selectpicker" th:field="*{tourIds}" multiple
+                                    data-live-search="true" data-selected-text-format="count > 1" name="tourIds">
+                                <option th:each="tour : ${tours}"
+                                        th:value="${tour.id}"
+                                        th:text="${tour.name}"
+                                        th:selected="${tourBindFilter.tourIds.contains(tour.id)}">
+                                </option>
+                            </select>
+                        </div>
+
+                        <div class="col-md">
+                            <label for="employeeTypeSelect">Employee type</label>
+                            <select id="employeeTypeSelect" class="form-control selectpicker" th:field="*{employeeTypes}"
+                                    multiple data-live-search="true" data-selected-text-format="count > 3" name="employeeTypes">
+                                <option th:each="employeeType : ${allEmployeeTypes}"
+                                        th:value="${employeeType}"
+                                        th:text="${employeeType.name()}"
+                                        th:selected="${tourBindFilter.employeeTypes.contains(employeeType)}">
+                                </option>
+                            </select>
+                        </div>
+
+                        <!--                    todo: dynamic load based on employee type value-->
+                        <div class="col-md">
+                            <label for="employeeSelect">Employee</label>
+                            <select id="employeeSelect" class="form-control selectpicker" th:field="*{employeeIds}"
+                                    multiple data-live-search="true" data-selected-text-format="count > 2" name="employeeIds">
+                            </select>
+                        </div>
+
+                        <div class="col-md">
+                            <label></label>
+                            <button type="submit" class="btn btn-outline-success btn-block">Apply</button>
+                        </div>
+
+                        <input type="hidden" name="hideFilterForm" value="false">
+                    </div>
+                </form>
+            </div>
+
+            <div style="position:relative; padding-top: 1rem;" class="gantt" id="GanttChartDIV"></div>
+
+        </div>
+    </div>
+</div>
+<!--all page related scripts should be wrapped into 'scripts' thymeleaf fragment-->
+<div th:fragment="scripts">
+
+    <script th:src="@{/vendor/jsgantt-improved/dist/jsgantt.js}" type="text/javascript"></script>
+
+    <script type="text/javascript" th:src="@{/webjars/momentjs/moment.js}"></script>
+
+    <script type="text/javascript" th:src="@{/webjars/bootstrap-daterangepicker/js/bootstrap-daterangepicker.js}"></script>
+
+    <script type="text/javascript" th:src="@{/webjars/bootstrap-select/dist/js/bootstrap-select.js}"></script>
+
+    <script th:inline="javascript">
+
+        initGantt();
+        initDatePicker();
+
+        $('#employeeTypeSelect').on('changed.bs.select', function (e, clickedIndex, isSelected, previousValue) {
+            loadEmployeesForSelect();
+        });
+
+        function loadEmployeesForSelect() {
+
+            let chosenEmployeeTypes = $("#employeeTypeSelect :selected").map((_, e) => e.value).get();
+            let apiUrl = "http://localhost:8080/picasso/api/employee";
+            let chosenEmployees = [[${tourBindFilter.employeeIds}]]
+            let $employeeSelect = $('#employeeSelect');
+
+            $.ajax({
+                url: apiUrl,
+                type: "get",
+                data: {
+                    types: chosenEmployeeTypes
+                },
+                success: function (employees) {
+                    $.each(employees, function (index, employee) {
+                        let employeeId = employee.id;
+
+                        $employeeSelect.append(new Option(employee.name, employeeId));
+                    });
+                    $employeeSelect.prop("disabled", false);
+                    $employeeSelect.selectpicker('refresh');
+                    $employeeSelect.selectpicker('toggle');
+                },
+                error: function (xhr) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'unable to load employees for chosen types: ' + chosenEmployeeTypes
+                    });
+                    $employeeSelect.prop("disabled", true);
+                    $employeeSelect.selectpicker('refresh');
+                }
+            });
+        }
+
+        function initDatePicker() {
+
+            $('.date-picker').daterangepicker({
+                singleDatePicker: true,
+                showDropdowns: true,
+                timePicker: true,
+                timePicker24Hour: true,
+                timePickerIncrement: 5,
+                autoApply: true,
+                autoUpdateInput: true,
+                locale: {
+                    format: "DD.MMM.YYYY HH:mm",
+                }
+            });
+
+            let defaultStartDate = new  Date([[${tourBindFilter.startDate}]].toString());
+            let defaultEndDate = new Date([[${tourBindFilter.endDate}]].toString());
+
+            $('#filterStartDate').data('daterangepicker').setStartDate(defaultStartDate);
+            $('#filterEndDate').data('daterangepicker').setStartDate(defaultEndDate);
+        }
+
+        function initGantt() {
+
+            let ganttDataJsonArray = JSON.parse([[${ganttData}]].toString());
+
+            let ganttChart = new JSGantt.GanttChart(document.getElementById('GanttChartDIV'), 'day');
+
+            // configure ganttChart columns
+            ganttChart.setShowRes(0);
+            ganttChart.setShowDur(0);
+            ganttChart.setShowComp(0);
+            ganttChart.setShowStartDate(0);
+            ganttChart.setShowEndDate(0);
+            ganttChart.setShowPlanStartDate(0);
+            ganttChart.setShowPlanEndDate(0);
+            ganttChart.setShowCost(0);
+            ganttChart.setShowDeps(0);
+
+            // add vertical scroll
+            ganttChart.setTotalHeight('300px')
+
+            // configure ganttChart date columns width
+            ganttChart.setDayColWidth(22);
+
+            // configure ganttChart date format
+            ganttChart.setDayMajorDateDisplayFormat('dd.mon.yyyy');
+            ganttChart.setDateTaskTableDisplayFormat('dd.mon.yyyy');
+
+            // configure ganttChart tooltip information
+            ganttChart.setShowTaskInfoRes(0)
+
+            // add data to chart
+            $.each(ganttDataJsonArray, function (index, data) {
+                ganttChart.AddTaskItemObject(data);
+            });
+
+            /*ganttChart.setEventClickRow(function (task) {
+                alert(task);
+            });*/
+
+            ganttChart.setTotalHeight(document.documentElement.clientWidth);
+            ganttChart.Draw();
+        }
+
+    </script>
+</div>
+</body>
+</html>

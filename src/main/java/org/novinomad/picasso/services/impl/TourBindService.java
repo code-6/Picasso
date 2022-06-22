@@ -8,7 +8,7 @@ import org.novinomad.picasso.commons.LocalDateTimeRange;
 import org.novinomad.picasso.domain.entities.impl.Employee;
 import org.novinomad.picasso.domain.entities.impl.Tour;
 import org.novinomad.picasso.domain.entities.impl.TourBind;
-import org.novinomad.picasso.dto.TourBindDTO;
+import org.novinomad.picasso.dto.filters.TourBindFilter;
 import org.novinomad.picasso.exceptions.TourBindException;
 import org.novinomad.picasso.exceptions.base.PicassoException;
 import org.novinomad.picasso.repositories.EmployeeRepository;
@@ -150,13 +150,10 @@ public class TourBindService implements ITourBindService {
     }
 
     @Override
-    public List<TourBindDTO> getForTimeLine(LocalDateTime tourStartDate, LocalDateTime tourEndDate) {
-        List<TourBind> byTourDateRange = tourBindRepository.findByTourDateRange(tourStartDate, tourEndDate);
+    public List<TourBind> get(TourBindFilter tourBindFilter) {
+        List<Long> tourIds = tourBindFilter.getTourIds().isEmpty() ? null : tourBindFilter.getTourIds();
+        List<Long> employeeIds = tourBindFilter.getEmployeeIds().isEmpty() ? null : tourBindFilter.getEmployeeIds();
 
-        return byTourDateRange.stream()
-                .collect(Collectors.groupingBy(TourBind::getTour))
-                .entrySet().stream()
-                .map(e -> new TourBindDTO(e.getKey(), e.getValue()))
-                .collect(Collectors.toList());
+        return tourBindRepository.findByDatesTourEmployee(tourBindFilter.getStartDate(), tourBindFilter.getEndDate(), tourIds, employeeIds);
     }
 }
