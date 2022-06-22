@@ -23,8 +23,9 @@ public interface TourBindRepository extends JpaRepository<TourBind, Long> {
             from TOUR_BIND tb
             join TOUR t on tb.tour_id = t.id
             left join EMPLOYEE e on tb.EMPLOYEE_ID = e.ID
-            where (:startDate is null or t.start_date >= :startDate)
-            and (:endDate is null or t.end_Date <= :endDate)
+            where (:startDate is null or t.start_date <= :startDate and t.end_date >= :startDate )
+            or ( (:startDate is null or t.start_date >= :startDate) and (:endDate is null or t.end_date <= :endDate) ) 
+            or (:endDate is null or t.start_date <= :endDate and t.end_date >= :endDate )
             and (:tourIds is null or t.id in (:tourIds))
             and (:employeeIds is null or e.id in (:employeeIds))
             group by tb.id, tb.tour_id, tb.employee_id, tb.start_date, tb.end_date

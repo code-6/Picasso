@@ -28,7 +28,6 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -52,12 +51,6 @@ public class TourBindController {
 
         JSON_MAPPER.registerModule(new JavaTimeModule());
     }
-
-//    @ModelAttribute("ganttData")
-//    public String getGanttJsonData() throws JsonProcessingException {
-//
-//        return getGanttJsonData(getTourBindFilter());
-//    }
 
     @ModelAttribute("tourBindFilter")
     public TourBindFilter getTourBindFilter() {
