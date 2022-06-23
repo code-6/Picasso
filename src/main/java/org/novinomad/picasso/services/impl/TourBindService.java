@@ -44,16 +44,8 @@ public class TourBindService implements ITourBindService {
         try {
             TourBind tourBind = new TourBind(employee, tour, startDate, endDate);
 
-            List<TourBind> overlapsBinds = tourBindRepository.findOverlapsBinds(employee.getId(), startDate, endDate);
+            checkForTourOverlaps(tourBind);
 
-            if (!overlapsBinds.isEmpty()) {
-                Map<Tour, LocalDateTimeRange> overlapsToursAndRanges = overlapsBinds.stream()
-                        .collect(
-                                Collectors.toMap(TourBind::getTour,
-                                        tb -> getOverlapsRange(tourBind.getDateRange(), tb.getDateRange()))
-                        );
-                throw new TourBindException(employee, tour, tourBind.getDateRange(), overlapsToursAndRanges);
-            }
             return save(tourBind);
         } catch (PicassoException e) {
             log.error(e.getMessage(), e);
@@ -70,6 +62,24 @@ public class TourBindService implements ITourBindService {
                 .orElseThrow(() -> new PicassoException("Tour with id: {} not found in DB", tourId));
 
         return bind(employee, tour, startDate, endDate);
+    }
+
+    @Override
+    public void checkForTourOverlaps(TourBind tourBind) throws TourBindException {
+        Employee employee = tourBind.getEmployee();
+
+        List<TourBind> overlapsBinds = tourBindRepository.findOverlapsBinds(employee.getId(),
+                tourBind.getStartDate(),
+                tourBind.getEndDate());
+
+        if (!overlapsBinds.isEmpty()) {
+            Map<Tour, LocalDateTimeRange> overlapsToursAndRanges = overlapsBinds.stream()
+                    .collect(
+                            Collectors.toMap(TourBind::getTour,
+                                    tb -> getOverlapsRange(tourBind.getDateRange(), tb.getDateRange()))
+                    );
+            throw new TourBindException(employee, tourBind.getTour(), tourBind.getDateRange(), overlapsToursAndRanges);
+        }
     }
 
     @Override

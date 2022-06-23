@@ -12,7 +12,7 @@ import org.novinomad.picasso.commons.utils.CommonDateUtils;
 import org.novinomad.picasso.domain.entities.impl.Employee;
 import org.novinomad.picasso.domain.entities.impl.Tour;
 import org.novinomad.picasso.domain.entities.impl.TourBind;
-import org.novinomad.picasso.dto.TourBindDTO;
+import org.novinomad.picasso.dto.bind.TourBindDTO;
 import org.novinomad.picasso.dto.filters.TourBindFilter;
 import org.novinomad.picasso.dto.gantt.Task;
 import org.novinomad.picasso.services.impl.EmployeeService;
@@ -84,20 +84,20 @@ public class TourBindController {
     }
 
     private String getGanttJsonData(TourBindFilter tourBindFilter) throws JsonProcessingException {
-        List<Task> toursGanttData = tourBindService.get(tourBindFilter).stream()
+        List<Task> parentTasks = tourBindService.get(tourBindFilter).stream()
                 .collect(Collectors.groupingBy(TourBind::getTour))
                 .entrySet().stream()
                 .map(e -> new TourBindDTO(e.getKey(), e.getValue()))
                 .map(TourBindDTO::dto)
                 .toList();
 
-        List<Task> ganttData = new ArrayList<>();
+        List<Task> allTasks = new ArrayList<>();
 
-        toursGanttData.forEach(gd -> {
-            ganttData.add(gd);
-            ganttData.addAll(gd.getChildren());
+        parentTasks.forEach(gd -> {
+            allTasks.add(gd);
+            allTasks.addAll(gd.getChildren());
         });
 
-        return JSON_MAPPER.writeValueAsString(ganttData);
+        return JSON_MAPPER.writeValueAsString(allTasks);
     }
 }

@@ -6,7 +6,9 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonValue;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import lombok.*;
+import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
+import org.novinomad.picasso.commons.LocalDateTimeRange;
 import org.novinomad.picasso.commons.serializers.ListToCommaSeparatedString;
 import org.novinomad.picasso.commons.utils.CommonDateUtils;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -17,82 +19,178 @@ import java.util.List;
 
 
 @EqualsAndHashCode
-@AllArgsConstructor
-@NoArgsConstructor
 @Getter
 @Setter
 @Slf4j
+@FieldDefaults(level = AccessLevel.PRIVATE)
 public class Task implements ITask {
 
     @JsonProperty("pID")
     Long id;
-
     @JsonProperty("pName")
     String name;
-
     @JsonProperty("pStart")
     @DateTimeFormat(pattern = CommonDateUtils.ISO_8601_WITHOUT_SECONDS)
     LocalDateTime startDate;
-
     @JsonProperty("pEnd")
     @DateTimeFormat(pattern = CommonDateUtils.ISO_8601_WITHOUT_SECONDS)
     LocalDateTime endDate;
-
     @JsonProperty("pPlanStart")
     @DateTimeFormat(pattern = CommonDateUtils.ISO_8601_WITHOUT_SECONDS)
     LocalDateTime plannedStartDate;
-
     @JsonProperty("pPlanEnd")
     @DateTimeFormat(pattern = CommonDateUtils.ISO_8601_WITHOUT_SECONDS)
     LocalDateTime plannedEndDate;
-
     @JsonProperty("pClass")
     String cssClass = CssClass.BLUE.cssName;
-
     @JsonProperty("pLink")
     String webLink;
-
     @JsonFormat(shape = JsonFormat.Shape.NUMBER)
     @JsonProperty("pMile")
     boolean milestone = false;
-
     @JsonProperty("pRes")
     String resourceName = "";
-
     @JsonProperty("pComp")
     Double completionPercent = 0d;
-
     @JsonProperty("pGroup")
     Type type = Type.SINGLE;
-
     @JsonProperty("pOpen")
     @JsonFormat(shape = JsonFormat.Shape.NUMBER)
     boolean expanded = false;
-
     @JsonProperty("pDepend")
     @JsonSerialize(using = ListToCommaSeparatedString.class)
     List<Task> dependencies = new ArrayList<>();
-
     @JsonProperty("pCaption")
     String caption;
-
-    @JsonProperty("pCost")
-    Long cost = 0L;
-
     @JsonProperty("pNotes")
     String notes;
-
+    @JsonProperty("pCost")
+    Long cost = 0L;
     @JsonProperty("pBarText")
     String barText;
-
     @JsonIgnore
     Task parent;
-
     @JsonProperty("pParent")
     Long parentId = 0L;
-
     @JsonIgnore
     List<Task> children = new ArrayList<>();
+
+    public Task(Long id, String name, LocalDateTimeRange dateTimeRange) {
+        this.id = id;
+        this.name = name;
+        this.caption = name;
+        this.barText = name;
+        this.startDate = dateTimeRange.getStartDate();
+        this.plannedStartDate = dateTimeRange.getStartDate();
+        this.endDate = dateTimeRange.getEndDate();
+        this.plannedEndDate = dateTimeRange.getEndDate();
+    }
+
+    public Task id(Long id) {
+        this.id = id;
+        return this;
+    }
+
+    public Task name(String name) {
+        this.name = name;
+        return this;
+    }
+
+    public Task startDate(LocalDateTime startDate) {
+        this.startDate = startDate;
+        return this;
+    }
+
+    public Task endDate(LocalDateTime endDate) {
+        this.endDate = endDate;
+        return this;
+    }
+
+    public Task plannedStartDate(LocalDateTime plannedStartDate) {
+        this.plannedStartDate = plannedStartDate;
+        return this;
+    }
+
+    public Task plannedEndDate(LocalDateTime plannedEndDate) {
+        this.plannedEndDate = plannedEndDate;
+        return this;
+    }
+
+    public Task cssClass(String cssClass) {
+        this.cssClass = cssClass;
+        return this;
+    }
+
+    public Task webLink(String webLink) {
+        this.webLink = webLink;
+        return this;
+    }
+
+    public Task milestone(boolean milestone) {
+        this.milestone = milestone;
+        return this;
+    }
+
+    public Task resourceName(String resourceName) {
+        this.resourceName = resourceName;
+        return this;
+    }
+
+    public Task completionPercent(Double completionPercent) {
+        this.completionPercent = completionPercent;
+        return this;
+    }
+
+    public Task type(Type type) {
+        this.type = type;
+        return this;
+    }
+
+    public Task expanded(boolean expanded) {
+        this.expanded = expanded;
+        return this;
+    }
+
+    public Task dependencies(List<Task> dependencies) {
+        this.dependencies = dependencies;
+        return this;
+    }
+
+    public Task caption(String caption) {
+        this.caption = caption;
+        return this;
+    }
+
+    public Task cost(Long cost) {
+        this.cost = cost;
+        return this;
+    }
+
+    public Task notes(String notes) {
+        this.notes = notes;
+        return this;
+    }
+
+    public Task barText(String barText) {
+        this.barText = barText;
+        return this;
+    }
+
+    public Task parent(Task parent) {
+        this.parent = parent;
+        parentId = parent.getId();
+        return this;
+    }
+
+    public Task children(List<Task> children) {
+        this.children = children;
+        return this;
+    }
+
+    public Task child(Task child) {
+        children.add(child);
+        return this;
+    }
 
     public void setParent(Task parent) {
         this.parent = parent;
