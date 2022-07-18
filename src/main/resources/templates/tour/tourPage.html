@@ -19,12 +19,12 @@
             Tours
             <button id="showToursTableOptionsBtn" class="btn-sm btn-outline-primary" type="button"
                     data-bs-toggle="collapse" data-bs-target="#toursTableOptions" aria-expanded="false"
-                    aria-controls="toursTableOptions" onclick="$('#tourForm').removeClass('show')">
+                    aria-controls="toursTableOptions" onclick="$('#tourFormContainer').removeClass('show')">
                 Show filters
             </button>
             <button id="createNewTourBtn" class="btn-sm btn-outline-success" type="button"
-                    data-bs-toggle="collapse" data-bs-target="#tourForm" aria-expanded="false"
-                    aria-controls="tourForm" onclick="$('#toursTableOptions').removeClass('show')">
+                    data-bs-toggle="collapse" data-bs-target="#tourFormContainer" aria-expanded="false"
+                    aria-controls="tourFormContainer" onclick="$('#toursTableOptions').removeClass('show')">
                 Create new tour
             </button>
             <div class="collapse" id="toursTableOptions" th:object="${tourFilter}">
@@ -38,34 +38,9 @@
                 </div>
             </div>
 
-            <div class="collapse" id="tourForm">
+            <div class="collapse" id="tourFormContainer">
                 <div class="card card-body">
-                    <form th:object="${tour}">
-                        <div class="mb-3">
-                            <label for="tourNameForm" class="form-label">Name</label>
-                            <input type="text" class="form-control" id="tourNameForm" placeholder="enter tour name" name="name">
-                        </div>
-                        <div class="mb-3">
-                            <label for="datepickerForm" class="form-label">Date range</label>
-                            <div class="input-daterange input-group" id="datepickerForm" data-provide="datepicker">
-                                <input type="text" class="input-sm form-control" name="startDate" />
-                                <span class="input-group-addon">to</span>
-                                <input type="text" class="input-sm form-control" name="endDate" />
-                            </div>
-                        </div>
-                        <div class="mb-3">
-                            <label for="tourDescription" class="form-label">Description</label>
-                            <textarea class="form-control" id="tourDescription" rows="3" name="description"></textarea>
-                        </div>
-                        <div class="mb-3">
-                            <label for="formFileMultiple" class="form-label">Files</label>
-                            <input class="form-control" type="file" id="formFileMultiple" multiple name="files">
-                        </div>
-                        <div class="mb-3">
-                            <button type="submit" class="btn-sm btn-outline-success btn-block">Submit</button>
-                        </div>
-
-                    </form>
+                    <form th:replace="tour/tourForm :: tourForm" id="tourForm"></form>
                 </div>
             </div>
         </div>

@@ -13,16 +13,21 @@ import org.novinomad.picasso.domain.entities.impl.Employee;
 import org.novinomad.picasso.domain.entities.impl.Tour;
 import org.novinomad.picasso.domain.entities.impl.TourBind;
 import org.novinomad.picasso.dto.bind.TourBindDTO;
+import org.novinomad.picasso.dto.bind.TourBindFormDTO;
 import org.novinomad.picasso.dto.filters.TourBindFilter;
 import org.novinomad.picasso.dto.gantt.Task;
+import org.novinomad.picasso.exceptions.BindException;
 import org.novinomad.picasso.services.impl.EmployeeService;
 import org.novinomad.picasso.services.impl.TourBindService;
 import org.novinomad.picasso.services.impl.TourService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -58,32 +63,61 @@ public class TourBindController {
     }
 
     // for employee type select in filter form
-    @ModelAttribute("allEmployeeTypes")
+    @ModelAttribute("employeeTypes")
     public List<Employee.Type> getEmployeeTypes() {
         return Arrays.asList(Employee.Type.values());
     }
 
-    @ModelAttribute("tours")
-    public List<Tour> getTours() {
+    @ModelAttribute("allTours")
+    public List<Tour> getAllTours() {
         return tourService.get();
     }
 
+    @ModelAttribute("tourBindFormDTO")
+    public TourBindFormDTO getTourBindFormDTO() {
+        return new TourBindFormDTO();
+    }
+
+    @RequestMapping(params = {"bindTour"})
+    public String bindTour(final TourBindFormDTO tourBindFormDTO, Long tourId, final BindingResult bindingResult) throws BindException {
+        Tour tour = tourService.get(tourId).orElseThrow(() -> new BindException("Tour with id: {} not found", tourId));
+        tourBindFormDTO.setTour(tour);
+        return "tourBind/tourBind";
+    }
+
+    @RequestMapping(params = {"bindEmployee"})
+    public String bindEmployee(final TourBindFormDTO tourBindFormDTO, Long employeeId, final BindingResult bindingResult) throws BindException {
+        Employee employee = employeeService.get(employeeId).orElseThrow(() -> new BindException("Employee with id: {} not found", employeeId));
+        tourBindFormDTO.appointEmployee(employee);
+        return "tourBind/tourBind";
+    }
     @GetMapping
-    public String get(TourBindFilter tourBindFilter, Model modelMap) {
+    public String get(TourBindFilter tourBindFilter, Model model) {
 
         try {
-            if(tourBindFilter == null)
-                tourBindFilter = new TourBindFilter();
-
             String ganttJsonData = getGanttJsonData(tourBindFilter);
-            modelMap.addAttribute("ganttData", ganttJsonData);
+            model.addAttribute("ganttData", ganttJsonData);
         } catch (JsonProcessingException e) {
-            modelMap.addAttribute("exception", e.getMessage());
+            model.addAttribute("exception", e.getMessage());
         }
         return "tourBind/tourBind";
     }
 
+    @PostMapping
+    public String save(TourBindFormDTO tourBindFormData, Model model, RedirectAttributes attributes) {
+        try {
+            tourBindService.save(tourBindFormData.forSave());
+        } catch (BindException e) {
+            model.addAttribute("exception", e.getMessage());
+        }
+        return "redirect:/";
+    }
+
     private String getGanttJsonData(TourBindFilter tourBindFilter) throws JsonProcessingException {
+
+        if(tourBindFilter == null)
+            tourBindFilter = getTourBindFilter();
+
         List<Task> parentTasks = tourBindService.get(tourBindFilter).stream()
                 .collect(Collectors.groupingBy(TourBind::getTour))
                 .entrySet().stream()

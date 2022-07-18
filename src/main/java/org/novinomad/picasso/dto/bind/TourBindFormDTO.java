@@ -1,29 +1,41 @@
 package org.novinomad.picasso.dto.bind;
 
+import lombok.AccessLevel;
 import lombok.Data;
+import lombok.experimental.FieldDefaults;
 import org.novinomad.picasso.commons.LocalDateTimeRange;
 import org.novinomad.picasso.domain.entities.impl.Employee;
 import org.novinomad.picasso.domain.entities.impl.Tour;
 import org.novinomad.picasso.domain.entities.impl.TourBind;
-import org.novinomad.picasso.exceptions.TourBindException;
+import org.novinomad.picasso.exceptions.BindException;
 
 import java.util.*;
 
 @Data
+@FieldDefaults(level = AccessLevel.PRIVATE)
 public class TourBindFormDTO {
     Tour tour;
     Map<Employee, Set<LocalDateTimeRange>> employeesToDateRanges = new HashMap<>();
+
+    Boolean hideTourBindForm = true;
 
     public void appointEmployee(Employee employee, LocalDateTimeRange localDateTimeRange) {
         Optional.ofNullable(employeesToDateRanges.get(employee))
                 .ifPresentOrElse(dateRanges -> dateRanges.add(localDateTimeRange), () -> {
                     Set<LocalDateTimeRange> dateRanges = new TreeSet<>();
-                    dateRanges.add(localDateTimeRange);
+
+                    if(localDateTimeRange != null)
+                        dateRanges.add(localDateTimeRange);
+
                     employeesToDateRanges.put(employee, dateRanges);
                 });
     }
 
-    public List<TourBind> forSave() throws TourBindException {
+    public void appointEmployee(Employee employee) {
+        appointEmployee(employee, null);
+    }
+
+    public List<TourBind> forSave() throws BindException {
 
         List<TourBind> tourBinds = new ArrayList<>();
 

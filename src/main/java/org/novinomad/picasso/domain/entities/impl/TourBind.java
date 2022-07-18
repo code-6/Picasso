@@ -8,8 +8,7 @@ import lombok.Setter;
 import lombok.experimental.FieldDefaults;
 import org.novinomad.picasso.commons.IRange;
 import org.novinomad.picasso.domain.entities.base.AbstractEntity;
-import org.novinomad.picasso.dto.DTO;
-import org.novinomad.picasso.exceptions.TourBindException;
+import org.novinomad.picasso.exceptions.BindException;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.persistence.*;
@@ -44,7 +43,7 @@ public class TourBind extends AbstractEntity implements IRange {
     public TourBind(@NotNull Employee employee,
                     @NotNull Tour tour,
                     @NotNull LocalDateTime startDate,
-                    @NotNull LocalDateTime endDate) throws TourBindException
+                    @NotNull LocalDateTime endDate) throws BindException
     {
         this.employee = employee;
         this.tour = tour;
@@ -52,7 +51,7 @@ public class TourBind extends AbstractEntity implements IRange {
         this.endDate = endDate;
 
         if(!isDatesValid())
-            throw new TourBindException(employee, tour, getDateRange(), "out of tour date range");
+            throw new BindException(employee, tour, getDateRange(), "out of tour date range");
     }
 
     boolean isDatesValid() {

@@ -9,7 +9,7 @@ import org.apache.commons.lang3.RandomUtils;
 import org.novinomad.picasso.commons.utils.CarUtils;
 import org.novinomad.picasso.commons.utils.CommonDateUtils;
 import org.novinomad.picasso.domain.entities.impl.*;
-import org.novinomad.picasso.exceptions.TourBindException;
+import org.novinomad.picasso.exceptions.BindException;
 import org.novinomad.picasso.exceptions.base.PicassoException;
 import org.novinomad.picasso.repositories.DriverRepository;
 import org.novinomad.picasso.repositories.GuideRepository;
@@ -65,7 +65,7 @@ public class DevEnvInitializer implements IDevEnvInitializer {
 
     @Override
     public List<Tour> createTours() {
-        log.info("start create tours");
+        log.info("start create allTours");
         List<Tour> tours = new ArrayList<>();
         for (int i = 0; i < TOURS_COUNT_TO_CREATE; i++) {
             String name = faker.funnyName().name();
@@ -187,7 +187,7 @@ public class DevEnvInitializer implements IDevEnvInitializer {
                 log.debug("created new {}", save2);
                 bindings.add(save1);
                 bindings.add(save2);
-            } catch (TourBindException e) {
+            } catch (BindException e) {
                 log.error(e.getMessage(), e);
             } catch (Exception e) {
                 log.error("Something went wrong while creating bindings. {}", e.getMessage(), e);

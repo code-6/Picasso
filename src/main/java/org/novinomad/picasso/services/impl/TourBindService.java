@@ -9,7 +9,7 @@ import org.novinomad.picasso.domain.entities.impl.Employee;
 import org.novinomad.picasso.domain.entities.impl.Tour;
 import org.novinomad.picasso.domain.entities.impl.TourBind;
 import org.novinomad.picasso.dto.filters.TourBindFilter;
-import org.novinomad.picasso.exceptions.TourBindException;
+import org.novinomad.picasso.exceptions.BindException;
 import org.novinomad.picasso.exceptions.base.PicassoException;
 import org.novinomad.picasso.repositories.EmployeeRepository;
 import org.novinomad.picasso.repositories.TourBindRepository;
@@ -37,7 +37,7 @@ public class TourBindService implements ITourBindService {
     /**
      * Disallow bind if:
      * 1. dates to bind is out of tour dates range.
-     * 2. Intersects with dates of other tours.
+     * 2. Intersects with dates of other allTours.
      * */
     @Override
     public TourBind bind(Employee employee, Tour tour, LocalDateTime startDate, LocalDateTime endDate) throws PicassoException {
@@ -65,7 +65,7 @@ public class TourBindService implements ITourBindService {
     }
 
     @Override
-    public void checkForTourOverlaps(TourBind tourBind) throws TourBindException {
+    public void checkForTourOverlaps(TourBind tourBind) throws BindException {
         Employee employee = tourBind.getEmployee();
 
         List<TourBind> overlapsBinds = tourBindRepository.findOverlapsBinds(employee.getId(),
@@ -78,7 +78,7 @@ public class TourBindService implements ITourBindService {
                             Collectors.toMap(TourBind::getTour,
                                     tb -> getOverlapsRange(tourBind.getDateRange(), tb.getDateRange()))
                     );
-            throw new TourBindException(employee, tourBind.getTour(), tourBind.getDateRange(), overlapsToursAndRanges);
+            throw new BindException(employee, tourBind.getTour(), tourBind.getDateRange(), overlapsToursAndRanges);
         }
     }
 

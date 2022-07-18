@@ -8,43 +8,43 @@ import org.novinomad.picasso.exceptions.base.PicassoException;
 
 import java.util.Map;
 
-public class TourBindException extends PicassoException {
+public class BindException extends PicassoException {
     
     private static final String MSG_PATTERN = "Unable to bind: {} to the: {} for dates {} because: {}";
     
-    public TourBindException(Employee employee, 
-                             Tour tour, 
-                             LocalDateTimeRange dateTimeRange,
-                             String reason) 
+    public BindException(Employee employee,
+                         Tour tour,
+                         LocalDateTimeRange dateTimeRange,
+                         String reason)
     {
         this(MSG_PATTERN, employee, tour, dateTimeRange, reason);
     }
 
-    public TourBindException(Employee employee,
-                             Tour tour,
-                             LocalDateTimeRange dateTimeRange,
-                             Map<Tour, LocalDateTimeRange> overlapsToursAndRanges)
+    public BindException(Employee employee,
+                         Tour tour,
+                         LocalDateTimeRange dateTimeRange,
+                         Map<Tour, LocalDateTimeRange> overlapsToursAndRanges)
     {
         super(buildOverlapsCauseMessage(employee, tour, dateTimeRange, overlapsToursAndRanges));
     }
 
-    public TourBindException(String message, Object... args) {
+    public BindException(String message, Object... args) {
         super(message, args);
     }
 
-    public TourBindException(String message, Throwable cause, Object... args) {
+    public BindException(String message, Throwable cause, Object... args) {
         super(message, cause, args);
     }
 
-    public TourBindException(Throwable cause) {
+    public BindException(Throwable cause) {
         super(cause);
     }
 
-    public TourBindException(String message, 
-                             Throwable cause, 
-                             boolean enableSuppression, 
-                             boolean writableStackTrace, 
-                             Object... args) 
+    public BindException(String message,
+                         Throwable cause,
+                         boolean enableSuppression,
+                         boolean writableStackTrace,
+                         Object... args)
     {
         super(message, cause, enableSuppression, writableStackTrace, args);
     }

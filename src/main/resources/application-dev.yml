@@ -26,3 +26,6 @@ logging:
     org.novinomad.picasso: debug
     org.hibernate.SQL: error
 
+jobs:
+  enabled: false
+

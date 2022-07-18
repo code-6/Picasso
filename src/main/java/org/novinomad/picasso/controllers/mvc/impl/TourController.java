@@ -40,7 +40,7 @@ public class TourController {
 
         List<Tour> tours = tourService.get(tourFilter);
 
-        log.debug("GET /tour requested. Filter: {} return tours count: {}", tourFilter, tours.size());
+        log.debug("GET /tour requested. Filter: {} return allTours count: {}", tourFilter, tours.size());
 
         ModelAndView modelAndView = new ModelAndView(TOUR_PAGE);
         modelAndView.addObject("tour", new Tour());
@@ -65,7 +65,7 @@ public class TourController {
 
         List<Tour> tours = tourService.get(tourFilter);
 
-        log.debug("POST /tour requested. Tour: {} Filter: {}  return tours count: {}",tour, tourFilter, tours.size());
+        log.debug("POST /tour requested. Tour: {} Filter: {}  return allTours count: {}",tour, tourFilter, tours.size());
 
         model.addAttribute("filter", tourFilter);
         model.addAttribute("tours", tours);

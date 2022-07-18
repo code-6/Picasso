@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <meta name="description" content="">
     <meta name="author" content="Stanislav Tun">
+    <meta name="mainUrl" th:content="${#httpServletRequest.getScheme()} + '://' + ${#httpServletRequest.getServerName()} + ':' + ${#httpServletRequest.getServerPort()} + ${#httpServletRequest.getContextPath()}" />
 
     <title>Picasso</title>
 <!--    common dependencies-->
@@ -17,7 +18,7 @@
 <!--    common dependencies-->
 </head>
 
-<body class="sb-nav-fixed sb-sidenav-toggled">
+<body class="sb-nav-fixed">
 
 <div layout:fragment="header">
     <nav th:insert="fragments/header :: header"></nav>
