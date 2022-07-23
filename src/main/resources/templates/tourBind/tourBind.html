@@ -126,7 +126,7 @@
                                     <div class="col-10">
                                         <label for="bindFormTourSelect" class="col-sm-3 col-form-label">Tour</label>
                                         <select id="bindFormTourSelect" class="form-control selectpicker tourSelect"
-                                                data-live-search="true" data-selected-text-format="count > 1">
+                                                data-live-search="true" data-selected-text-format="count > 1" th:field="*{tour}" name="tour">
                                             <option th:value="${null}"></option>
                                             <option th:each="tour : ${allTours}"
                                                     th:value="${tour.id}"
@@ -186,14 +186,33 @@
                             </div>
 
                             <div class="col collapse collapse-horizontal show" id="tourBindResult"
-                                 th:if="${tourBindFormDTO.tour != null}">
-                                <div class="card mb-4">
-                                    <div class="card-header" th:text="${tourBindFormDTO.tour.name}"></div>
+                                 th:if="${tourBindFormDTO != null}">
+                                <div class="card mb-4" id="bindResultTourCard" th:attr="style=${tourBindFormDTO.tour == null ? 'display: none' : ''}">
+                                    <div class="card-header">
+                                        <p>Chosen tour details</p>
+                                    </div>
                                     <div class="card-body">
-                                        <input class="form-control"
-                                               th:value="${tourBindFormDTO.tour.getDateRange().toString()}" disabled>
-                                        <textarea class="form-control" th:value="${tourBindFormDTO.tour.description}"
-                                                  disabled></textarea>
+                                        <div class="form-group row">
+                                            <label for="bindResultTourCardName" class="col-sm-2 col-form-label">Name</label>
+                                            <div class="col-sm-10">
+                                                <input disabled class="form-control" th:value="${tourBindFormDTO?.tour?.name}" id="bindResultTourCardName">
+                                            </div>
+                                        </div>
+                                        <div class="form-group row">
+                                            <label for="bindResultTourCardDateRange" class="col-sm-2 col-form-label">Dates</label>
+                                            <div class="col-sm-10">
+                                                <input class="form-control"
+                                                       th:value="${tourBindFormDTO?.tour?.getDateRange()?.toString()}" disabled id="bindResultTourCardDateRange">
+                                            </div>
+                                        </div>
+
+                                        <div class="form-group row">
+                                            <label for="bindResultTourCardDateRange" class="col-sm-2 col-form-label">Description</label>
+                                            <div class="col-sm-10">
+                                               <textarea class="form-control" th:value="${tourBindFormDTO?.tour?.description}"
+                                                         disabled id="bindResultTourCardDescription" ></textarea>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -232,6 +251,8 @@
 
         const mainUrl = $("meta[name='mainUrl']").attr("content");
 
+        const dateTimeFormat = 'DD.MMM.YYYY HH:mm';
+
         initGantt();
 
         initDatePicker();
@@ -245,6 +266,10 @@
             });
         });
 
+        $('#bindFormTourSelect').on('changed.bs.select', function () {
+            initializeTourCard();
+        });
+
         function loadEmployeesForSelect($employeeTypeSelect) {
 
             const chosenEmployeeTypes = $employeeTypeSelect.find(":selected").map((_, e) => e.value).get();
@@ -253,19 +278,21 @@
 
             let $employeeSelect = $(employeeSelectId);
 
+            $employeeSelect.empty();
+
             let getEmployeesByTypesApiUrl = mainUrl + "/api/employee";
 
             $.ajax({
                 url: getEmployeesByTypesApiUrl,
                 type: "get",
                 data: {
-                    types: chosenEmployeeTypes
+                    "types": chosenEmployeeTypes.toString().replace('[', '').replace(']','')
                 },
                 success: function (employees) {
                     $.each(employees, function (index, employee) {
                         let employeeId = employee.id;
 
-                        $employeeSelect.append(new Option(employee.name, employeeId));
+                        $employeeSelect.append(new Option(employee.type + ': ' + employee.name, employeeId));
                     });
                     $employeeSelect.prop("disabled", false);
                     $employeeSelect.selectpicker('refresh');
@@ -293,7 +320,7 @@
                 autoApply: true,
                 autoUpdateInput: true,
                 locale: {
-                    format: "DD.MMM.YYYY HH:mm",
+                    format: dateTimeFormat,
                 }
             });
 
@@ -345,6 +372,33 @@
 
             ganttChart.setTotalHeight(document.documentElement.clientWidth);
             ganttChart.Draw();
+        }
+
+        function initializeTourCard() {
+            const selectedTourId = $('#bindFormTourSelect').find(":selected").map((_, e) => e.value).get()
+            let getTourUrl = mainUrl + "/api/tour/" + selectedTourId;
+
+            $('#bindResultTourCard').removeAttr('style');
+
+            // load tour details
+            $.ajax({
+                url: getTourUrl,
+                type: "get",
+                success: function (tour) {
+                    console.log(tour);
+                    let tourStartDate = new Date(tour.startDate);
+                    let tourEndDate = new Date(tour.endDate);
+                    $('#bindResultTourCardName').val(tour.name);
+                    $('#bindResultTourCardDateRange').val(moment(tourStartDate).format(dateTimeFormat) + ' ~ ' + moment(tourEndDate).format(dateTimeFormat));
+                    $('#bindResultTourCardDescription').val(tour.description);
+                },
+                error: function () {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'unable to get tour by id: ' + selectedTourId
+                    });
+                }
+            });
         }
 
     </script>
