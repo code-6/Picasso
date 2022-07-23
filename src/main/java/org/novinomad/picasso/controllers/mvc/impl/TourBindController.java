@@ -59,23 +59,31 @@ public class TourBindController {
 
     @ModelAttribute("tourBindFilter")
     public TourBindFilter getTourBindFilter() {
-        return new TourBindFilter();
+        TourBindFilter tourBindFilter = new TourBindFilter();
+        log.debug("return new tourBindFilter: {}", tourBindFilter);
+        return tourBindFilter;
     }
 
     // for employee type select in filter form
     @ModelAttribute("employeeTypes")
     public List<Employee.Type> getEmployeeTypes() {
-        return Arrays.asList(Employee.Type.values());
+        List<Employee.Type> types = Arrays.asList(Employee.Type.values());
+        log.debug("return employee types: {}", types);
+        return types;
     }
 
     @ModelAttribute("allTours")
     public List<Tour> getAllTours() {
-        return tourService.get();
+        List<Tour> tours = tourService.get();
+        log.debug("return all tours: {}", tours.size());
+        return tours;
     }
 
     @ModelAttribute("tourBindFormDTO")
     public TourBindFormDTO getTourBindFormDTO() {
-        return new TourBindFormDTO();
+        TourBindFormDTO tourBindFormDTO = new TourBindFormDTO();
+        log.debug("return new tourBindFormDTO: {}", tourBindFormDTO);
+        return tourBindFormDTO;
     }
 
     @RequestMapping(params = {"bindTour"})
@@ -132,6 +140,7 @@ public class TourBindController {
             allTasks.addAll(gd.getChildren());
         });
 
+        log.debug("return data for gantt chart. Filter: {} data: {}", tourBindFilter, allTasks);
         return JSON_MAPPER.writeValueAsString(allTasks);
     }
 }

@@ -222,4 +222,14 @@ public class Task implements ITask {
         @Getter
         final String cssName;
     }
+
+    @Override
+    public String toString() {
+        return "Task{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", parentId=" + parentId +
+                ", children=" + children.stream().map(Task::getId).toList() +
+                '}';
+    }
 }
