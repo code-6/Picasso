@@ -1,9 +1,7 @@
 package org.novinomad.picasso.commons;
 
-import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import lombok.experimental.FieldDefaults;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDateTime;
@@ -11,21 +9,28 @@ import java.time.format.DateTimeFormatter;
 import java.util.Objects;
 
 import static org.novinomad.picasso.commons.utils.CommonDateUtils.ISO_8601;
+import static org.novinomad.picasso.commons.utils.CommonDateUtils.RU_WITHOUT_SECONDS;
 
-@RequiredArgsConstructor
 @Getter
-@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class LocalDateTimeRange implements Comparable<LocalDateTimeRange> {
 
     @DateTimeFormat(pattern = ISO_8601)
-    LocalDateTime startDate;
+    private final LocalDateTime startDate;
 
     @DateTimeFormat(pattern = ISO_8601)
-    LocalDateTime endDate;
+    private final LocalDateTime endDate;
+
+    public LocalDateTimeRange(LocalDateTime startDate, LocalDateTime endDate) {
+        if(startDate == null || endDate == null)
+            throw new IllegalArgumentException("start and and dates may not be null");
+
+        this.startDate = startDate;
+        this.endDate = endDate;
+    }
 
     @Override
     public String toString() {
-        DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern(ISO_8601);
+        DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern(RU_WITHOUT_SECONDS);
         return startDate.format(dateTimeFormatter) + " ~ " + endDate.format(dateTimeFormatter);
     }
 

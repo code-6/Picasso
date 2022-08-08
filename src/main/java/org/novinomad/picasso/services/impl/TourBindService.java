@@ -94,6 +94,7 @@ public class TourBindService implements ITourBindService {
         }
     }
 
+    @Override
     @Transactional
     public List<TourBind> save(Collection<TourBind> tourBinds) {
         List<TourBind> savedTourBinds = new ArrayList<>();

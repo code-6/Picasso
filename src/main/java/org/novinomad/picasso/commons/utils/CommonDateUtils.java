@@ -13,7 +13,7 @@ public class CommonDateUtils {
     public static final String ISO_8601 = "yyyy-MM-dd HH:mm:ss";
     public static final String ISO_8601_WITHOUT_SECONDS = "yyyy-MM-dd HH:mm";
 
-    public static final String RU_WITHOUT_SECONDS = "dd.MMM.yyyy HH:mm";
+    public static final String RU_WITHOUT_SECONDS = "dd MMM yyyy HH:mm";
 
     public static LocalDateTime dateToLocalDateTime(Date dateToConvert) {
         return dateToConvert.toInstant()

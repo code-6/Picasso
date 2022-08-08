@@ -3,12 +3,29 @@ package org.novinomad.picasso.services;
 import org.novinomad.picasso.commons.ICrud;
 import org.novinomad.picasso.domain.entities.impl.Employee;
 
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 public interface IEmployeeService extends ICrud<Employee> {
 
-    List<Employee> get(Employee.Type... types);
-    default List<Employee> get(List<Employee.Type> types) {
-        return get( types.toArray(Employee.Type[] :: new) );
+    default List<Employee> get(Employee.Type... types) {
+        return get(Arrays.asList(types));
     }
+
+    default List<Employee> getOrEmpty(Employee.Type... types) {
+        if(types == null || types.length == 0)
+            return Collections.emptyList();
+
+        return get(Arrays.asList(types));
+    }
+
+    default List<Employee> getOrEmpty(List<Employee.Type> types) {
+        if(types == null || types.isEmpty())
+            return Collections.emptyList();
+
+        return get(types);
+    }
+
+    List<Employee> get(List<Employee.Type> types);
 }

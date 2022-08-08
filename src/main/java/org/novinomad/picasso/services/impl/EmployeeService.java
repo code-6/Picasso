@@ -14,7 +14,7 @@ import javax.transaction.Transactional;
 import java.util.*;
 
 @Slf4j
-@Service
+@Service("employeeService")
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class EmployeeService implements IEmployeeService {
@@ -43,7 +43,7 @@ public class EmployeeService implements IEmployeeService {
                 // ignored because save contains logging.
             }
         });
-        if(savedEmployees.size() != employees.size())
+        if (savedEmployees.size() != employees.size())
             log.warn("not all Employees are saved. To be saved: {} saved: {}", employees.size(), savedEmployees.size());
 
         return savedEmployees;
@@ -71,7 +71,7 @@ public class EmployeeService implements IEmployeeService {
                 // ignored because save contains logging.
             }
         });
-        if(deletedEmployees.size() != ids.size())
+        if (deletedEmployees.size() != ids.size())
             log.warn("not all Employees are deleted. To be deleted: {} deleted: {}", deletedEmployees.size(), ids.size());
 
         return deletedEmployees;
@@ -99,10 +99,12 @@ public class EmployeeService implements IEmployeeService {
     }
 
     @Override
-    public List<Employee> get(Employee.Type ... types) {
-        if(types == null || types.length == 0)
-            return get();
-        else
-            return employeeRepository.findAllByTypeIn(Arrays.asList(types));
+    public List<Employee> get(Long... ids) {
+        return employeeRepository.findAllByIdIn(Arrays.asList(ids));
+    }
+
+    @Override
+    public List<Employee> get(List<Employee.Type> types) {
+        return employeeRepository.findAllByTypeIn(types);
     }
 }

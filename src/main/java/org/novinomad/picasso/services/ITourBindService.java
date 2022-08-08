@@ -9,6 +9,7 @@ import org.novinomad.picasso.exceptions.BindException;
 import org.novinomad.picasso.exceptions.base.PicassoException;
 
 import java.time.LocalDateTime;
+import java.util.Collection;
 import java.util.List;
 
 public interface ITourBindService extends ICrud<TourBind> {
@@ -28,4 +29,6 @@ public interface ITourBindService extends ICrud<TourBind> {
         }
     }
     List<TourBind> get(TourBindFilter tourBindFilter);
+
+    List<TourBind> save(Collection<TourBind> tourBinds);
 }

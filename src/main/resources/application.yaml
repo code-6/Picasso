@@ -26,5 +26,7 @@ spring:
       maximum-pool-size: 5
 
 logging:
-  level: info
+  level:
+    org.novinomad.picasso: info
+    org.hibernate.SQL: error
 

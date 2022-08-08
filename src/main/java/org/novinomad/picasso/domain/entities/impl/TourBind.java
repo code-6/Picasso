@@ -50,15 +50,15 @@ public class TourBind extends AbstractEntity implements IRange {
         this.startDate = startDate;
         this.endDate = endDate;
 
-        if(!isDatesValid())
+        if(isOutOfTourDateRange())
             throw new BindException(employee, tour, getDateRange(), "out of tour date range");
     }
 
-    boolean isDatesValid() {
+    boolean isOutOfTourDateRange() {
         LocalDateTime tourStartDate = tour.getStartDate();
         LocalDateTime tourEndDate = tour.getEndDate();
 
-        return !startDate.isAfter(tourEndDate) || !endDate.isBefore(tourStartDate);
+        return startDate.isAfter(tourEndDate) || endDate.isBefore(tourStartDate);
     }
 
     //region equals, hashCode, toString

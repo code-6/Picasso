@@ -17,4 +17,8 @@ public interface TourRepository extends JpaRepository<Tour, Long> {
               and (:name is null or lower(t.name) like :name) 
             """)
     List<Tour> findByFilter(LocalDateTime startDate, LocalDateTime endDate, String name);
+
+    @Query("select t from Tour t order by t.startDate desc ")
+    @Override
+    List<Tour> findAll();
 }

@@ -13,19 +13,16 @@ public interface ICrud<T extends AbstractEntity> {
 
     void delete(Long id) throws PicassoException;
 
-    /**
-     * If already exists -> return existent else -> create new
-     */
-    default T createOrGet(T t) throws PicassoException {
-        return get(t.getId()).orElse(save(t));
-    }
-
     default void delete(T t) throws PicassoException {
         delete(t.getId());
     }
 
     default Optional<T> get(Long id) {
         return Optional.empty();
+    }
+
+    default List<T> get(Long ... ids) {
+        return Collections.emptyList();
     }
 
     default List<T> get() {

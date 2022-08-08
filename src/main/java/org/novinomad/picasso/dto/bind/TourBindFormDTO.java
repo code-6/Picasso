@@ -2,6 +2,7 @@ package org.novinomad.picasso.dto.bind;
 
 import lombok.AccessLevel;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.novinomad.picasso.commons.LocalDateTimeRange;
 import org.novinomad.picasso.domain.entities.impl.Employee;
@@ -15,19 +16,20 @@ import java.util.*;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class TourBindFormDTO {
     Tour tour;
-    Map<Employee, Set<LocalDateTimeRange>> employeesToDateRanges = new HashMap<>();
+    List<EmployeeBind> employeeBinds = new ArrayList<>();
 
     Boolean hideTourBindForm = true;
 
+    private Optional<EmployeeBind> getEmployeeBindOf(Employee employee) {
+        return employeeBinds.stream().filter(eb -> employee.equals(eb.getEmployee())).findAny();
+    }
+
     public void appointEmployee(Employee employee, LocalDateTimeRange localDateTimeRange) {
-        Optional.ofNullable(employeesToDateRanges.get(employee))
-                .ifPresentOrElse(dateRanges -> dateRanges.add(localDateTimeRange), () -> {
-                    Set<LocalDateTimeRange> dateRanges = new TreeSet<>();
-
-                    if(localDateTimeRange != null)
-                        dateRanges.add(localDateTimeRange);
-
-                    employeesToDateRanges.put(employee, dateRanges);
+        getEmployeeBindOf(employee)
+                .ifPresentOrElse(employeeBind -> employeeBind.addDateRange(localDateTimeRange), () -> {
+                    EmployeeBind employeeBind = new EmployeeBind(employee);
+                    employeeBind.addDateRange(localDateTimeRange);
+                    employeeBinds.add(employeeBind);
                 });
     }
 
@@ -35,19 +37,40 @@ public class TourBindFormDTO {
         appointEmployee(employee, null);
     }
 
+    public void appointEmployee(List<Employee> employees) {
+        employees.forEach(this::appointEmployee);
+    }
+
     public List<TourBind> forSave() throws BindException {
 
         List<TourBind> tourBinds = new ArrayList<>();
 
-        for (Map.Entry<Employee, Set<LocalDateTimeRange>> entry : employeesToDateRanges.entrySet()) {
+        for (EmployeeBind employeeBind : employeeBinds) {
 
-            Employee employee = entry.getKey();
-            Set<LocalDateTimeRange> dateRanges = entry.getValue();
+            Employee employee = employeeBind.getEmployee();
+            SortedSet<LocalDateTimeRange> dateRanges = employeeBind.getLocalDateTimeRanges();
 
             for (LocalDateTimeRange dateRange : dateRanges) {
                 tourBinds.add(new TourBind(employee, tour, dateRange.getStartDate(), dateRange.getEndDate()));
             }
         }
         return tourBinds;
+    }
+
+    @Data
+    @NoArgsConstructor
+    public static class EmployeeBind {
+        private Employee.Type employeeType;
+        private Employee employee;
+        private SortedSet<LocalDateTimeRange> localDateTimeRanges = new TreeSet<>();
+
+        public EmployeeBind(Employee employee) {
+            this.employee = employee;
+        }
+
+        public void addDateRange(LocalDateTimeRange localDateTimeRange) {
+            if (localDateTimeRange != null)
+                localDateTimeRanges.add(localDateTimeRange);
+        }
     }
 }
