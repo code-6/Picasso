@@ -15,16 +15,14 @@ public class BindException extends PicassoException {
     public BindException(Employee employee,
                          Tour tour,
                          LocalDateTimeRange dateTimeRange,
-                         String reason)
-    {
+                         String reason) {
         this(MSG_PATTERN, employee, tour, dateTimeRange, reason);
     }
 
     public BindException(Employee employee,
                          Tour tour,
                          LocalDateTimeRange dateTimeRange,
-                         Map<Tour, LocalDateTimeRange> overlapsToursAndRanges)
-    {
+                         Map<Tour, LocalDateTimeRange> overlapsToursAndRanges) {
         super(buildOverlapsCauseMessage(employee, tour, dateTimeRange, overlapsToursAndRanges));
     }
 
@@ -44,16 +42,14 @@ public class BindException extends PicassoException {
                          Throwable cause,
                          boolean enableSuppression,
                          boolean writableStackTrace,
-                         Object... args)
-    {
+                         Object... args) {
         super(message, cause, enableSuppression, writableStackTrace, args);
     }
 
     private static String buildOverlapsCauseMessage(Employee employee,
                                                     Tour tour,
                                                     LocalDateTimeRange dateTimeRange,
-                                                    Map<Tour, LocalDateTimeRange> overlapsToursAndRanges)
-    {
+                                                    Map<Tour, LocalDateTimeRange> overlapsToursAndRanges) {
         String baseMessage = CommonMessageFormat.format(MSG_PATTERN, employee, tour, dateTimeRange, "overlaps with: \n");
 
         StringBuilder overlapsCauseBuilder = new StringBuilder(baseMessage);

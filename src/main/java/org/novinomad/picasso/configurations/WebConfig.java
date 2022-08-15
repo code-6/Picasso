@@ -14,13 +14,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
 @Configuration
 public class WebConfig {
 
-    @Bean(name = "sideNavVisibilityHolder")
-    @Scope(value = WebApplicationContext.SCOPE_SESSION,
-            proxyMode = ScopedProxyMode.TARGET_CLASS)
-    public ILayoutSideToggleHolder sideNavToggled() {
-        return new LayoutSideToggleHolder();
-    }
-
     @Bean
     public LayoutDialect layoutDialect() {
         return new LayoutDialect();

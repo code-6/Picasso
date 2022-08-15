@@ -14,8 +14,10 @@ import org.springframework.format.annotation.DateTimeFormat;
 import javax.persistence.*;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Locale;
 import java.util.Objects;
 
+import static org.novinomad.picasso.commons.utils.CommonDateUtils.COMMON;
 import static org.novinomad.picasso.commons.utils.CommonDateUtils.ISO_8601;
 
 @Entity
@@ -32,11 +34,11 @@ public class TourBind extends AbstractEntity implements IRange {
     @OneToOne
     Tour tour;
 
-    @DateTimeFormat(pattern = ISO_8601)
+    @DateTimeFormat(pattern = COMMON)
     @Column(nullable = false)
     LocalDateTime startDate;
 
-    @DateTimeFormat(pattern = ISO_8601)
+    @DateTimeFormat(pattern = COMMON)
     @Column(nullable = false)
     LocalDateTime endDate;
 
@@ -79,7 +81,7 @@ public class TourBind extends AbstractEntity implements IRange {
 
     @Override
     public String toString() {
-        DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern(ISO_8601);
+        DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern(COMMON, Locale.ENGLISH);
         return super.toString().replace("}", "") +
                 ", tour=" + tour +
                 ", employee=" + employee +

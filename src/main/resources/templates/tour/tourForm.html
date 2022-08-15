@@ -1,36 +1,54 @@
 <div th:fragment="tourFormContent">
-    <div class="mb-3">
-        <label for="tourNameForm" class="form-label">Name</label>
-        <input type="text" class="form-control" id="tourNameForm" placeholder="enter tour name" name="name">
-    </div>
-    <div class="mb-3">
-        <label for="datepickerForm" class="form-label">Date range</label>
-        <div class="input-daterange input-group" id="datepickerForm" data-provide="datepicker">
-            <input type="text" class="input-sm form-control" name="startDate"/>
-            <span class="input-group-addon">to</span>
-            <input type="text" class="input-sm form-control" name="endDate"/>
+    <div class="row form-group">
+        <div class="col-sm-2">
+            <label for="tourNameForm" class="form-label">Name</label>
+        </div>
+        <div class="col">
+            <input type="text" class="form-control" id="tourNameForm" placeholder="enter tour name" name="name">
         </div>
     </div>
-    <div class="mb-3">
-        <label for="tourDescription" class="form-label">Description</label>
-        <textarea class="form-control" id="tourDescription" rows="3" name="description"></textarea>
-    </div>
-    <div class="mb-3">
-        <label for="formFileMultiple" class="form-label">Files</label>
-        <input class="form-control" type="file" id="formFileMultiple" multiple name="files">
-    </div>
-    <div class="mb-3">
-        <div class="row row-cols-2">
-            <div class="col">
-                <button type="submit" class="btn-sm btn-outline-success btn-block">Submit</button>
+    <div class="row form-group">
+        <div class="col-sm-2">
+            <label for="datepickerForm" class="form-label">Date range</label>
+        </div>
+        <div class="col">
+            <div class="input-daterange input-group" id="datepickerForm" data-provide="datepicker">
+                <input type="text" class="input-sm form-control" name="startDate"/>
+                <span class="input-group-addon">to</span>
+                <input type="text" class="input-sm form-control" name="endDate"/>
             </div>
+        </div>
+    </div>
+    <div class="row form-group">
+        <div class="col-sm-2">
+            <label for="tourDescription" class="form-label">Description</label>
+        </div>
+        <div class="col">
 
-            <div class="col">
-                <button type="button" class="btn-sm btn-outline-secondary btn-block" data-toggle="collapse"
-                        href="#tourFormContainer"
-                        aria-expanded="true" aria-controls="tourFormContainer">Close
-                </button>
-            </div>
+            <textarea class="form-control" id="tourDescription" rows="3" name="description"></textarea>
+        </div>
+    </div>
+    <div class="row form-group">
+        <div class="col-sm-2">
+            <label for="formFileMultiple" class="form-label">Files</label>
+
+        </div>
+        <div class="col">
+            <input class="form-control" type="file" id="formFileMultiple" multiple name="files">
+
+        </div>
+    </div>
+    <div class="row form-group">
+        <div class="col-sm-2"></div>
+        <div class="col">
+
+            <button type="submit" class="btn btn-outline-success btn-block">Submit</button>
+        </div>
+        <div class="col">
+            <button type="button" class="btn btn-outline-secondary btn-block" data-toggle="collapse"
+                    href="#tourFormContainer"
+                    aria-expanded="true" aria-controls="tourFormContainer">Close
+            </button>
         </div>
     </div>
 </div>

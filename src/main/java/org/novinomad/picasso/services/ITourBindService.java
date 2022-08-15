@@ -1,6 +1,7 @@
 package org.novinomad.picasso.services;
 
 import org.novinomad.picasso.commons.ICrud;
+import org.novinomad.picasso.commons.LocalDateTimeRange;
 import org.novinomad.picasso.domain.entities.impl.Employee;
 import org.novinomad.picasso.domain.entities.impl.Tour;
 import org.novinomad.picasso.domain.entities.impl.TourBind;
@@ -19,15 +20,17 @@ public interface ITourBindService extends ICrud<TourBind> {
     default TourBind bind(TourBind tourBind) throws PicassoException {
         return bind(tourBind.getEmployee(), tourBind.getTour(), tourBind.getStartDate(), tourBind.getEndDate());
     }
-    void checkForTourOverlaps(TourBind tourBind) throws BindException;
+    void validateBind(Long tourId, Long employeeId, LocalDateTimeRange bindRange) throws PicassoException;
+    void validateBind(TourBind tourBind) throws BindException;
     default boolean overlapsWithOtherTour(TourBind tourBind) {
         try {
-            checkForTourOverlaps(tourBind);
+            validateBind(tourBind);
             return false;
         } catch (BindException e) {
             return true;
         }
     }
+
     List<TourBind> get(TourBindFilter tourBindFilter);
 
     List<TourBind> save(Collection<TourBind> tourBinds);

@@ -3,18 +3,15 @@ package org.novinomad.picasso.controllers.restapi.impl;
 import groovy.util.logging.Slf4j;
 import lombok.RequiredArgsConstructor;
 import org.novinomad.picasso.commons.ICrud;
-import org.novinomad.picasso.domain.entities.impl.Employee;
-import org.novinomad.picasso.domain.entities.impl.Tour;
+import org.novinomad.picasso.commons.LocalDateTimeRange;
 import org.novinomad.picasso.domain.entities.impl.TourBind;
-import org.novinomad.picasso.dto.bind.TourBindFormDTO;
-import org.novinomad.picasso.exceptions.BindException;
 import org.novinomad.picasso.exceptions.base.PicassoException;
 import org.novinomad.picasso.services.IEmployeeService;
 import org.novinomad.picasso.services.ITourBindService;
 import org.novinomad.picasso.services.ITourService;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -27,13 +24,12 @@ public class TourBindRestController implements ICrud<TourBind> {
 
     final ITourBindService tourBindService;
 
-    @PutMapping(value = "/employee")
-    public TourBindFormDTO bindEmployee(TourBindFormDTO tourBindFormDTO, @RequestParam Long ... employeeIds) throws BindException {
-        List<Employee> employee = employeeService.get(employeeIds);
 
-        tourBindFormDTO.appointEmployee(employee);
-
-        return tourBindFormDTO;
+    @GetMapping("/validate/{tourId}/{employeeId}/{localDateTimeRange}")
+    public void validate(@PathVariable Long tourId,
+                                          @PathVariable Long employeeId,
+                                          @PathVariable LocalDateTimeRange localDateTimeRange) throws PicassoException {
+        tourBindService.validateBind(tourId, employeeId, localDateTimeRange);
     }
 
     @Override

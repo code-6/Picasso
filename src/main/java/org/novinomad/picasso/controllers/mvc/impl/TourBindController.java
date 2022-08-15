@@ -6,6 +6,7 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
+import org.novinomad.picasso.commons.LocalDateTimeRange;
 import org.novinomad.picasso.domain.entities.impl.Employee;
 import org.novinomad.picasso.domain.entities.impl.Tour;
 import org.novinomad.picasso.domain.entities.impl.TourBind;
@@ -79,6 +80,24 @@ public class TourBindController {
 
         tourBindFormDTO.getEmployeeBinds().add(new TourBindFormDTO.EmployeeBind());
 
+        return "tourBind/tourBind";
+    }
+
+    @RequestMapping(params = "addEmployeeTourDateRange")
+    public String addEmployeeTourDateRange(final TourBindFormDTO tourBindFormDTO, final HttpServletRequest httpServletRequest) {
+        final int rowId = Integer.parseInt(httpServletRequest.getParameter("addEmployeeTourDateRange"));
+        TourBindFormDTO.EmployeeBind employeeBind = tourBindFormDTO.getEmployeeBinds().get(rowId);
+        Tour tour = tourBindFormDTO.getTour();
+        employeeBind.addDateRange(tour.getDateRange());
+        return "tourBind/tourBind";
+    }
+
+    @RequestMapping(params = {"removeEmployeeTourDateRange", "employeeRowId"})
+    public String removeEmployeeTourDateRange(final TourBindFormDTO tourBindFormDTO, final HttpServletRequest httpServletRequest) {
+        final int dateRangeRowId = Integer.parseInt(httpServletRequest.getParameter("removeEmployeeTourDateRange"));
+        final int employeeRowId = Integer.parseInt(httpServletRequest.getParameter("employeeRowId"));
+        TourBindFormDTO.EmployeeBind employeeBind = tourBindFormDTO.getEmployeeBinds().get(employeeRowId);
+        employeeBind.getLocalDateTimeRanges().remove(dateRangeRowId);
         return "tourBind/tourBind";
     }
 

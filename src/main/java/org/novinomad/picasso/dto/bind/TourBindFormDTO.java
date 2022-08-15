@@ -15,6 +15,7 @@ import java.util.*;
 @Data
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class TourBindFormDTO {
+    boolean dateRangeChosenAtLeasOnce = false;
     Tour tour;
     List<EmployeeBind> employeeBinds = new ArrayList<>();
 
@@ -48,7 +49,7 @@ public class TourBindFormDTO {
         for (EmployeeBind employeeBind : employeeBinds) {
 
             Employee employee = employeeBind.getEmployee();
-            SortedSet<LocalDateTimeRange> dateRanges = employeeBind.getLocalDateTimeRanges();
+            List<LocalDateTimeRange> dateRanges = employeeBind.getLocalDateTimeRanges();
 
             for (LocalDateTimeRange dateRange : dateRanges) {
                 tourBinds.add(new TourBind(employee, tour, dateRange.getStartDate(), dateRange.getEndDate()));
@@ -62,7 +63,7 @@ public class TourBindFormDTO {
     public static class EmployeeBind {
         private Employee.Type employeeType;
         private Employee employee;
-        private SortedSet<LocalDateTimeRange> localDateTimeRanges = new TreeSet<>();
+        private List<LocalDateTimeRange> localDateTimeRanges = new ArrayList<>();
 
         public EmployeeBind(Employee employee) {
             this.employee = employee;
@@ -72,5 +73,9 @@ public class TourBindFormDTO {
             if (localDateTimeRange != null)
                 localDateTimeRanges.add(localDateTimeRange);
         }
+    }
+
+    public boolean dateRangeChosenAtLeasOnce() {
+        return dateRangeChosenAtLeasOnce;
     }
 }

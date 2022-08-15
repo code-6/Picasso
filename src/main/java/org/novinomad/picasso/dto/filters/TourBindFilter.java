@@ -15,9 +15,9 @@ import java.util.List;
 @Data
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class TourBindFilter {
-    @DateTimeFormat(pattern = CommonDateUtils.RU_WITHOUT_SECONDS)
+    @DateTimeFormat(pattern = CommonDateUtils.COMMON)
     LocalDateTime startDate;
-    @DateTimeFormat(pattern = CommonDateUtils.RU_WITHOUT_SECONDS)
+    @DateTimeFormat(pattern = CommonDateUtils.COMMON)
     LocalDateTime endDate;
 
     List<Employee.Type> employeeTypes = new ArrayList<>();

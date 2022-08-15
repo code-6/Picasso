@@ -11,10 +11,10 @@ import org.novinomad.picasso.domain.entities.impl.TourBind;
 import org.novinomad.picasso.dto.filters.TourBindFilter;
 import org.novinomad.picasso.exceptions.BindException;
 import org.novinomad.picasso.exceptions.base.PicassoException;
-import org.novinomad.picasso.repositories.EmployeeRepository;
 import org.novinomad.picasso.repositories.TourBindRepository;
-import org.novinomad.picasso.repositories.TourRepository;
+import org.novinomad.picasso.services.IEmployeeService;
 import org.novinomad.picasso.services.ITourBindService;
+import org.novinomad.picasso.services.ITourService;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
@@ -22,7 +22,7 @@ import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static org.novinomad.picasso.commons.utils.CommonDateUtils.getOverlapsRange;
+import static org.novinomad.picasso.commons.utils.CommonDateUtils.findOverlappedRange;
 
 @Slf4j
 @Service
@@ -31,8 +31,10 @@ import static org.novinomad.picasso.commons.utils.CommonDateUtils.getOverlapsRan
 public class TourBindService implements ITourBindService {
 
     final TourBindRepository tourBindRepository;
-    final TourRepository tourRepository;
-    final EmployeeRepository employeeRepository;
+
+    final ITourService tourService;
+
+    final IEmployeeService employeeService;
 
     /**
      * Disallow bind if:
@@ -44,7 +46,7 @@ public class TourBindService implements ITourBindService {
         try {
             TourBind tourBind = new TourBind(employee, tour, startDate, endDate);
 
-            checkForTourOverlaps(tourBind);
+            validateBind(tourBind);
 
             return save(tourBind);
         } catch (PicassoException e) {
@@ -55,20 +57,20 @@ public class TourBindService implements ITourBindService {
 
     @Override
     public TourBind bind(Long employeeID, Long tourId, LocalDateTime startDate, LocalDateTime endDate) throws PicassoException {
-        Employee employee = employeeRepository.findById(employeeID)
+        Employee employee = employeeService.get(employeeID)
                 .orElseThrow(() -> new PicassoException("Employee with id: {} not found in DB", employeeID));
 
-        Tour tour = tourRepository.findById(tourId)
+        Tour tour = tourService.get(tourId)
                 .orElseThrow(() -> new PicassoException("Tour with id: {} not found in DB", tourId));
 
         return bind(employee, tour, startDate, endDate);
     }
 
     @Override
-    public void checkForTourOverlaps(TourBind tourBind) throws BindException {
+    public void validateBind(TourBind tourBind) throws BindException {
         Employee employee = tourBind.getEmployee();
 
-        List<TourBind> overlapsBinds = tourBindRepository.findOverlapsBinds(employee.getId(),
+        List<TourBind> overlapsBinds = tourBindRepository.findOverlappedBinds(employee.getId(),
                 tourBind.getStartDate(),
                 tourBind.getEndDate());
 
@@ -76,9 +78,31 @@ public class TourBindService implements ITourBindService {
             Map<Tour, LocalDateTimeRange> overlapsToursAndRanges = overlapsBinds.stream()
                     .collect(
                             Collectors.toMap(TourBind::getTour,
-                                    tb -> getOverlapsRange(tourBind.getDateRange(), tb.getDateRange()))
+                                    tb -> findOverlappedRange(tourBind.getDateRange(), tb.getDateRange()))
                     );
             throw new BindException(employee, tourBind.getTour(), tourBind.getDateRange(), overlapsToursAndRanges);
+        }
+    }
+
+    @Override
+    public void validateBind(Long tourId, Long employeeId, LocalDateTimeRange bindRange) throws PicassoException {
+        Employee employee = employeeService.get(employeeId)
+                .orElseThrow(() -> new PicassoException("Employee with id: {} not found in DB", employeeId));
+
+        Tour tour = tourService.get(tourId)
+                .orElseThrow(() -> new PicassoException("Tour with id: {} not found in DB", tourId));
+
+        List<TourBind> overlapsBinds = tourBindRepository.findOverlappedBinds(employee.getId(),
+                bindRange.getStartDate(),
+                bindRange.getEndDate());
+
+        if (!overlapsBinds.isEmpty()) {
+            Map<Tour, LocalDateTimeRange> overlapsToursAndRanges = overlapsBinds.stream()
+                    .collect(
+                            Collectors.toMap(TourBind::getTour,
+                                    tb -> findOverlappedRange(bindRange, tb.getDateRange()))
+                    );
+            throw new BindException(employee, tour, bindRange, overlapsToursAndRanges);
         }
     }
 
@@ -165,6 +189,6 @@ public class TourBindService implements ITourBindService {
         List<Long> tourIds = tourBindFilter.getTourIds().isEmpty() ? null : tourBindFilter.getTourIds();
         List<Long> employeeIds = tourBindFilter.getEmployeeIds().isEmpty() ? null : tourBindFilter.getEmployeeIds();
 
-        return tourBindRepository.findByDatesTourEmployee(tourBindFilter.getStartDate(), tourBindFilter.getEndDate(), tourIds, employeeIds);
+        return tourBindRepository.findByFilter(tourBindFilter.getStartDate(), tourBindFilter.getEndDate(), tourIds, employeeIds);
     }
 }

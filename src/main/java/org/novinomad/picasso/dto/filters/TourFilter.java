@@ -12,9 +12,9 @@ import java.util.Locale;
 
 @Data
 public class TourFilter {
-    @DateTimeFormat(pattern = CommonDateUtils.RU_WITHOUT_SECONDS)
+    @DateTimeFormat(pattern = CommonDateUtils.COMMON)
     LocalDateTime startDate;
-    @DateTimeFormat(pattern = CommonDateUtils.RU_WITHOUT_SECONDS)
+    @DateTimeFormat(pattern = CommonDateUtils.COMMON)
     LocalDateTime endDate;
     String tourName;
 

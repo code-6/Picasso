@@ -19,6 +19,7 @@ import java.util.Locale;
 import java.util.Objects;
 import java.util.Set;
 
+import static org.novinomad.picasso.commons.utils.CommonDateUtils.COMMON;
 import static org.novinomad.picasso.commons.utils.CommonDateUtils.ISO_8601;
 
 @Entity
@@ -40,10 +41,10 @@ public class Tour extends AbstractEntity implements ITour, IRange {
     @Column(columnDefinition = "NVARCHAR2(1000)")
     String description;
 
-    @DateTimeFormat(pattern = ISO_8601)
+    @DateTimeFormat(pattern = COMMON)
     LocalDateTime startDate;
 
-    @DateTimeFormat(pattern = ISO_8601)
+    @DateTimeFormat(pattern = COMMON)
     LocalDateTime endDate;
 
     @ElementCollection
@@ -81,7 +82,7 @@ public class Tour extends AbstractEntity implements ITour, IRange {
 
     @Override
     public String toString() {
-        DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern(ISO_8601);
+        DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern(COMMON, Locale.ENGLISH);
         return super.toString().replace("}", "") +
                 ", name='" + name + '\'' +
                 ", startDate=" + (startDate == null ? null : startDate.format(dateTimeFormatter)) +
@@ -91,7 +92,7 @@ public class Tour extends AbstractEntity implements ITour, IRange {
 
     @Override
     public String toStringFull() {
-        DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern(ISO_8601);
+        DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern(COMMON, Locale.ENGLISH);
         return super.toString().replace("}", "") +
                 ", name='" + name + '\'' +
                 ", startDate=" + (startDate == null ? null : startDate.format(dateTimeFormatter)) +
@@ -104,7 +105,7 @@ public class Tour extends AbstractEntity implements ITour, IRange {
         if(endDate == null) return "";
 
         if(StringUtils.isEmpty(format))
-            format = ISO_8601;
+            format = COMMON;
 
         return endDate.format(DateTimeFormatter.ofPattern(format, Locale.ENGLISH));
     }
@@ -113,7 +114,7 @@ public class Tour extends AbstractEntity implements ITour, IRange {
         if(startDate == null) return "";
 
         if(StringUtils.isEmpty(format))
-            format = ISO_8601;
+            format = COMMON;
 
         return startDate.format(DateTimeFormatter.ofPattern(format, Locale.ENGLISH));
     }

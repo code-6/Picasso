@@ -1,24 +1,27 @@
 package org.novinomad.picasso.commons;
 
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
+import lombok.Setter;
+import org.novinomad.picasso.commons.utils.CommonDateUtils;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Locale;
 import java.util.Objects;
 
 import static org.novinomad.picasso.commons.utils.CommonDateUtils.ISO_8601;
-import static org.novinomad.picasso.commons.utils.CommonDateUtils.RU_WITHOUT_SECONDS;
+import static org.novinomad.picasso.commons.utils.CommonDateUtils.COMMON;
 
 @Getter
+@Setter
 public class LocalDateTimeRange implements Comparable<LocalDateTimeRange> {
 
-    @DateTimeFormat(pattern = ISO_8601)
-    private final LocalDateTime startDate;
+    @DateTimeFormat(pattern = COMMON)
+    private LocalDateTime startDate;
 
-    @DateTimeFormat(pattern = ISO_8601)
-    private final LocalDateTime endDate;
+    @DateTimeFormat(pattern = COMMON)
+    private LocalDateTime endDate;
 
     public LocalDateTimeRange(LocalDateTime startDate, LocalDateTime endDate) {
         if(startDate == null || endDate == null)
@@ -30,7 +33,7 @@ public class LocalDateTimeRange implements Comparable<LocalDateTimeRange> {
 
     @Override
     public String toString() {
-        DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern(RU_WITHOUT_SECONDS);
+        DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern(COMMON, Locale.ENGLISH);
         return startDate.format(dateTimeFormatter) + " ~ " + endDate.format(dateTimeFormatter);
     }
 
@@ -54,5 +57,31 @@ public class LocalDateTimeRange implements Comparable<LocalDateTimeRange> {
             return endDate.compareTo(o.getEndDate());
 
         return startDate.compareTo(o.getStartDate());
+    }
+
+    public static LocalDateTimeRange parse(String text) {
+        DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern(CommonDateUtils.COMMON, Locale.ENGLISH);
+
+        String[] split = text.split("\s[~\\-]\s");
+
+        if(split.length != 2) {
+            String errorMessage = String.format("something went wrong while split following string: %s expected array.length = 2, but was: %d",
+                    text, split.length);
+            throw new RuntimeException(errorMessage);
+        }
+        return new LocalDateTimeRange(LocalDateTime.parse(split[0], dateTimeFormatter), LocalDateTime.parse(split[1], dateTimeFormatter));
+    }
+
+    public static LocalDateTimeRange parse(String text, Locale locale) {
+        DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern(CommonDateUtils.COMMON, locale);
+
+        String[] split = text.split("\s[~\\-]\s");
+
+        if(split.length != 2) {
+            String errorMessage = String.format("something went wrong while split following string: %s expected array.length = 2, but was: %d",
+                    text, split.length);
+            throw new RuntimeException(errorMessage);
+        }
+        return new LocalDateTimeRange(LocalDateTime.parse(split[0], dateTimeFormatter), LocalDateTime.parse(split[1], dateTimeFormatter));
     }
 }

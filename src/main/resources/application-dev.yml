@@ -6,6 +6,9 @@ server:
       timeout: ${PCS_SERVLET_SESSION_TIMEOUT:5m}
 
 spring:
+  thymeleaf:
+    cache: false
+#    prefix: file:src/main/resource/templates/
   jpa:
     database-platform: org.hibernate.dialect.${PCS_HIBERNATE_DIALECT:H2Dialect}
     hibernate:

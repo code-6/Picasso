@@ -13,7 +13,7 @@ public class CommonDateUtils {
     public static final String ISO_8601 = "yyyy-MM-dd HH:mm:ss";
     public static final String ISO_8601_WITHOUT_SECONDS = "yyyy-MM-dd HH:mm";
 
-    public static final String RU_WITHOUT_SECONDS = "dd MMM yyyy HH:mm";
+    public static final String COMMON = "dd MMM yyyy HH:mm";
 
     public static LocalDateTime dateToLocalDateTime(Date dateToConvert) {
         return dateToConvert.toInstant()
@@ -25,7 +25,7 @@ public class CommonDateUtils {
         return java.sql.Timestamp.valueOf(dateToConvert);
     }
     
-    public static LocalDateTimeRange getOverlapsRange(LocalDateTimeRange range1, LocalDateTimeRange range2) {
+    public static LocalDateTimeRange findOverlappedRange(LocalDateTimeRange range1, LocalDateTimeRange range2) {
         LocalDateTime overlapsStart = null, overlapsEnd = null;
         LocalDateTimeRange overlapsRange = null;
 
