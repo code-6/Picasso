@@ -6,7 +6,7 @@ import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.novinomad.picasso.domain.entities.impl.Guide;
 import org.novinomad.picasso.exceptions.base.PicassoException;
-import org.novinomad.picasso.repositories.GuideRepository;
+import org.novinomad.picasso.repositories.jpa.GuideRepository;
 import org.novinomad.picasso.services.IGuideService;
 import org.springframework.stereotype.Service;
 

@@ -4,7 +4,7 @@ import com.github.javafaker.Faker;
 import org.junit.jupiter.api.*;
 import org.novinomad.picasso.domain.entities.impl.Driver;
 import org.novinomad.picasso.domain.entities.impl.Employee;
-import org.novinomad.picasso.repositories.DriverRepository;
+import org.novinomad.picasso.repositories.jpa.DriverRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;

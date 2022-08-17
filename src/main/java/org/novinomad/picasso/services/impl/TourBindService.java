@@ -8,13 +8,17 @@ import org.novinomad.picasso.commons.LocalDateTimeRange;
 import org.novinomad.picasso.domain.entities.impl.Employee;
 import org.novinomad.picasso.domain.entities.impl.Tour;
 import org.novinomad.picasso.domain.entities.impl.TourBind;
-import org.novinomad.picasso.dto.filters.TourBindFilter;
+import org.novinomad.picasso.dto.bind.TourBindDTO;
+import org.novinomad.picasso.dto.filters.TourCriteria;
+import org.novinomad.picasso.dto.gantt.Task;
 import org.novinomad.picasso.exceptions.BindException;
 import org.novinomad.picasso.exceptions.base.PicassoException;
-import org.novinomad.picasso.repositories.TourBindRepository;
+import org.novinomad.picasso.repositories.jpa.TourBindRepository;
 import org.novinomad.picasso.services.IEmployeeService;
 import org.novinomad.picasso.services.ITourBindService;
 import org.novinomad.picasso.services.ITourService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
@@ -35,6 +39,10 @@ public class TourBindService implements ITourBindService {
     final ITourService tourService;
 
     final IEmployeeService employeeService;
+
+    @Autowired
+    @Qualifier("tourBindJdbcRepository")
+    TourBindRepository tourBindJdbcRepository;
 
     /**
      * Disallow bind if:
@@ -185,10 +193,32 @@ public class TourBindService implements ITourBindService {
     }
 
     @Override
-    public List<TourBind> get(TourBindFilter tourBindFilter) {
-        List<Long> tourIds = tourBindFilter.getTourIds().isEmpty() ? null : tourBindFilter.getTourIds();
-        List<Long> employeeIds = tourBindFilter.getEmployeeIds().isEmpty() ? null : tourBindFilter.getEmployeeIds();
+    public List<TourBind> get(TourCriteria tourCriteria) {
+        List<Long> tourIds = tourCriteria.getTourIds().isEmpty() ? null : tourCriteria.getTourIds();
+        List<Long> employeeIds = tourCriteria.getEmployeeIds().isEmpty() ? null : tourCriteria.getEmployeeIds();
 
-        return tourBindRepository.findByFilter(tourBindFilter.getStartDate(), tourBindFilter.getEndDate(), tourIds, employeeIds);
+        return tourBindJdbcRepository.findByFilter(tourCriteria.getStartDate(), tourCriteria.getEndDate(), tourIds, employeeIds);
+    }
+
+    @Override
+    public List<Task> getForGanttChart(TourCriteria tourCriteria) {
+        if (tourCriteria == null)
+            tourCriteria = new TourCriteria();
+
+        List<Task> parentTasks = get(tourCriteria).stream()
+                .collect(Collectors.groupingBy(TourBind::getTour))
+                .entrySet().stream()
+                .map(e -> new TourBindDTO(e.getKey(), e.getValue()))
+                .map(TourBindDTO::dto)
+                .toList();
+
+        List<Task> allTasks = new ArrayList<>();
+
+        parentTasks.forEach(gd -> {
+            allTasks.add(gd);
+            allTasks.addAll(gd.getChildren());
+        });
+
+        return allTasks;
     }
 }

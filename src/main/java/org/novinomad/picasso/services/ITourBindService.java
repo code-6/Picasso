@@ -5,7 +5,8 @@ import org.novinomad.picasso.commons.LocalDateTimeRange;
 import org.novinomad.picasso.domain.entities.impl.Employee;
 import org.novinomad.picasso.domain.entities.impl.Tour;
 import org.novinomad.picasso.domain.entities.impl.TourBind;
-import org.novinomad.picasso.dto.filters.TourBindFilter;
+import org.novinomad.picasso.dto.filters.TourCriteria;
+import org.novinomad.picasso.dto.gantt.Task;
 import org.novinomad.picasso.exceptions.BindException;
 import org.novinomad.picasso.exceptions.base.PicassoException;
 
@@ -31,7 +32,9 @@ public interface ITourBindService extends ICrud<TourBind> {
         }
     }
 
-    List<TourBind> get(TourBindFilter tourBindFilter);
+    List<TourBind> get(TourCriteria tourCriteria);
 
     List<TourBind> save(Collection<TourBind> tourBinds);
+
+    List<Task> getForGanttChart(TourCriteria tourCriteria);
 }

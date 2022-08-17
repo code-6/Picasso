@@ -1,4 +1,4 @@
-package org.novinomad.picasso.services.conversion;
+package org.novinomad.picasso.services.conversion.formatters;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;

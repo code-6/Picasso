@@ -43,25 +43,208 @@
                 <div class="col">
                     <i class="fas fa-table me-1"></i>
                     Gantt chart
-                    <a class="btn btn-sm btn-link" data-toggle="collapse" href="#tourBindFilter" role="button"
-                       aria-expanded="false" aria-controls="tourBindFilter tourBind tourFormContainer">
+                    <a class="btn btn-sm btn-link" data-toggle="collapse" href="#tourCriteria" role="button"
+                       aria-expanded="false" aria-controls="tourCriteria tourBind tourFormContainer">
                         Filters
                     </a>
                     <a class="btn btn-sm btn-link" data-toggle="collapse" href="#tourBind" role="button"
-                       aria-expanded="false" aria-controls="tourBind tourBindFilter tourFormContainer">
+                       aria-expanded="false" aria-controls="tourBind tourCriteria tourFormContainer">
                         Create new bind
                     </a>
                 </div>
             </div>
         </div>
         <div class="card-body">
+<!--            <div class="row tour-bind-container">-->
+
+<!--                <div class="col">-->
+<!--                    &lt;!&ndash;                tour bind form &ndash;&gt;-->
+<!--                    <div th:classappend="${tourBindFormDTO.hideTourBindForm} ? '' : 'show'" id="tourBind"-->
+<!--                         th:if="${tourBindFormDTO != null}">-->
+<!--                        <hr/>-->
+<!--                        <form id="tourBindForm" th:object="${tourBindFormDTO}" th:action="@{/}" th:method="post">-->
+<!--                            <div class="row form-group">-->
+<!--                                <div class="col-sm-2">-->
+<!--                                    <label for="bindFormTourSelect">Tour</label>-->
+<!--                                </div>-->
+<!--                                <div class="col">-->
+<!--                                    <select id="bindFormTourSelect" class="form-control selectpicker tourSelect" required-->
+<!--                                            data-live-search="true" data-selected-text-format="count > 1"-->
+<!--                                            th:field="*{tour}" name="tour">-->
+<!--                                        <option th:value="${null}"></option>-->
+<!--                                        <option th:each="tour : ${allTours}"-->
+<!--                                                th:value="${tour.id}"-->
+<!--                                                th:text="${tour.id + ': ' + tour.name + ' [' + tour.getDateRange().toString() + ']'}"-->
+<!--                                                th:selected="${tourBindFormDTO?.tour?.id == tour.id}">-->
+<!--                                        </option>-->
+<!--                                    </select>-->
+<!--                                </div>-->
+<!--                                <div class="col-sm-1">-->
+<!--                                    <button class="btn btn-outline-success"-->
+<!--                                            title="These aren't the tours you're looking for ? Create new one. "-->
+<!--                                            data-toggle="collapse" href="#tourFormContainer" type="button"-->
+<!--                                            aria-expanded="false" aria-controls="tourFormContainer">-->
+<!--                                        <i class="fa-solid fa-plus"></i>-->
+<!--                                    </button>-->
+<!--                                </div>-->
+<!--                            </div>-->
+
+<!--                            <div class="collapse" id="bindResultTourDetails" th:classappend="${tourBindFormDTO.tour == null} ? '' : 'show'">-->
+
+<!--                                <div class="row form-group">-->
+<!--                                    <div class="col-sm-2">-->
+<!--                                        <label for="bindResultTourDates">Dates</label>-->
+<!--                                    </div>-->
+<!--                                    <div class="col">-->
+<!--                                        <input id="bindResultTourDates" class="form-control"-->
+<!--                                               th:value="${tourBindFormDTO?.tour?.getDateRange()?.toString()}" disabled >-->
+<!--                                    </div>-->
+<!--                                    <div class="col-sm-1"></div>-->
+<!--                                </div>-->
+<!--                                <div class="row form-group">-->
+<!--                                    <div class="col-sm-2">-->
+<!--                                        <label for="bindResultTourDescription">Description</label>-->
+<!--                                    </div>-->
+<!--                                    &lt;!&ndash;                                FIXME 2022-08-09: bound tour description disappears after 'add employee' button press &ndash;&gt;-->
+<!--                                    <div class="col">-->
+<!--                                    <textarea id="bindResultTourDescription" class="form-control"-->
+<!--                                              th:value="${tourBindFormDTO?.tour?.description}"-->
+<!--                                              disabled ></textarea>-->
+<!--                                    </div>-->
+<!--                                    <div class="col-sm-1"></div>-->
+<!--                                </div>-->
+
+<!--                            </div>-->
+<!--                            <hr/>-->
+<!--                            <div class="collapse" id="bindResultEmployees" th:classappend="${tourBindFormDTO.employeeBinds.isEmpty()} ? '' : 'show'">-->
+<!--                                <div th:each="employeeBind, i : ${tourBindFormDTO.employeeBinds}">-->
+<!--                                    <div class="row form-group">-->
+<!--                                        <div class="col-sm-2">-->
+<!--                                            <select th:id="${'employeeTypeSelect_' + i.index}" class="form-control selectpicker employeeTypeSelect"-->
+<!--                                                    data-live-search="true" required-->
+<!--                                                    th:field="*{employeeBinds[__${i.index}__].employeeType}"-->
+<!--                                                    th:data-employee-select-id="${'employeeSelect_' + i.index}">-->
+<!--                                                <option th:value="${null}"></option>-->
+<!--                                                <option th:each="employeeType : ${allEmployeeTypes}"-->
+<!--                                                        th:value="${employeeType}"-->
+<!--                                                        th:text="${employeeType.name()}"-->
+<!--                                                        th:selected="${employeeBind.employeeType != null and employeeBind.employeeType.equals(employeeType)}">-->
+<!--                                                </option>-->
+<!--                                            </select>-->
+<!--                                        </div>-->
+<!--                                        <div class="col">-->
+<!--                                            <select th:id="${'employeeSelect_' + i.index}" class="form-control selectpicker employeeSelect"-->
+<!--                                                    th:field="*{employeeBinds[__${i.index}__].employee}" required-->
+<!--                                                    data-live-search="true">-->
+<!--                                                <option th:value="${null}"></option>-->
+<!--                                                <option th:each="employee : ${@employeeService.getOrEmpty(employeeBind.getEmployeeType())}"-->
+<!--                                                        th:value="${employee.id}"-->
+<!--                                                        th:text="${employee.type + ': ' + employee.name}"-->
+<!--                                                        th:selected="${employeeBind.employee != null and employeeBind.employee.equals(employee)}">-->
+<!--                                            </select>-->
+<!--                                        </div>-->
+<!--                                        <div class="col-sm-1">-->
+<!--                                            &lt;!&ndash;                                            TODO 2022-08-15 enabled only if employee type and employee selected. Also allow to add more only if previously added date-range filled. Disallow to submit if any of date-ranges is empty.&ndash;&gt;-->
+<!--                                            <button class="btn btn-outline-success" type="submit" name="addEmployeeTourDateRange"-->
+<!--                                                    title="Add custom date range. Optional action, if not chosen, employee will be utilized to full tour date range" th:value="${i.index}">-->
+<!--                                                <i class="fa-solid fa-calendar-plus"></i>-->
+<!--                                            </button>-->
+<!--                                        </div>-->
+<!--                                        <div class="col-sm-1">-->
+<!--                                            <button class="btn btn-outline-primary" type="submit" name="unbindEmployee"-->
+<!--                                                    title="Unbind employee" th:value="${i.index}">-->
+<!--                                                <i class="fa-solid fa-user-xmark"></i>-->
+<!--                                            </button>-->
+<!--                                        </div>-->
+<!--                                    </div>-->
+<!--                                    <div th:each="employeeBindTourDateRange, j : ${employeeBind.localDateTimeRanges}">-->
+<!--                                        <div class="row form-group">-->
+<!--                                            <div class="col-sm-2"></div>-->
+<!--                                            <div class="col">-->
+<!--                                                <input type="text" class="form-control date-picker date-picker-employee-tour-bind" required-->
+<!--                                                       th:id="${'employeeTourDateRange_'+i.index+'-'+j.index}"-->
+<!--                                                       th:data-employee-id="${employeeBind?.employee?.id}"-->
+<!--                                                       th:data-tour-id="${tourBindFormDTO?.tour?.id}"-->
+<!--                                                       th:field="*{employeeBinds[__${i.index}__].localDateTimeRanges[__${j.index}__]}" name="localDateTimeRange">-->
+<!--                                            </div>-->
+<!--                                            <div class="col-sm-1">-->
+<!--                                                <button class="btn btn-outline-primary" type="submit" name="removeEmployeeTourDateRange"-->
+<!--                                                        title="Remove custom date range" th:value="${j.index}">-->
+<!--                                                    <i class="fa-solid fa-calendar-xmark"></i>-->
+<!--                                                    <input type="hidden" th:value="${i.index}" name="employeeRowId">-->
+<!--                                                </button>-->
+<!--                                            </div>-->
+<!--                                        </div>-->
+<!--                                    </div>-->
+<!--                                </div>-->
+<!--                            </div>-->
+
+<!--                            <div class="collapse" id="bindResultEmployeesControls" th:classappend="${tourBindFormDTO.tour == null} ? '' : 'show'">-->
+<!--                                <div class="row form-group">-->
+<!--                                    <div class="col-sm-2"></div>-->
+<!--                                    <div class="col">-->
+<!--                                        <button class="btn btn-outline-success btn-block" type="submit" name="bindEmployee" id="bindEmployeeBtn"-->
+<!--                                                th:text="${'Add employee to the ' + tourBindFormDTO?.tour?.name}">-->
+
+<!--                                        </button>-->
+<!--                                    </div>-->
+<!--                                    <div class="col-sm-1">-->
+<!--                                        <button class="btn btn-outline-success" type="button"-->
+<!--                                                title="These aren't the employees you're looking for ? Create new one. ">-->
+<!--                                            <i class="fa-solid fa-plus"></i>-->
+<!--                                        </button>-->
+<!--                                    </div>-->
+<!--                                </div>-->
+<!--                            </div>-->
+
+<!--                            <div class="row form-group">-->
+<!--                                <div class="col-sm-2"></div>-->
+<!--                                <div class="col">-->
+<!--                                    &lt;!&ndash;                                    TODO 2022-08-15 : allow to submit only if: &ndash;&gt;-->
+<!--                                    &lt;!&ndash;                                    1) Tour is chosen&ndash;&gt;-->
+<!--                                    &lt;!&ndash;                                    2) At least one employee chosen&ndash;&gt;-->
+<!--                                    &lt;!&ndash;                                    3) There is no overlaps with other tours&ndash;&gt;-->
+<!--                                    <button class="btn btn-outline-success btn-block" type="submit" id="submitBindBtn">-->
+<!--                                        Submit-->
+<!--                                    </button>-->
+<!--                                </div>-->
+<!--                                <div class="col-sm-1"></div>-->
+<!--                            </div>-->
+
+<!--                            <input type="hidden" name="hideTourBindForm" value="false">-->
+<!--                        </form>-->
+<!--                    </div>-->
+
+<!--                </div>-->
+
+<!--                <div class="col">-->
+<!--                    &lt;!&ndash;                tour form &ndash;&gt;-->
+<!--                    <div class="collapse" id="tourFormContainer">-->
+<!--                        <hr/>-->
+<!--                        <form th:object="${tour}" id="tourForm">-->
+<!--                            <div th:include="tour/tourForm :: tourFormContent"></div>-->
+<!--                        </form>-->
+<!--                    </div>-->
+<!--                    &lt;!&ndash;                employee form &ndash;&gt;-->
+<!--                    <div class="collapse" id="employeeFormContainer">-->
+<!--                        <hr/>-->
+<!--                        <form th:object="${employee}" id="employeeForm">-->
+<!--                            <div th:include="employee/employeeForm :: employeeFormContent"></div>-->
+<!--                        </form>-->
+<!--                    </div>-->
+<!--                </div>-->
+
+
+
+<!--            </div>-->
+
+            <!--            tour bind filter form (filter gantt chart)-->
             <div class="row">
                 <div class="col">
-                    <!--            tour bind filter form (filter gantt chart)-->
-                    <div class="collapse" th:classappend="${tourBindFilter.hideFilterForm} ? '' : 'show'" id="tourBindFilter">
+                    <div class="collapse show" id="tourCriteria">
                         <hr/>
-                        <form th:object="${tourBindFilter}" th:action="@{/}" th:method="get">
-                            <div class="row g-2">
+                        <form th:object="${tourCriteria}" th:id="tourCriteriaForm">
+                            <div class="row g-2 align-items-end">
 
                                 <div class="col-md align-items-end">
                                     <label for="filterStartDate">Start date</label>
@@ -82,8 +265,8 @@
                                             data-live-search="true" data-selected-text-format="count > 1" name="tourIds">
                                         <option th:each="tour : ${allTours}"
                                                 th:value="${tour.id}"
-                                                th:text="${tour.name}"
-                                                th:selected="${tourBindFilter.tourIds.contains(tour.id)}">
+                                                th:text="${tour.id + '. ' + tour.name}"
+                                                th:selected="${tourCriteria.tourIds.contains(tour.id)}">
                                         </option>
                                     </select>
                                 </div>
@@ -98,7 +281,7 @@
                                         <option th:each="employeeType : ${allEmployeeTypes}"
                                                 th:value="${employeeType}"
                                                 th:text="${employeeType.name()}"
-                                                th:selected="${tourBindFilter.employeeTypes.contains(employeeType)}">
+                                                th:selected="${tourCriteria.employeeTypes.contains(employeeType)}">
                                         </option>
                                     </select>
                                 </div>
@@ -113,206 +296,22 @@
                                 </div>
 
                                 <div class="col-md align-items-end">
-                                    <label for="submitFilterBtn"> </label>
-                                    <button id="submitFilterBtn" type="submit"
+                                    <button id="submitFilterBtn" type="button" onclick="submitGanttFilterForm()"
+                                            title="Press to see filtered tours and employees"
                                             class="btn btn-outline-success btn-block form-control">Apply
                                     </button>
                                 </div>
-
-                                <input type="hidden" name="hideFilterForm" value="false">
                             </div>
                         </form>
                     </div>
                 </div>
             </div>
-            <div class="row tour-bind-container">
 
-                <div class="col">
-                    <!--                tour bind form -->
-                    <div class="collapse" th:classappend="${tourBindFormDTO.hideTourBindForm} ? '' : 'show'" id="tourBind"
-                         th:if="${tourBindFormDTO != null}">
-                        <hr/>
-                        <form id="tourBindForm" th:object="${tourBindFormDTO}" th:action="@{/}" th:method="post">
-                            <div class="row form-group">
-                                <div class="col-sm-2">
-                                    <label for="bindFormTourSelect">Tour</label>
-                                </div>
-                                <div class="col">
-                                    <select id="bindFormTourSelect" class="form-control selectpicker tourSelect" required
-                                            data-live-search="true" data-selected-text-format="count > 1"
-                                            th:field="*{tour}" name="tour">
-                                        <option th:value="${null}"></option>
-                                        <option th:each="tour : ${allTours}"
-                                                th:value="${tour.id}"
-                                                th:text="${tour.id + ': ' + tour.name + ' [' + tour.getDateRange().toString() + ']'}"
-                                                th:selected="${tourBindFormDTO?.tour?.id == tour.id}">
-                                        </option>
-                                    </select>
-                                </div>
-                                <div class="col-sm-1">
-                                    <button class="btn btn-outline-success"
-                                            title="These aren't the tours you're looking for ? Create new one. "
-                                            data-toggle="collapse" href="#tourFormContainer" type="button"
-                                            aria-expanded="false" aria-controls="tourFormContainer">
-                                        <i class="fa-solid fa-plus"></i>
-                                    </button>
-                                </div>
-                            </div>
-
-                            <div class="collapse" id="bindResultTourDetails" th:classappend="${tourBindFormDTO.tour == null} ? '' : 'show'">
-
-                                <div class="row form-group">
-                                    <div class="col-sm-2">
-                                        <label for="bindResultTourDates">Dates</label>
-                                    </div>
-                                    <div class="col">
-                                        <input id="bindResultTourDates" class="form-control"
-                                               th:value="${tourBindFormDTO?.tour?.getDateRange()?.toString()}" disabled >
-                                    </div>
-                                    <div class="col-sm-1"></div>
-                                </div>
-                                <div class="row form-group">
-                                    <div class="col-sm-2">
-                                        <label for="bindResultTourDescription">Description</label>
-                                    </div>
-                                    <!--                                FIXME 2022-08-09: bound tour description disappears after 'add employee' button press -->
-                                    <div class="col">
-                                    <textarea id="bindResultTourDescription" class="form-control"
-                                              th:value="${tourBindFormDTO?.tour?.description}"
-                                              disabled ></textarea>
-                                    </div>
-                                    <div class="col-sm-1"></div>
-                                </div>
-
-                            </div>
-                            <hr/>
-                            <div class="collapse" id="bindResultEmployees" th:classappend="${tourBindFormDTO.employeeBinds.isEmpty()} ? '' : 'show'">
-                                <div th:each="employeeBind, i : ${tourBindFormDTO.employeeBinds}">
-                                    <div class="row form-group">
-                                        <div class="col-sm-2">
-                                            <select th:id="${'employeeTypeSelect_' + i.index}" class="form-control selectpicker employeeTypeSelect"
-                                                    data-live-search="true" required
-                                                    th:field="*{employeeBinds[__${i.index}__].employeeType}"
-                                                    th:data-employee-select-id="${'employeeSelect_' + i.index}">
-                                                <option th:value="${null}"></option>
-                                                <option th:each="employeeType : ${allEmployeeTypes}"
-                                                        th:value="${employeeType}"
-                                                        th:text="${employeeType.name()}"
-                                                        th:selected="${employeeBind.employeeType != null and employeeBind.employeeType.equals(employeeType)}">
-                                                </option>
-                                            </select>
-                                        </div>
-                                        <div class="col">
-                                            <select th:id="${'employeeSelect_' + i.index}" class="form-control selectpicker employeeSelect"
-                                                    th:field="*{employeeBinds[__${i.index}__].employee}" required
-                                                    data-live-search="true">
-                                                <option th:value="${null}"></option>
-                                                <option th:each="employee : ${@employeeService.getOrEmpty(employeeBind.getEmployeeType())}"
-                                                        th:value="${employee.id}"
-                                                        th:text="${employee.type + ': ' + employee.name}"
-                                                        th:selected="${employeeBind.employee != null and employeeBind.employee.equals(employee)}">
-                                            </select>
-                                        </div>
-                                        <div class="col-sm-1">
-<!--                                            TODO 2022-08-15 enabled only if employee type and employee selected. Also allow to add more only if previously added date-range filled. Disallow to submit if any of date-ranges is empty.-->
-                                            <button class="btn btn-outline-success" type="submit" name="addEmployeeTourDateRange"
-                                                    title="Add custom date range. Optional action, if not chosen, employee will be utilized to full tour date range" th:value="${i.index}">
-                                                <i class="fa-solid fa-calendar-plus"></i>
-                                            </button>
-                                        </div>
-                                        <div class="col-sm-1">
-                                            <button class="btn btn-outline-primary" type="submit" name="unbindEmployee"
-                                                    title="Unbind employee" th:value="${i.index}">
-                                                <i class="fa-solid fa-user-xmark"></i>
-                                            </button>
-                                        </div>
-                                    </div>
-                                    <div th:each="employeeBindTourDateRange, j : ${employeeBind.localDateTimeRanges}">
-                                        <div class="row form-group">
-                                            <div class="col-sm-2"></div>
-                                            <div class="col">
-                                                <input type="text" class="form-control date-picker date-picker-employee-tour-bind" required
-                                                       th:id="${'employeeTourDateRange_'+i.index+'-'+j.index}"
-                                                       th:data-employee-id="${employeeBind?.employee?.id}"
-                                                       th:data-tour-id="${tourBindFormDTO?.tour?.id}"
-                                                       th:field="*{employeeBinds[__${i.index}__].localDateTimeRanges[__${j.index}__]}" name="localDateTimeRange">
-                                            </div>
-                                            <div class="col-sm-1">
-                                                <button class="btn btn-outline-primary" type="submit" name="removeEmployeeTourDateRange"
-                                                        title="Remove custom date range" th:value="${j.index}">
-                                                    <i class="fa-solid fa-calendar-xmark"></i>
-                                                    <input type="hidden" th:value="${i.index}" name="employeeRowId">
-                                                </button>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="collapse" id="bindResultEmployeesControls" th:classappend="${tourBindFormDTO.tour == null} ? '' : 'show'">
-                                <div class="row form-group">
-                                    <div class="col-sm-2"></div>
-                                    <div class="col">
-                                        <button class="btn btn-outline-success btn-block" type="submit" name="bindEmployee" id="bindEmployeeBtn"
-                                        th:text="${'Add employee to the ' + tourBindFormDTO?.tour?.name}">
-
-                                        </button>
-                                    </div>
-                                    <div class="col-sm-1">
-                                        <button class="btn btn-outline-success" type="button"
-                                                title="These aren't the employees you're looking for ? Create new one. ">
-                                            <i class="fa-solid fa-plus"></i>
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="row form-group">
-                                <div class="col-sm-2"></div>
-                                <div class="col">
-<!--                                    TODO 2022-08-15 : allow to submit only if: -->
-<!--                                    1) Tour is chosen-->
-<!--                                    2) At least one employee chosen-->
-<!--                                    3) There is no overlaps with other tours-->
-                                    <button class="btn btn-outline-success btn-block" type="submit" id="submitBindBtn">
-                                        Submit
-                                    </button>
-                                </div>
-                                <div class="col-sm-1"></div>
-                            </div>
-
-                            <input type="hidden" name="hideTourBindForm" value="false">
-                        </form>
-                    </div>
-
-                </div>
-
-                <div class="col">
-                    <!--                tour form -->
-                    <div class="collapse" id="tourFormContainer">
-                        <hr/>
-                        <form th:object="${tour}" id="tourForm">
-                            <div th:include="tour/tourForm :: tourFormContent"></div>
-                        </form>
-                    </div>
-                    <!--                employee form -->
-                    <div class="collapse" id="employeeFormContainer">
-                        <hr/>
-                        <form th:object="${employee}" id="employeeForm">
-                            <div th:include="employee/employeeForm :: employeeFormContent"></div>
-                        </form>
-                    </div>
-                </div>
-
-
-
-            </div>
             <div class="row">
                 <div class="col">
                     <div style="position:relative; padding-top: 1rem;" class="gantt" id="GanttChartDIV"></div>
                 </div>
             </div>
-
         </div>
     </div>
 </div>
@@ -327,6 +326,7 @@
             th:src="@{/webjars/bootstrap-daterangepicker/js/bootstrap-daterangepicker.js}"></script>
 
     <script type="text/javascript" th:src="@{/webjars/bootstrap-select/dist/js/bootstrap-select.js}"></script>
+    <script type="text/javascript" th:src="@{/js/tourBind.js}"></script>
 
     <script th:inline="javascript">
 
@@ -335,7 +335,8 @@
 
         const dateTimeFormat = 'DD MMM YYYY HH:mm';
 
-        initGantt();
+        // draw gantt chart when page (re)loaded
+        initGanttChart();
 
         initDatePicker();
 
@@ -359,6 +360,16 @@
             validateBind(tourId, employeeId, dateRange);
         });
 
+        function submitGanttFilterForm() {
+            $('#submitFilterBtn').prop('disabled', true);
+            let filterFormData = $('#tourCriteriaForm').serialize();
+            console.log('submitGanttFilterForm -> filter form data = ' + filterFormData);
+            let ganttTasks = getToursForGanttChart(filterFormData, mainUrl + '/api/tour/bind/gantt', false);
+            initGanttChart(ganttTasks);
+            $('#submitFilterBtn').prop('disabled', false);
+
+        }
+
         function loadEmployeesForSelect($employeeTypeSelect) {
 
             const chosenEmployeeTypes = $employeeTypeSelect.find(":selected").map((_, e) => e.value).get();
@@ -381,7 +392,7 @@
                     $.each(employees, function (index, employee) {
                         let employeeId = employee.id;
 
-                        $employeeSelect.append(new Option(employee.type + ': ' + employee.name, employeeId));
+                        $employeeSelect.append(new Option(employee.type + ' ' + employee.id + '. ' + employee.name, employeeId));
                     });
                     $employeeSelect.prop("disabled", false);
                     $employeeSelect.selectpicker('refresh');
@@ -412,8 +423,8 @@
                     format: dateTimeFormat,
                 }
             });
-            let defaultStartDate = new Date([[${tourBindFilter.startDate}]].toString());
-            let defaultEndDate = new Date([[${tourBindFilter.endDate}]].toString());
+            let defaultStartDate = new Date([[${tourCriteria.startDate}]].toString());
+            let defaultEndDate = new Date([[${tourCriteria.endDate}]].toString());
 
             $('#filterStartDate').data('daterangepicker').setStartDate(defaultStartDate);
             $('#filterEndDate').data('daterangepicker').setStartDate(defaultEndDate);
@@ -444,9 +455,11 @@
             console.log("date pickers initialized")
         }
 
-        function initGantt() {
+        function initGanttChart(ganttTasks) {
 
-            let ganttDataJsonArray = JSON.parse([[${ganttData}]].toString());
+            if(!ganttTasks)
+                ganttTasks = [[${toursForGantt}]];
+            // let ganttDataJsonArray = JSON.parse([[${ganttData}]].toString());
 
             let ganttChart = new JSGantt.GanttChart(document.getElementById('GanttChartDIV'), 'day');
 
@@ -475,7 +488,7 @@
             ganttChart.setShowTaskInfoRes(0)
 
             // add data to chart
-            $.each(ganttDataJsonArray, function (index, data) {
+            $.each(ganttTasks, function (index, data) {
                 ganttChart.AddTaskItemObject(data);
             });
 

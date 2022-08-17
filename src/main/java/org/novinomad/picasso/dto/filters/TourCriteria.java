@@ -14,7 +14,7 @@ import java.util.List;
 
 @Data
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class TourBindFilter {
+public class TourCriteria {
     @DateTimeFormat(pattern = CommonDateUtils.COMMON)
     LocalDateTime startDate;
     @DateTimeFormat(pattern = CommonDateUtils.COMMON)
@@ -23,11 +23,10 @@ public class TourBindFilter {
     List<Employee.Type> employeeTypes = new ArrayList<>();
 
     List<Long> employeeIds = new ArrayList<>();
+    
     List<Long> tourIds = new ArrayList<>();
 
-    boolean hideFilterForm = true;
-
-    public TourBindFilter() {
+    public TourCriteria() {
         normalize();
     }
 

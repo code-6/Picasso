@@ -1,4 +1,4 @@
-package org.novinomad.picasso.repositories;
+package org.novinomad.picasso.repositories.jpa;
 
 import org.novinomad.picasso.domain.entities.impl.Driver;
 import org.springframework.data.jpa.repository.JpaRepository;

@@ -5,20 +5,10 @@ import org.junit.jupiter.api.*;
 import org.novinomad.picasso.domain.entities.impl.Driver;
 import org.novinomad.picasso.domain.entities.impl.Guide;
 import org.novinomad.picasso.domain.entities.impl.Tour;
-import org.novinomad.picasso.repositories.DriverRepository;
-import org.novinomad.picasso.repositories.GuideRepository;
-import org.novinomad.picasso.repositories.TourRepository;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.TestPropertySource;
 
 import java.time.LocalDateTime;
 import java.util.*;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 //@SpringBootTest
 //@ActiveProfiles("test")

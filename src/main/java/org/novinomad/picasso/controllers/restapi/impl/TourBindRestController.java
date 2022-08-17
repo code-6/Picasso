@@ -5,32 +5,39 @@ import lombok.RequiredArgsConstructor;
 import org.novinomad.picasso.commons.ICrud;
 import org.novinomad.picasso.commons.LocalDateTimeRange;
 import org.novinomad.picasso.domain.entities.impl.TourBind;
+import org.novinomad.picasso.dto.bind.TourBindDTO;
+import org.novinomad.picasso.dto.filters.TourCriteria;
+import org.novinomad.picasso.dto.gantt.Task;
 import org.novinomad.picasso.exceptions.base.PicassoException;
 import org.novinomad.picasso.services.IEmployeeService;
 import org.novinomad.picasso.services.ITourBindService;
 import org.novinomad.picasso.services.ITourService;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
+
+import java.awt.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Slf4j
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("/api/bind")
+@RequestMapping("/api/tour/bind")
 public class TourBindRestController implements ICrud<TourBind> {
 
     final IEmployeeService employeeService;
-    final ITourService tourService;
 
     final ITourBindService tourBindService;
 
-
     @GetMapping("/validate/{tourId}/{employeeId}/{localDateTimeRange}")
     public void validate(@PathVariable Long tourId,
-                                          @PathVariable Long employeeId,
-                                          @PathVariable LocalDateTimeRange localDateTimeRange) throws PicassoException {
+                         @PathVariable Long employeeId,
+                         @PathVariable LocalDateTimeRange localDateTimeRange) throws PicassoException {
         tourBindService.validateBind(tourId, employeeId, localDateTimeRange);
     }
+
 
     @Override
     @PostMapping
@@ -42,5 +49,11 @@ public class TourBindRestController implements ICrud<TourBind> {
     @DeleteMapping
     public void delete(Long id) throws PicassoException {
         tourBindService.delete(id);
+    }
+
+    @PostMapping(value = "/gantt", produces = MediaType.APPLICATION_JSON_VALUE)
+    public List<Task> getToursForGanttChart(TourCriteria criteria) {
+
+        return tourBindService.getForGanttChart(Optional.ofNullable(criteria).orElse(new TourCriteria()));
     }
 }
