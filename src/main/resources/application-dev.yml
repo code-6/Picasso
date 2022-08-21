@@ -8,7 +8,7 @@ server:
 spring:
   thymeleaf:
     cache: false
-#    prefix: file:src/main/resource/templates/
+#    prefix: ///C:/Users/wongs/IdeaProjects/Picasso/src/main/resources/templates/
   jpa:
     database-platform: org.hibernate.dialect.${PCS_HIBERNATE_DIALECT:H2Dialect}
     hibernate:

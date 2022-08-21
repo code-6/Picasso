@@ -18,19 +18,20 @@ public interface IRange {
     }
 
     default boolean inPast() {
-        return getEndDate().isBefore(LocalDateTime.now());
+        return getEndDate() != null && getEndDate().isBefore(LocalDateTime.now());
     }
 
     default boolean inFuture() {
-        return getStartDate().isAfter(LocalDateTime.now());
+        return getStartDate() != null && getStartDate().isAfter(LocalDateTime.now());
     }
 
     default double getCompletenessPercent() {
-        double completePercent = 0L;
 
         if(inPast()) return 100L;
 
         if(inFuture()) return 0L;
+
+        if(getStartDate() == null || getEndDate() == null) return 0d;
 
         Duration i = Duration.between(getStartDate(), getEndDate()); // 100%
         Duration j = Duration.between(getStartDate(), LocalDateTime.now()); // actual

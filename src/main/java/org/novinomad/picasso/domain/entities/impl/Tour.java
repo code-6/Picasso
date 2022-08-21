@@ -62,7 +62,12 @@ public class Tour extends AbstractEntity implements ITour, IRange {
     }
 
     public int getDaysCount() {
-        return (int) ChronoUnit.DAYS.between(startDate, endDate);
+        try {
+
+            return (int) ChronoUnit.DAYS.between(startDate, endDate);
+        } catch (NullPointerException e) {
+            return 0;
+        }
     }
 
     //region equals, hashCode, toString

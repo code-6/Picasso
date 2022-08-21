@@ -5,21 +5,16 @@ import lombok.RequiredArgsConstructor;
 import org.novinomad.picasso.commons.ICrud;
 import org.novinomad.picasso.commons.LocalDateTimeRange;
 import org.novinomad.picasso.domain.entities.impl.TourBind;
-import org.novinomad.picasso.dto.bind.TourBindDTO;
 import org.novinomad.picasso.dto.filters.TourCriteria;
 import org.novinomad.picasso.dto.gantt.Task;
 import org.novinomad.picasso.exceptions.base.PicassoException;
 import org.novinomad.picasso.services.IEmployeeService;
 import org.novinomad.picasso.services.ITourBindService;
-import org.novinomad.picasso.services.ITourService;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
-import java.awt.*;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Slf4j
 @RequiredArgsConstructor

@@ -15,7 +15,7 @@ import java.util.Objects;
 @Table(indexes = @Index(columnList = "name"))
 @Entity
 @Inheritance(strategy = InheritanceType.JOINED)
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@NoArgsConstructor(access = AccessLevel.PUBLIC)
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
 public class Employee extends AbstractEntity {
 

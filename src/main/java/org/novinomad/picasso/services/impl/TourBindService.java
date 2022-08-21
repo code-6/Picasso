@@ -1,5 +1,6 @@
 package org.novinomad.picasso.services.impl;
 
+import com.sun.xml.bind.v2.TODO;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -8,7 +9,6 @@ import org.novinomad.picasso.commons.LocalDateTimeRange;
 import org.novinomad.picasso.domain.entities.impl.Employee;
 import org.novinomad.picasso.domain.entities.impl.Tour;
 import org.novinomad.picasso.domain.entities.impl.TourBind;
-import org.novinomad.picasso.dto.bind.TourBindDTO;
 import org.novinomad.picasso.dto.filters.TourCriteria;
 import org.novinomad.picasso.dto.gantt.Task;
 import org.novinomad.picasso.exceptions.BindException;
@@ -121,14 +121,17 @@ public class TourBindService implements ITourBindService {
             log.debug("saved {}", tourBind);
             return savedTourBind;
         } catch (Exception e) {
-            log.error("unable to create: {} because: {}", tourBind, e.getMessage(), e);
-            throw new PicassoException(e, "unable to create: {} because: {}", tourBind, e.getMessage());
+            log.error("unable to save: {} because: {}", tourBind, e.getMessage(), e);
+            throw new PicassoException(e, "unable to save: {} because: {}", tourBind, e.getMessage());
         }
     }
 
     @Override
     @Transactional
     public List<TourBind> save(Collection<TourBind> tourBinds) {
+        // TODO fix for update action unique constraint violation exception. Possible variants:
+        // 1. Add bind id to model.
+        // 2. Fetch existent from db first, check and then save.
         List<TourBind> savedTourBinds = new ArrayList<>();
         tourBinds.forEach(tourBind -> {
             try {
@@ -205,20 +208,6 @@ public class TourBindService implements ITourBindService {
         if (tourCriteria == null)
             tourCriteria = new TourCriteria();
 
-        List<Task> parentTasks = get(tourCriteria).stream()
-                .collect(Collectors.groupingBy(TourBind::getTour))
-                .entrySet().stream()
-                .map(e -> new TourBindDTO(e.getKey(), e.getValue()))
-                .map(TourBindDTO::dto)
-                .toList();
-
-        List<Task> allTasks = new ArrayList<>();
-
-        parentTasks.forEach(gd -> {
-            allTasks.add(gd);
-            allTasks.addAll(gd.getChildren());
-        });
-
-        return allTasks;
+        return Task.fromBindsWithChildrenInList(get(tourCriteria));
     }
 }
