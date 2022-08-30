@@ -11,6 +11,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.novinomad.picasso.commons.LocalDateTimeRange;
 import org.novinomad.picasso.commons.serializers.ListToCommaSeparatedString;
 import org.novinomad.picasso.commons.utils.CommonDateUtils;
+import org.novinomad.picasso.commons.utils.CommonMessageFormat;
+import org.novinomad.picasso.commons.utils.SpringContextUtil;
 import org.novinomad.picasso.domain.entities.impl.Employee;
 import org.novinomad.picasso.domain.entities.impl.Tour;
 import org.novinomad.picasso.domain.entities.impl.TourBind;
@@ -18,9 +20,12 @@ import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+
+import static org.novinomad.picasso.commons.utils.CommonMessageFormat.*;
 
 
 @EqualsAndHashCode
@@ -29,14 +34,6 @@ import java.util.stream.Collectors;
 @Slf4j
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class Task implements ITask {
-
-    @JsonIgnore
-    private static final String tourNameWithIcon = "<a href=\"http://localhost:8080/picasso/api/tour/%d\"><i class=\"fa-solid fa-earth-asia\"></i> %s</a>";
-    @JsonIgnore
-    private static final String guideNameWithIcon = "<a href=\"http://localhost:8080/picasso/api/employee/%d\"><i class=\"fa-solid fa-person-hiking\"></i> %s</a>";
-    @JsonIgnore
-    private static final String driverNameWithIcon = "<a href=\"http://localhost:8080/picasso/api/employee/%d\"><i class=\"fa-solid fa-user-tie\"></i> %s</a>";
-
     @JsonProperty("pID")
     Long id;
     @JsonProperty("pName")
@@ -118,34 +115,34 @@ public class Task implements ITask {
         return allTasks;
     }
 
+    private static final String ANCHOR = """
+            <a id="taskId_${id}" class="${entityType}-task" data-type="${entityType}" data-${entityType}-id="${entityId}">${taskName}</a>
+            """;
+
     private static Task build(Tour tour, List<TourBind> binds) {
 
         Long ganttTourTaskId = Long.parseLong("84" + tour.getId()); // 84 - ASCII symbol code (T)
-        String ganttTourTaskName = String.format(tourNameWithIcon, tour.getId(), tour.getName());
-        Task ganttTourTask = new Task(ganttTourTaskId, ganttTourTaskName, tour.getDateRange())
+
+        Task ganttTourTask = new Task(ganttTourTaskId,tour.getId() + ". " + tour.getName(), tour.getDateRange())
                 .notes(tour.getDescription())
                 .completionPercent(tour.getCompletenessPercent())
                 .type(Task.Type.PARENT);
 
-        if(tour.inPast())
+        if (tour.inPast())
             ganttTourTask.cssClass(Task.CssClass.GREY.getCssName());
-        else if(tour.inFuture())
+        else if (tour.inFuture())
             ganttTourTask.cssClass(Task.CssClass.GREEN.getCssName());
         else
             ganttTourTask.cssClass(Task.CssClass.BLUE.getCssName());
 
         binds.forEach(bind -> {
-            long ganttEmployeeTaskId = Long.parseLong("66" + bind.getId());
+            long ganttEmployeeTaskId = Long.parseLong("66" + bind.getId()); // 66 - ASCII symbol code (B)
             Employee employee = bind.getEmployee();
             Long employeeId = employee.getId();
             Employee.Type employeeType = employee.getType();
             String employeeName = employee.getName();
-            String ganttEmployeeTaskName= employeeType.equals(Employee.Type.GUIDE)
-                    ? String.format(guideNameWithIcon, employeeId, employeeName)
-                    : String.format(driverNameWithIcon, employeeId, employeeName);
 
-            // 66 - ASCII symbol code (B)
-            Task ganttEmployeeTask = new Task(ganttEmployeeTaskId, ganttEmployeeTaskName, bind.getDateRange())
+            Task ganttEmployeeTask = new Task(ganttEmployeeTaskId, employeeType + " " + employeeId + ". " + employeeName, bind.getDateRange())
                     .parent(ganttTourTask);
 
             ganttTourTask.addChild(ganttEmployeeTask);

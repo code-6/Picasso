@@ -1,0 +1,22 @@
+<div th:fragment="ganttTourTaskTooltipContent">
+    <div class="gTILine gTIsd">
+        <span class="gTaskLabel" th:text="#{start.cap} + #{date} + ':'"></span>
+        <span class="gTaskText">{{pStart}}</span>
+    </div>
+    <div class="gTILine gTIed">
+        <span class="gTaskLabel" th:text="#{end.cap} + #{date} + ':'"></span>
+        <span class="gTaskText">{{pEnd}}</span>
+    </div>
+    <div class="gTILine gTId">
+        <span class="gTaskLabel" th:text="#{duration.cap} + ':'"></span>
+        <span class="gTaskText">{{pDuration}}</span>
+    </div>
+    <div class="gTILine gTIc">
+        <span class="gTaskLabel" th:text="#{completion.cap} + ':'"></span>
+        <span class="gTaskText">{{pComp}}</span>
+    </div>
+    <div class="gTILine gTIn">
+        <span class="gTaskLabel" th:text="#{note.cap.pl} + ':'"> </span>
+        <span class="gTaskNotes">{{pNotes}}</span>
+    </div>
+</div>

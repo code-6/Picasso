@@ -1,0 +1,25 @@
+<div th:fragment="ganttTaskTooltip" th:with="editCtx=${ctx}">
+    <span class="gTtTitle">{{pName}}</span>
+    <div th:if="${isTourTask}">
+        <div th:include="fragments/ganttTourTaskTooltip :: ganttTourTaskTooltipContent"></div>
+    </div>
+    <div th:unless="${isTourTask}">
+        <div th:include="fragments/ganttEmployeeTaskTooltip :: ganttEmployeeTaskTooltipContent"></div>
+    </div>
+    <div class="gTILine gTIn">
+        <div class="row justify-content-end">
+            <div class="col-4">
+                <div class="btn-group-sm">
+                    <button th:data-ctx="${ctx}" th:data-entity-id="${entityId}" th:text="#{edit.cap}" onclick="onEditEntity($(this).attr('data-entity-id'), $(this).attr('data-ctx'))"
+                            class="btn btn-sm btn-outline-primary btn-edit-entity">
+                        <i class="fa-thin fa-pen-to-square"></i>
+                    </button>
+                    <button th:data-entity-id="${entityId}" th:text="#{delete.cap}"
+                            class="btn btn-sm btn-outline-danger">
+                        <i class="fa-thin fa-trash-can"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

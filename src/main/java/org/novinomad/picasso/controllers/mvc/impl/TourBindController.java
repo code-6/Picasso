@@ -28,8 +28,10 @@ import java.util.List;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @RequiredArgsConstructor
 @Controller
-@RequestMapping("/")
+@RequestMapping(TourBindController.CTX)
 public class TourBindController {
+
+    public static final String CTX = "/";
 
     final IEmployeeService employeeService;
     final ITourService tourService;
@@ -47,15 +49,34 @@ public class TourBindController {
         return tourService.get();
     }
 
+    @ModelAttribute("employee")
+    public Employee getEmployee() {
+        return new Employee();
+    }
+
+    @ModelAttribute("tour")
+    public Tour getTour() {
+        return new Tour();
+    }
+
     @GetMapping
     public ModelAndView index(@ModelAttribute("tourCriteria") final TourCriteria tourCriteria) {
 
         return new ModelAndView("tourBind/tourBind")
                 .addObject("tourCriteria", tourCriteria)
                 .addObject("tourBind", new TourBindModel())
-                .addObject("tour", new Tour())
-                .addObject("employee", new Employee())
                 .addObject("toursForGantt", tourBindService.getForGanttChart(tourCriteria));
+    }
+
+    @GetMapping("/{tourId}")
+    public String editTourBind(@PathVariable Long tourId, Model model) {
+        TourCriteria tourCriteria = new TourCriteria();
+        tourCriteria.setTourIds(List.of(tourId));
+        List<TourBind> tourBinds = tourBindService.get(tourCriteria);
+        TourBindModel tourBind = TourBindModel.fromEntities(tourBinds);
+        model.addAttribute("tourBind", tourBind);
+
+        return "tourBind/tourBind :: tourBindForm";
     }
 
     @PostMapping
@@ -74,6 +95,16 @@ public class TourBindController {
         model.addAttribute("tourBind", tourBind);
 
         return "tourBind/tourBind :: bindResultEmployees";
+    }
+
+    @GetMapping("/ganttTooltipFragment")
+    public String getGanttTooltipFragment(@RequestParam String taskId, Model model) {
+
+        model.addAttribute("ctx", CTX);
+        model.addAttribute("isTourTask", "84".equals(taskId.substring(0,2)));
+        model.addAttribute("entityId", Long.parseLong(taskId.substring(2)));
+
+        return "fragments/ganttTaskTooltip :: ganttTaskTooltip";
     }
 
     @PostMapping("/unbindEmployee")

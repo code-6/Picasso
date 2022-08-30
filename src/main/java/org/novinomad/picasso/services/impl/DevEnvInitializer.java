@@ -57,8 +57,10 @@ public class DevEnvInitializer implements IDevEnvInitializer {
     void init() {
         log.info("initialize DB with test data");
         try {
-            createTourBindings();
-        } catch (PicassoException e) {
+            List<Employee> employees = createEmployees();
+            List<Tour> tours = createTours();
+//            createTourBindings(tours, employees);
+        } catch (Exception e) {
             log.error("unable to initialize DB with test data because: {}", e.getMessage());
         }
     }

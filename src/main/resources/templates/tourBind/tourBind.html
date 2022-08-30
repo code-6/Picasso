@@ -15,6 +15,8 @@
 
     <link rel="stylesheet" type="text/css" th:href="@{/webjars/bootstrap-select/dist/css/bootstrap-select.min.css}"/>
 
+    <link th:href="@{/vendor/popover/css/bootstrap-popover-x.min.css}" rel="stylesheet">
+
     <style>
         .card-body {
             padding: 0 1rem 1rem;
@@ -48,9 +50,8 @@
                         Filters
                     </a>
                     <a class="btn btn-sm btn-link" data-toggle="collapse" href="#tourBind" role="button"
-                       aria-expanded="false" aria-controls="tourBind tourCriteria tourFormContainer">
-                        Create new bind
-                    </a>
+                       aria-expanded="false" aria-controls="tourBind tourCriteria tourFormContainer"
+                    th:text="#{create-new-bind}"></a>
                 </div>
             </div>
         </div>
@@ -61,10 +62,10 @@
                     <!--                tour bind form -->
                     <div class="collapse" id="tourBind">
                         <hr/>
-                        <form id="tourBindForm" th:object="${tourBind}" th:method="post" th:action="@{/}">
+                        <form id="tourBindForm" th:object="${tourBind}" th:method="post" th:action="@{/}" th:fragment="tourBindForm">
                             <div class="row form-group">
                                 <div class="col-sm-2">
-                                    <label for="bindFormTourSelect">Tour</label>
+                                    <label for="bindFormTourSelect" th:text="#{tour.cap}"></label>
                                 </div>
                                 <div class="col">
                                     <select id="bindFormTourSelect" class="form-control selectpicker tourSelect"
@@ -81,7 +82,7 @@
                                 </div>
                                 <div class="col-sm-1">
                                     <button class="btn btn-outline-success"
-                                            title="These aren't the tours you're looking for ? Create new one. "
+                                            th:title="#{tour.no-required-entry}"
                                             data-toggle="collapse" href="#tourFormContainer" type="button"
                                             aria-expanded="false" aria-controls="tourFormContainer">
                                         <i class="fa-solid fa-plus"></i>
@@ -93,7 +94,7 @@
 
                                 <div class="row form-group">
                                     <div class="col-sm-2">
-                                        <label for="bindResultTourDates">Dates</label>
+                                        <label for="bindResultTourDates" th:text="#{date.cap.pl}"></label>
                                     </div>
                                     <div class="col">
                                         <input id="bindResultTourDates" class="form-control" disabled
@@ -103,7 +104,7 @@
                                 </div>
                                 <div class="row form-group">
                                     <div class="col-sm-2">
-                                        <label for="bindResultTourDescription">Description</label>
+                                        <label for="bindResultTourDescription" th:text="#{description.cap}"></label>
                                     </div>
                                     <div class="col">
                                         <textarea id="bindResultTourDescription" class="form-control" disabled
@@ -193,7 +194,7 @@
                                     <div class="col">
                                         <button class="btn btn-outline-success btn-block" type="button"
                                                 name="bindEmployee" id="bindEmployeeBtn"
-                                                th:text="${'Add employee to the ' + tourBind.tour?.name}"
+                                                th:text="#{bind-employee-to-the} + ${tourBind.tour?.name}"
                                                 onclick="onBindEmployee($(this).attr('name'))">
                                         </button>
                                     </div>
@@ -213,8 +214,7 @@
                                     <!--                                    1) Tour is chosen-->
                                     <!--                                    2) At least one employee chosen-->
                                     <!--                                    3) There is no overlaps with other tours-->
-                                    <button class="btn btn-outline-success btn-block" type="submit" id="submitBindBtn">
-                                        Submit
+                                    <button class="btn btn-outline-success btn-block" type="submit" id="submitBindBtn" th:text="#{submit.cap}">
                                     </button>
                                 </div>
                                 <div class="col-sm-1"></div>
@@ -252,21 +252,21 @@
                             <div class="row g-2 align-items-end">
 
                                 <div class="col-md align-items-end">
-                                    <label for="filterStartDate">Start date</label>
+                                    <label for="filterStartDate" th:text="#{start.cap} + #{date}"></label>
                                     <input type="text" class="form-control date-picker date-picker-single"
                                            id="filterStartDate"
                                            th:field="*{startDate}" name="startDate">
                                 </div>
 
                                 <div class="col-md align-items-end">
-                                    <label for="filterEndDate">End date</label>
+                                    <label for="filterEndDate" th:text="#{end.cap} + #{date}"></label>
                                     <input type="text" class="form-control date-picker date-picker-single"
                                            id="filterEndDate"
                                            th:field="*{endDate}" name="endDate">
                                 </div>
 
                                 <div class="col-md align-items-end">
-                                    <label for="filterTourSelect">Tour</label>
+                                    <label for="filterTourSelect" th:text="#{tour.cap}"></label>
                                     <select id="filterTourSelect" class="form-control selectpicker tourSelect"
                                             th:field="*{tourIds}" multiple
                                             data-live-search="true" data-selected-text-format="count > 1"
@@ -280,7 +280,7 @@
                                 </div>
 
                                 <div class="col-md align-items-end">
-                                    <label for="filterEmployeeTypeSelect">Employee type</label>
+                                    <label for="filterEmployeeTypeSelect" th:text="#{employee-type}"></label>
                                     <select id="filterEmployeeTypeSelect"
                                             class="form-control selectpicker employeeTypeSelect"
                                             th:field="*{employeeTypes}" name="employeeTypes"
@@ -328,13 +328,16 @@
 
     <script type="text/javascript" th:src="@{/webjars/momentjs/moment.js}"></script>
 
-    <script type="text/javascript"
-            th:src="@{/webjars/bootstrap-daterangepicker/js/bootstrap-daterangepicker.js}"></script>
+    <script type="text/javascript" th:src="@{/webjars/bootstrap-daterangepicker/js/bootstrap-daterangepicker.js}"></script>
 
     <script type="text/javascript" th:src="@{/webjars/bootstrap-select/dist/js/bootstrap-select.js}"></script>
+
+    <script th:src="@{/vendor/popover/js/bootstrap-popover-x.min.js}"></script>
+
     <script type="text/javascript" th:src="@{/js/tourBind.js}"></script>
 
     <script th:inline="javascript">
+        /*<![CDATA[*/
 
         // main url stored in head tag of layout.html
         const mainUrl = $("meta[name='mainUrl']").attr("content");
@@ -343,8 +346,65 @@
 
         $(document).ready(function () {
             initPage();
+
             initGanttChart();
+
+            $('#tourBindForm').submit(function(event) {
+                event.preventDefault();
+
+                $(this).unbind('submit').submit();
+
+                // let canSubmit = [[${tourBind.canSubmit()}]];
+                // if(canSubmit) {
+                // } else {
+                //     Swal.fire({
+                //         icon: 'error',
+                //         title: 'Submit not allowed. Make sure tour is chosen and at least one employee bound'
+                //     });
+                // }
+            });
         });
+
+        function onEditEntity (entityId, ctx) {
+
+            if(!ctx)
+                ctx = [[${ctx}]];
+
+            if(ctx === '/')
+                ctx = "";
+
+            $.ajax({
+                url: mainUrl + ctx + '/' + entityId,
+                type: "get",
+                async: false,
+                success: function (responsePayload) {
+                    console.log('get tour bind form fragment success ' + responsePayload)
+                    let form = $('#tourBindForm');
+                    let formDiv = $('#tourBind');
+                    $(form).html(responsePayload);
+                    initEmployeeSelect();
+
+                    $('.employeeTypeSelect').selectpicker('refresh');
+                    $('.employeeSelect').selectpicker('refresh');
+                    $('.tourSelect').selectpicker('refresh');
+
+                    initDatePicker();
+                    if(!$(formDiv).hasClass('show')) {
+                        $(formDiv).addClass('show')
+                    }
+                    if($('#bindResultEmployeesControls').has('show')) {
+                        $('#bindResultEmployeesControls').addClass('show')
+                    }
+                },
+                error: function (responsePayload) {
+                    console.log('get tour bind form fragment failed ' + responsePayload)
+                    Swal.fire({
+                        icon: 'error',
+                        title: responsePayload
+                    });
+                }
+            });
+        }
 
         function initPage() {
 
@@ -380,6 +440,7 @@
 
             $('.employeeTypeSelect').selectpicker('refresh');
             $('.employeeSelect').selectpicker('refresh');
+            $('.tourSelect').selectpicker('refresh');
 
             initDatePicker();
         }
@@ -526,12 +587,14 @@
             // configure ganttChart date columns width
             ganttChart.setDayColWidth(22);
 
-            // configure ganttChart date format
+            // configure ganttChart date format displayed on top and bottom of the table
             ganttChart.setDayMajorDateDisplayFormat('dd mon yyyy');
             ganttChart.setDateTaskTableDisplayFormat('dd mon yyyy');
+            ganttChart.setDateTaskDisplayFormat('dd mon yyyy hh:mm');
 
             // configure ganttChart tooltip information
             ganttChart.setShowTaskInfoRes(0)
+            ganttChart.setShowTaskInfoLink(0)
 
             // add data to chart
             $.each(ganttTasks, function (index, data) {
@@ -543,7 +606,39 @@
             });*/
 
             ganttChart.setTotalHeight(document.documentElement.clientWidth);
+
+            ganttChart.setTooltipTemplate(function (task) {
+                let tooltipHtml;
+                $.ajax({
+                    url: mainUrl + '/ganttTooltipFragment?taskId='+task.getDataObject().pID,
+                    type: "get",
+                    async: false,
+                    success: function (responsePayload) {
+                        console.log('get tooltip fragment success ')
+                        tooltipHtml = responsePayload;
+                    },
+                    error: function (responsePayload) {
+                        console.log('get tooltip fragment failed ' + responsePayload)
+                        Swal.fire({
+                            icon: 'error',
+                            title: responsePayload
+                        });
+                    }
+                });
+                return tooltipHtml;
+            });
+
             ganttChart.Draw();
+
+            $('.btn-edit-entity').on('click', function () {
+            })
+
+            // working but can be better tio show custom tooltip using API
+            // $('.tour-task').click(function (){
+            // })
+            //
+            // $('.employee-task').click(function (){
+            // })
 
             console.log('gantt chart initialized')
         }
@@ -590,20 +685,7 @@
             console.log('fillChosenTourDetails called')
         }
 
-        $('#tourBindForm').submit(function(event) {
-            event.preventDefault();
-
-            let canSubmit = [[${tourBind.canSubmit()}]];
-
-            if(canSubmit) {
-                $(this).unbind('submit').submit();
-            } else {
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Submit not allowed. Make sure tour is chosen and at least one employee bound'
-                });
-            }
-        })
+        /*]]>*/
 
     </script>
 </div>

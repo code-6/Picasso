@@ -7,9 +7,8 @@ import org.novinomad.picasso.domain.entities.impl.Tour;
 import org.novinomad.picasso.domain.entities.impl.TourBind;
 import org.novinomad.picasso.exceptions.BindException;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Data
 public class TourBindModel {
@@ -32,12 +31,17 @@ public class TourBindModel {
         }, () -> {
             EmployeeBindModel employeeBindModel = new EmployeeBindModel();
             employeeBindModel.getDateRanges().add(dateRange);
+            employeeBindModel.setEmployee(employee);
             employees.add(employeeBindModel);
         });
     }
 
     public Optional<EmployeeBindModel> getBoundEmployee(Employee employee) {
-        return employees.stream().filter(e -> e.getEmployee().equals(employee)).findAny();
+        return employees.isEmpty()
+                ? Optional.empty()
+                : employees.stream()
+                .filter(e -> e != null && e.getEmployee() != null && e.getEmployee().equals(employee))
+                .findAny();
     }
 
     public List<TourBind> toEntities() throws BindException {
@@ -49,6 +53,21 @@ public class TourBindModel {
             }
         }
         return tourBinds;
+    }
+
+    public static TourBindModel fromEntities(List<TourBind> tourBinds) {
+        Map<Tour, List<TourBind>> collect = tourBinds.stream().collect(Collectors.groupingBy(TourBind::getTour));
+        int toursCount = collect.keySet().size();
+        if (toursCount > 1)
+            throw new IllegalArgumentException("all tour binds should have same tour. Given tour binds have " + toursCount + " tours");
+
+        TourBindModel tourBindModel = new TourBindModel();
+        collect.forEach((tour, binds) -> {
+            tourBindModel.setTour(tour);
+
+            binds.forEach(bind -> tourBindModel.bindEmployee(bind.getEmployee(), bind.getDateRange()));
+        });
+        return tourBindModel;
     }
 
     public boolean canSubmit() {

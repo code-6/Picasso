@@ -2,6 +2,10 @@ package org.novinomad.picasso.commons.utils;
 
 import lombok.experimental.UtilityClass;
 
+import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 @UtilityClass
 public class CommonMessageFormat {
 
@@ -14,5 +18,14 @@ public class CommonMessageFormat {
     public static String format(String pattern, Object ... args) {
         pattern = pattern.replaceAll("(\\{})", "%s");
         return String.format(pattern, args);
+    }
+
+    public static String format(String pattern, Map<String, String> values) {
+        for (Map.Entry<String, String> entry : values.entrySet()) {
+            String key = entry.getKey();
+            String val = entry.getValue();
+            pattern = pattern.replaceAll("\\$\\{" + key + "}", val);
+        }
+        return pattern;
     }
 }

@@ -1,5 +1,6 @@
 package org.novinomad.picasso.domain.entities.impl;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 import org.apache.commons.lang3.StringUtils;
@@ -33,6 +34,11 @@ import static org.novinomad.picasso.commons.utils.CommonDateUtils.ISO_8601;
         @Index(columnList = "name", name = "tour_name_idx")
 })
 public class Tour extends AbstractEntity implements ITour, IRange {
+
+    @Transient
+    @JsonIgnore
+    @Getter
+    public static final String ICON = "<i class=\"fa-thin fa-earth-asia\"></i>";
 
     @Nationalized
     String name;

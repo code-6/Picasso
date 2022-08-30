@@ -55,8 +55,12 @@ public class Employee extends AbstractEntity {
                 '}';
     }
 
+    @RequiredArgsConstructor
     public enum Type {
-        DRIVER,
-        GUIDE;
+        DRIVER("<i class=\"fa-thin fa-person-military-pointing\"></i>"),
+        GUIDE("<i class=\"fa-thin fa-person-hiking\"></i>");
+
+        @Getter
+        private final String ICON;
     }
 }
