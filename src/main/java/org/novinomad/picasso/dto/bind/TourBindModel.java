@@ -47,11 +47,12 @@ public class TourBindModel {
     public List<TourBind> toEntities() throws BindException {
         List<TourBind> tourBinds = new ArrayList<>();
 
-        for (EmployeeBindModel employeeBindModel : employees) {
-            for (BindDateRange bindDateRange : employeeBindModel.getBindIdsToDateRanges()) {
-                tourBinds.add(new TourBind(bindDateRange.getBindId(), employeeBindModel.getEmployee(), tour, bindDateRange.getDateRange()));
-            }
-        }
+        if (employees.isEmpty()) tourBinds.add(new TourBind(null, tour, tour.getDateRange()));
+        else
+            for (EmployeeBindModel employeeBindModel : employees)
+                for (BindDateRange bindDateRange : employeeBindModel.getBindIdsToDateRanges())
+                    tourBinds.add(new TourBind(bindDateRange.getBindId(), employeeBindModel.getEmployee(), tour, bindDateRange.getDateRange()));
+
         return tourBinds;
     }
 

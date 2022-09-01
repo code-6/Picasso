@@ -484,7 +484,7 @@
         function submitGanttFilterForm() {
             $('#submitFilterBtn').prop('disabled', true);
             $.ajax({
-                url: mainUrl,
+                url: mainUrl + '/api/bind/gantt-tasks',
                 type: "post",
                 data: $('#tourCriteriaForm').serialize(),
                 success: function (tasks) {

@@ -46,7 +46,7 @@ public class TourBindRestController implements ICrud<TourBind> {
         tourBindService.delete(id);
     }
 
-    @PostMapping(value = "/gantt", produces = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(value = "/gantt-tasks", produces = MediaType.APPLICATION_JSON_VALUE)
     public List<Task> getToursForGanttChart(TourCriteria criteria) {
 
         return tourBindService.getForGanttChart(Optional.ofNullable(criteria).orElse(new TourCriteria()));

@@ -59,7 +59,7 @@ public class DevEnvInitializer implements IDevEnvInitializer {
         try {
             List<Employee> employees = createEmployees();
             List<Tour> tours = createTours();
-//            createTourBindings(tours, employees);
+            createTourBindings(tours, employees);
         } catch (Exception e) {
             log.error("unable to initialize DB with test data because: {}", e.getMessage());
         }
