@@ -9,76 +9,42 @@
 
     <link rel="stylesheet" type="text/css" th:href="@{/webjars/datatables/css/jquery.dataTables.css}">
     <link rel="stylesheet" type="text/css" th:href="@{/webjars/bootstrap-daterangepicker/css/bootstrap-daterangepicker.css}" />
-    <link rel="stylesheet" type="text/css" th:href="@{/webjars/bootstrap-select/css/bootstrap-select.min.css}" />
+    <link rel="stylesheet" type="text/css" th:href="@{/webjars/bootstrap-select/dist/css/bootstrap-select.min.css}" />
 </head>
 <body class="sb-nav-fixed" >
 <div layout:fragment="content">
     <div class="card mb-4">
         <div class="card-header">
             <i class="fas fa-table me-1"></i>
-            Tours
-            <button id="showToursTableOptionsBtn" class="btn-sm btn-outline-primary" type="button"
-                    data-bs-toggle="collapse" data-bs-target="#toursTableOptions" aria-expanded="false"
-                    aria-controls="toursTableOptions" onclick="$('#tourFormContainer').removeClass('show')">
-                Show filters
-            </button>
-            <button id="createNewTourBtn" class="btn-sm btn-outline-success" type="button"
-                    data-bs-toggle="collapse" data-bs-target="#tourFormContainer" aria-expanded="false"
-                    aria-controls="tourFormContainer" onclick="$('#toursTableOptions').removeClass('show')">
-                Create new tour
-            </button>
-            <div class="collapse" id="toursTableOptions" th:object="${tourFilter}">
-                <div class="card card-body">
-                    <div class="mb-3">
-                        <input type="text" id="filterStartDate" th:field="${tourFilter.startDate}" />
-                        <input type="text" id="filterEndDate"  th:field="${tourFilter.endDate}" />
-                        <input type="text" id="tourNameFilter" placeholder="type tour name" th:field="${tourFilter.tourName}"/>
-                        <button type="button" class="btn-sm btn-outline-success btn-block">Show</button>
-                    </div>
-                </div>
-            </div>
+            <th:block th:text="#{tour.cap.pl}"></th:block>
 
-            <div class="collapse" id="tourFormContainer">
-                <div class="card card-body">
-                    <form th:replace="tour/tourForm :: tourForm" id="tourForm"></form>
-                </div>
-            </div>
+            <a class="btn btn-outline-primary" type="button" data-toggle="collapse" data-target="#toursTableOptions"
+               aria-expanded="false" aria-controls="toursTableOptions" href="#">
+                <i class="fa-thin fa-filter"></i>
+                <span th:text="#{filter.cap.pl}"></span>
+            </a>
+
+            <a class="btn btn-outline-success" type="button" data-toggle="collapse" data-target="#tourFormContainer"
+               aria-expanded="false" aria-controls="tourFormContainer" href="#">
+                <i class="fa-thin fa-square-plus"></i>
+                <span th:text="#{create.cap}"></span>
+            </a>
         </div>
         <div class="card-body">
-            <table id="toursTable" class="display compact cell-border hover stripe">
-                <thead>
-                <tr>
-                    <th>Name</th>
-                    <th>Start date</th>
-                    <th>End date</th>
-                    <th>Description</th>
-                    <th>Management</th>
-                </tr>
-                </thead>
-                <tfoot>
-                <tr>
-                    <th>Name</th>
-                    <th>Start date</th>
-                    <th>End date</th>
-                    <th>Description</th>
-                    <th>Management</th>
-                </tr>
-                </tfoot>
-                <tbody>
-
-                <tr th:each="tour : ${tours}">
-                    <td><span th:text="${tour.name}"></span></td>
-                    <td><span th:text="${tour.getStartDate('yyyy-MM-dd hh:mm')}"></span></td>
-                    <td><span th:text="${tour.getEndDate('yyyy-MM-dd hh:mm')}"></span></td>
-                    <td th:title="${tour.description}"><span th:text="${tour.description}"></span></td>
-                    <td>
-                        <i class="fa-solid fa-pen-to-square"></i>
-                        <i class="fa-solid fa-trash-can"></i>
-                    </td>
-                </tr>
-
-                </tbody>
-            </table>
+            <div class="collapse" id="toursTableOptions" th:object="${tourFilter}">
+                <div th:include="tour/tourFilterForm :: tourFilterFormContent"></div>
+                <hr>
+            </div>
+            <div class="collapse" id="tourFormContainer">
+                <form th:object="${tour}" id="tourForm">
+                    <div th:include="tour/tourForm :: tourFormContent"></div>
+                </form>
+                <hr>
+            </div>
+            <div class="collapse show">
+                <table id="toursTable" class="display compact cell-border hover stripe" th:include="tour/toursTable :: toursTable"></table>
+                <hr>
+            </div>
         </div>
     </div>
 </div>
@@ -87,7 +53,7 @@
     <script type="text/javascript" charset="utf8" th:src="@{/webjars/datatables/js/jquery.dataTables.js}"></script>
     <script type="text/javascript" charset="utf8" th:src="@{/webjars/momentjs/min/moment.min.js}"></script>
     <script type="text/javascript" th:src="@{/webjars/bootstrap-daterangepicker/js/bootstrap-daterangepicker.js}"></script>
-    <script type="text/javascript" th:src="@{/webjars/bootstrap-select/js/bootstrap-select.js}"></script>
+    <script type="text/javascript" th:src="@{/webjars/bootstrap-select/dist/js/bootstrap-select.js}"></script>
     <script type="text/javascript">
         $(document).ready(function () {
             $('#toursTable').DataTable({
@@ -96,7 +62,7 @@
                 ordering: true,
                 fixedHeader: true,
                 columnDefs: [{
-                    targets: 3,
+                    targets: 2,
                     render: function (data, type, row) {
                         return data.length > 80 ?
                             data.substr(0, 80) + '…' :
@@ -105,26 +71,17 @@
                 }]
             });
 
-            $(function() {
-                $('#filterStartDate').daterangepicker({
-                    singleDatePicker: true,
-                    showDropdowns: true,
-                    minYear: 1901,
-                    maxYear: parseInt(moment().format('YYYY'),10)
-                }, function(start, end, label) {
-                    var years = moment().diff(start, 'years');
-                    alert("You are " + years + " years old!");
-                });
-
-                $('#filterEndDate').daterangepicker({
-                    singleDatePicker: true,
-                    showDropdowns: true,
-                    minYear: 1901,
-                    maxYear: parseInt(moment().format('YYYY'),10)
-                }, function(start, end, label) {
-                    var years = moment().diff(start, 'years');
-                    alert("You are " + years + " years old!");
-                });
+            $('.date-picker-single').daterangepicker({
+                singleDatePicker: true,
+                showDropdowns: true,
+                timePicker: true,
+                timePicker24Hour: true,
+                timePickerIncrement: 5,
+                autoApply: true,
+                autoUpdateInput: true,
+                locale: {
+                    format: dateTimeFormat,
+                }
             });
         });
     </script>

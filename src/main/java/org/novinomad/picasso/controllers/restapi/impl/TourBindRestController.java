@@ -19,7 +19,7 @@ import java.util.Optional;
 @Slf4j
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("/api/tour/bind")
+@RequestMapping("/api/bind")
 public class TourBindRestController implements ICrud<TourBind> {
 
     final IEmployeeService employeeService;

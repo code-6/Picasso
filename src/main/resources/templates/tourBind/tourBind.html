@@ -161,16 +161,19 @@
                                             </button>
                                         </div>
                                     </div>
-                                    <div th:each="employeeBindTourDateRange, j : ${employeeBind.dateRanges}">
+                                    <div th:each="bindDateRange, j : ${employeeBind.getBindIdsToDateRanges}">
                                         <div class="row form-group">
                                             <div class="col-sm-2"></div>
                                             <div class="col">
+                                                <input type="hidden" name="bindId"
+                                                       th:field="${tourBind.employees[__${i.index}__].bindIdsToDateRanges[__${j.index}__]?.bindId}">
+
                                                 <input type="text" required
                                                        class="form-control date-picker date-picker-employee-tour-bind"
                                                        th:id="${'employeeTourDateRange_'+i.index+'-'+j.index}"
                                                        th:data-employee-id="${employeeBind?.employee?.id}"
-                                                       th:data-tour-id="${tourBind.tour.id}" name="localDateTimeRange"
-                                                       th:field="${tourBind.employees[__${i.index}__].dateRanges[__${j.index}__]}">
+                                                       th:data-tour-id="${tourBind.tour.id}" name="dateRange"
+                                                       th:field="${tourBind.employees[__${i.index}__].bindIdsToDateRanges[__${j.index}__]?.dateRange}">
                                             </div>
                                             <div class="col-sm-1">
                                                 <button class="btn btn-outline-primary" type="button"
@@ -304,7 +307,7 @@
                                 <div class="col-md align-items-end">
                                     <button id="submitFilterBtn" type="button" onclick="submitGanttFilterForm()"
                                             title="Press to see filtered tours and employees"
-                                            class="btn btn-outline-success btn-block form-control">Show tours
+                                            class="btn btn-outline-success btn-block form-control" th:text="#{show.cap} + #{tour.pl}">
                                     </button>
                                 </div>
                             </div>
@@ -334,39 +337,79 @@
 
     <script th:src="@{/vendor/popover/js/bootstrap-popover-x.min.js}"></script>
 
-    <script type="text/javascript" th:src="@{/js/tourBind.js}"></script>
-
     <script th:inline="javascript">
         /*<![CDATA[*/
-
         // main url stored in head tag of layout.html
         const mainUrl = $("meta[name='mainUrl']").attr("content");
 
         const dateTimeFormat = 'DD MMM YYYY HH:mm';
 
         $(document).ready(function () {
-            initPage();
+
+            initSingleDatePickers();
+
+            initFilterDates();
+
+            initBindFormDatePickers();
+
+            initEmployeeTypeSelectChangeListener();
 
             initGanttChart();
+
+            // when tour is changed in bind form then load tour details like dates and description and update form. Also show/hide other components.
+            $('#bindFormTourSelect').on('changed.bs.select', function (e, clickedIndex, isSelected, previousValue) {
+                const selectedTourId = $('#bindFormTourSelect').find(":selected").map((_, e) => e.value).get();
+
+                // if tour not selected hide everything in bind form except tour select
+                if (selectedTourId == null || selectedTourId[0] === '') {
+                    hideEmployeeBindFormElements();
+                    resetEmployeeBindFormFields();
+                } else {
+                    try {
+                        let tour = getTour(selectedTourId, false);
+                        let tourStartDate = new Date(tour.startDate);
+                        let tourEndDate = new Date(tour.endDate);
+                        $('#bindResultTourName').val(tour.name);
+                        $('#bindResultTourDates').val(moment(tourStartDate).format(dateTimeFormat) + ' ~ ' + moment(tourEndDate).format(dateTimeFormat));
+                        $('#bindResultTourDescription').val(tour.description);
+
+                        $('#bindResultTourDetails').addClass('show');
+                        $('#bindResultEmployees').addClass('show');
+                        $('#bindResultEmployeesControls').addClass('show');
+                        $('#bindEmployeeBtn').text('Add employee to the ' + tour.name);
+                    } catch (e) {
+                        resetEmployeeBindFormFields();
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'unable to get tour by id: ' + selectedTourId
+                        });
+                    }
+                }
+            });
 
             $('#tourBindForm').submit(function(event) {
                 event.preventDefault();
 
                 $(this).unbind('submit').submit();
 
-                // let canSubmit = [[${tourBind.canSubmit()}]];
-                // if(canSubmit) {
-                // } else {
-                //     Swal.fire({
-                //         icon: 'error',
-                //         title: 'Submit not allowed. Make sure tour is chosen and at least one employee bound'
-                //     });
-                // }
             });
         });
 
-        function onEditEntity (entityId, ctx) {
+        function hideEmployeeBindFormElements() {
+            $('#bindResultTourDetails').removeClass('show');
+            $('#bindResultEmployees').removeClass('show');
+            $('#bindResultEmployeesControls').removeClass('show');
+            $('#submitBindBtnRow').removeClass('show');
+        }
 
+        function resetEmployeeBindFormFields() {
+            $('#bindResultTourName').val(null);
+            $('#bindResultTourDates').val(null);
+            $('#bindResultTourDescription').val(null);
+        }
+
+        // event handler when bind, tour or employee edit button pressed.
+        function onEditEntity (entityId, ctx) {
             if(!ctx)
                 ctx = [[${ctx}]];
 
@@ -376,19 +419,17 @@
             $.ajax({
                 url: mainUrl + ctx + '/' + entityId,
                 type: "get",
-                async: false,
                 success: function (responsePayload) {
-                    console.log('get tour bind form fragment success ' + responsePayload)
                     let form = $('#tourBindForm');
                     let formDiv = $('#tourBind');
                     $(form).html(responsePayload);
-                    initEmployeeSelect();
+                    initEmployeeTypeSelectChangeListener();
 
                     $('.employeeTypeSelect').selectpicker('refresh');
                     $('.employeeSelect').selectpicker('refresh');
                     $('.tourSelect').selectpicker('refresh');
 
-                    initDatePicker();
+                    initBindFormDatePickers();
                     if(!$(formDiv).hasClass('show')) {
                         $(formDiv).addClass('show')
                     }
@@ -397,7 +438,7 @@
                     }
                 },
                 error: function (responsePayload) {
-                    console.log('get tour bind form fragment failed ' + responsePayload)
+                    console.log('onEditEntity ' + responsePayload)
                     Swal.fire({
                         icon: 'error',
                         title: responsePayload
@@ -406,65 +447,51 @@
             });
         }
 
-        function initPage() {
-
-            initDatePicker();
-
-            initEmployeeSelect();
-
-            $('#bindFormTourSelect').on('changed.bs.select', function (e, clickedIndex, isSelected, previousValue) {
-                fillChosenTourDetails();
-            });
-
-            $('.date-picker-employee-tour-bind').on('apply.daterangepicker', function (e, clickedIndex, isSelected, previousValue) {
-                let employeeId = $(this).attr('data-employee-id');
-                let tourId = $(this).attr('data-tour-id');
-                let dateRange = $(this).val();
-                validateBind(tourId, employeeId, dateRange);
-            });
-            console.log('page initialized')
-        }
-
-
-        /**
-         * Append html row with employee and type select to bind form
-         * */
         function onBindEmployee(ctxPath) {
-            let tourBindFormData = $('#tourBindForm').serialize();
-            console.log(tourBindFormData)
-            let tourBindFormFragment = bindEmployee(tourBindFormData, mainUrl + '/' + ctxPath, false);
-            console.log(tourBindFormFragment)
-            $('#bindResultEmployees').html(tourBindFormFragment);
+            $.ajax({
+                url: mainUrl + '/' + ctxPath,
+                type: "post",
+                data: $('#tourBindForm').serialize(),
+                success: function (tourBindFormFragment) {
+                    $('#bindResultEmployees').html(tourBindFormFragment);
 
-            initEmployeeSelect();
+                    initEmployeeTypeSelectChangeListener();
 
-            $('.employeeTypeSelect').selectpicker('refresh');
-            $('.employeeSelect').selectpicker('refresh');
-            $('.tourSelect').selectpicker('refresh');
+                    $('.employeeTypeSelect').selectpicker('refresh');
+                    $('.employeeSelect').selectpicker('refresh');
+                    $('.tourSelect').selectpicker('refresh');
 
-            initDatePicker();
+                    initBindFormDatePickers();
+                },
+                error: function (error) {
+                    console.error('onBindEmployee ' + error);
+                }
+            });
         }
 
-        function initEmployeeSelect() {
+        function initEmployeeTypeSelectChangeListener() {
             $('.employeeTypeSelect').each(function () {
-
-                let $employeeTypeSelect = $(this);
-
-                $employeeTypeSelect.on('changed.bs.select', function () {
-                    loadEmployeesForSelect($employeeTypeSelect);
+                $(this).on('changed.bs.select', function () {
+                    loadEmployeesForSelect($(this));
                 });
             });
-            console.log('init employee type select')
         }
 
         function submitGanttFilterForm() {
             $('#submitFilterBtn').prop('disabled', true);
-            let filterFormData = $('#tourCriteriaForm').serialize();
-            console.log('submitGanttFilterForm -> filter form data = ' + filterFormData);
-            let ganttTasks = getToursForGanttChart(filterFormData, mainUrl + '/api/tour/bind/gantt', false);
-            initGanttChart(ganttTasks);
-            $('#submitFilterBtn').prop('disabled', false);
-
+            $.ajax({
+                url: mainUrl,
+                type: "post",
+                data: $('#tourCriteriaForm').serialize(),
+                success: function (tasks) {
+                    initGanttChart(tasks);
+                    $('#submitFilterBtn').prop('disabled', false);
+                },
+                error: function (responseData) {
+                    console.error('failed HTTP GET call %s %s', serverEndpoint, responseData);
+                    $('#submitFilterBtn').prop('disabled', false);
+                }
+            });
         }
 
         function loadEmployeesForSelect($employeeTypeSelect) {
@@ -509,8 +536,7 @@
             });
         }
 
-        function initDatePicker() {
-
+        function initSingleDatePickers () {
             $('.date-picker-single').daterangepicker({
                 singleDatePicker: true,
                 showDropdowns: true,
@@ -523,12 +549,17 @@
                     format: dateTimeFormat,
                 }
             });
+        }
+
+        function initFilterDates() {
             let defaultStartDate = new Date([[${tourCriteria.startDate}]].toString());
             let defaultEndDate = new Date([[${tourCriteria.endDate}]].toString());
 
             $('#filterStartDate').data('daterangepicker').setStartDate(defaultStartDate);
             $('#filterEndDate').data('daterangepicker').setStartDate(defaultEndDate);
+        }
 
+        function initBindFormDatePickers() {
             let tourStartDate = null;
             let tourEndDate = null;
             try {
@@ -558,15 +589,29 @@
                     separator: ' ~ ',
                     format: dateTimeFormat,
                 }
+            }).on('apply.daterangepicker', function (e, clickedIndex, isSelected, previousValue) {
+                // validate bind when employee dates changed
+                $.ajax({
+                    url: mainUrl + '/api/bind/validate/' + $(this).attr('data-tour-id') + '/' + $(this).attr('data-employee-id') + '/' + $(this).val(),
+                    type: "get",
+                    error: function (validateErrorMessage) {
+                        console.error('validate bind failed ' + validateErrorMessage);
+                        Swal.fire({
+                            icon: 'error',
+                            title: validateErrorMessage.responseJSON.message
+                        });
+                    }
+                });
             });
-            console.log("date pickers initialized")
         }
 
         function initGanttChart(ganttTasks) {
 
+            const dateTimeFormat = 'dd mon yyyy hh:mm';
+            const dateFormat = 'dd mon yyyy';
+
             if (!ganttTasks)
                 ganttTasks = [[${toursForGantt}]];
-            // let ganttDataJsonArray = JSON.parse([[${ganttData}]].toString());
 
             let ganttChart = new JSGantt.GanttChart(document.getElementById('GanttChartDIV'), 'day');
 
@@ -588,9 +633,9 @@
             ganttChart.setDayColWidth(22);
 
             // configure ganttChart date format displayed on top and bottom of the table
-            ganttChart.setDayMajorDateDisplayFormat('dd mon yyyy');
-            ganttChart.setDateTaskTableDisplayFormat('dd mon yyyy');
-            ganttChart.setDateTaskDisplayFormat('dd mon yyyy hh:mm');
+            ganttChart.setDayMajorDateDisplayFormat(dateFormat);
+            ganttChart.setDateTaskTableDisplayFormat(dateFormat);
+            ganttChart.setDateTaskDisplayFormat(dateTimeFormat);
 
             // configure ganttChart tooltip information
             ganttChart.setShowTaskInfoRes(0)
@@ -600,10 +645,6 @@
             $.each(ganttTasks, function (index, data) {
                 ganttChart.AddTaskItemObject(data);
             });
-
-            /*ganttChart.setEventClickRow(function (task) {
-                alert(task);
-            });*/
 
             ganttChart.setTotalHeight(document.documentElement.clientWidth);
 
@@ -629,64 +670,28 @@
             });
 
             ganttChart.Draw();
-
-            $('.btn-edit-entity').on('click', function () {
-            })
-
-            // working but can be better tio show custom tooltip using API
-            // $('.tour-task').click(function (){
-            // })
-            //
-            // $('.employee-task').click(function (){
-            // })
-
-            console.log('gantt chart initialized')
         }
 
-        function fillChosenTourDetails() {
-            const selectedTourId = $('#bindFormTourSelect').find(":selected").map((_, e) => e.value).get();
-
-            if (selectedTourId == null || selectedTourId[0] === '') {
-                $('#bindResultTourDetails').removeClass('show');
-                $('#bindResultEmployees').removeClass('show');
-                $('#bindResultEmployeesControls').removeClass('show');
-                $('#bindResultEmployeesControls').removeClass('show');
-                $('#submitBindBtnRow').removeClass('show');
-            } else {
-                // load tour details
-                $.ajax({
-                    url: mainUrl + '/api/tour/' + selectedTourId,
-                    type: "get",
-                    success: function (tour) {
-                        console.log(tour);
-                        let tourStartDate = new Date(tour.startDate);
-                        let tourEndDate = new Date(tour.endDate);
-                        $('#bindResultTourName').val(tour.name);
-                        $('#bindResultTourDates').val(moment(tourStartDate).format(dateTimeFormat) + ' ~ ' + moment(tourEndDate).format(dateTimeFormat));
-                        $('#bindResultTourDescription').val(tour.description);
-
-                        $('#bindResultTourDetails').addClass('show');
-                        $('#bindResultEmployees').addClass('show');
-                        $('#bindResultEmployeesControls').addClass('show');
-                        $('#bindEmployeeBtn').text('Add employee to the ' + tour.name);
-                    },
-                    error: function () {
-                        $('#bindResultTourDetails').removeClass('show');
-                        $('#bindResultEmployees').removeClass('show');
-                        $('#bindResultEmployeesControls').removeClass('show');
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'unable to get tour by id: ' + selectedTourId
-                        });
-                    }
-                });
-            }
-
-            console.log('fillChosenTourDetails called')
+        function getTour(tourId, async) {
+            if(typeof async == "undefined")
+                async = true;
+            let tour;
+            $.ajax({
+                url: mainUrl + '/api/tour/' + tourId ,
+                type: "get",
+                async: async,
+                success: function (t) {
+                    tour = t;
+                },
+                error: function (error) {
+                    let errorMessage = 'failed get tour by id ' + tourId + ' error: ' + error;
+                    console.error(errorMessage);
+                    throw errorMessage;
+                }
+            });
+            return tour;
         }
-
         /*]]>*/
-
     </script>
 </div>
 </body>

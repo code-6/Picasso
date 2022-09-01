@@ -8,6 +8,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.novinomad.picasso.domain.entities.impl.Employee;
 import org.novinomad.picasso.domain.entities.impl.Tour;
 import org.novinomad.picasso.domain.entities.impl.TourBind;
+import org.novinomad.picasso.dto.bind.BindDateRange;
 import org.novinomad.picasso.dto.bind.EmployeeBindModel;
 import org.novinomad.picasso.dto.bind.TourBindModel;
 import org.novinomad.picasso.dto.filters.TourCriteria;
@@ -127,7 +128,7 @@ public class TourBindController {
             final int employeeRowId = Integer.parseInt(request.getParameter("employeeRowId"));
             EmployeeBindModel employeeBindModel = tourBind.getEmployees().get(employeeRowId);
             Tour tour = tourBind.getTour();
-            employeeBindModel.getDateRanges().add(tour.getDateRange());
+            employeeBindModel.getBindIdsToDateRanges().add(new BindDateRange(tour.getDateRange()));
         } catch (NumberFormatException e) {
             log.error(e.getMessage(), e);
         }
@@ -143,7 +144,7 @@ public class TourBindController {
             final int dateRangeRowId = Integer.parseInt(request.getParameter("unbindEmployeeDateRange"));
 
             EmployeeBindModel employeeBindModel = tourBind.getEmployees().get(employeeRowId);
-            employeeBindModel.getDateRanges().remove(dateRangeRowId);
+            employeeBindModel.getBindIdsToDateRanges().remove(dateRangeRowId);
         } catch (NumberFormatException e) {
             log.error(e.getMessage(), e);
         }

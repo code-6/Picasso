@@ -1,0 +1,35 @@
+<table id="toursTable" class="display compact cell-border hover stripe" th:fragment="toursTable">
+  <thead>
+  <tr>
+    <th th:text="#{name.cap}"></th>
+    <th th:text="#{date.cap.pl}"></th>
+    <th th:text="#{description.cap}"></th>
+    <th></th>
+  </tr>
+  </thead>
+  <tfoot>
+  <tr>
+    <th th:text="#{name.cap}"></th>
+    <th th:text="#{date.cap.pl}"></th>
+    <th th:text="#{description.cap}"></th>
+    <th></th>
+  </tr>
+  </tfoot>
+  <tbody>
+
+  <tr th:each="tour : ${tours}">
+    <td><span th:text="${tour.name}"></span></td>
+    <td><span th:text="${tour.getDateRange().toString()}"></span></td>
+    <td th:title="${tour.description}"><span th:text="${tour.description}"></span></td>
+    <td>
+
+      <div class="btn-group" role="group" aria-label="Basic example">
+        <button type="button" class="btn btn-sm btn-outline-primary"><i class="fa-thin fa-pen-to-square"></i></button>
+        <button type="button" class="btn btn-sm btn-outline-success"><i class="fa-thin fa-file"></i></button>
+        <button type="button" class="btn btn-sm btn-outline-danger"><i class="fa-thin fa-trash-can"></i></button>
+      </div>
+    </td>
+  </tr>
+
+  </tbody>
+</table>

@@ -34,7 +34,7 @@ public class TourController {
     static final String TOUR_PAGE = "tour/tourPage";
 
     @GetMapping
-    public ModelAndView list(TourFilter tourFilter) {
+    public ModelAndView list(@ModelAttribute("tourFilter") TourFilter tourFilter) {
 
         tourFilter = Optional.ofNullable(tourFilter).orElse(new TourFilter());
 

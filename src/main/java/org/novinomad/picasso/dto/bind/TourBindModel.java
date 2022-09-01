@@ -19,18 +19,18 @@ public class TourBindModel {
 
     public void bindEmployee(Employee employee) {
         if (tour != null) {
-            bindEmployee(employee, tour.getDateRange());
+            bindEmployee(null, employee, tour.getDateRange());
         }
     }
 
-    public void bindEmployee(Employee employee, LocalDateTimeRange dateRange) {
-        getBoundEmployee(employee).ifPresentOrElse(e -> {
-            List<LocalDateTimeRange> dateRanges = e.getDateRanges();
-            if (!dateRanges.contains(dateRange))
-                dateRanges.add(dateRange);
+    public void bindEmployee(Long bindId, Employee employee, LocalDateTimeRange dateRange) {
+        getBoundEmployee(employee).ifPresentOrElse(employeeBindModel -> {
+            List<BindDateRange> dateRanges = employeeBindModel.getBindIdsToDateRanges();
+            if (dateRanges.stream().noneMatch(bindDateRange -> bindDateRange.getDateRange().equals(dateRange)))
+                dateRanges.add(new BindDateRange(bindId, dateRange));
         }, () -> {
             EmployeeBindModel employeeBindModel = new EmployeeBindModel();
-            employeeBindModel.getDateRanges().add(dateRange);
+            employeeBindModel.getBindIdsToDateRanges().add(new BindDateRange(bindId, dateRange));
             employeeBindModel.setEmployee(employee);
             employees.add(employeeBindModel);
         });
@@ -48,8 +48,8 @@ public class TourBindModel {
         List<TourBind> tourBinds = new ArrayList<>();
 
         for (EmployeeBindModel employeeBindModel : employees) {
-            for (LocalDateTimeRange dateRange : employeeBindModel.getDateRanges()) {
-                tourBinds.add(new TourBind(employeeBindModel.getEmployee(), tour, dateRange));
+            for (BindDateRange bindDateRange : employeeBindModel.getBindIdsToDateRanges()) {
+                tourBinds.add(new TourBind(bindDateRange.getBindId(), employeeBindModel.getEmployee(), tour, bindDateRange.getDateRange()));
             }
         }
         return tourBinds;
@@ -65,7 +65,7 @@ public class TourBindModel {
         collect.forEach((tour, binds) -> {
             tourBindModel.setTour(tour);
 
-            binds.forEach(bind -> tourBindModel.bindEmployee(bind.getEmployee(), bind.getDateRange()));
+            binds.forEach(bind -> tourBindModel.bindEmployee(bind.getId(), bind.getEmployee(), bind.getDateRange()));
         });
         return tourBindModel;
     }

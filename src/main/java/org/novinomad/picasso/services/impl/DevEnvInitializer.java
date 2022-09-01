@@ -70,7 +70,7 @@ public class DevEnvInitializer implements IDevEnvInitializer {
         log.info("start create allTours");
         List<Tour> tours = new ArrayList<>();
         for (int i = 0; i < TOURS_COUNT_TO_CREATE; i++) {
-            String name = faker.funnyName().name();
+            String name = faker.name().title();
             String desc = faker.yoda().quote();
             Date startDate = faker.date().between(minDate, maxDate);
             int rndTourDuration = RandomUtils.nextInt(MIN_TOUR_DAYS_COUNT, MAX_TOUR_DAYS_COUNT);

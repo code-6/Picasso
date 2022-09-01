@@ -1,0 +1,23 @@
+<div th:fragment="tourFilterFormContent">
+    <div class="row align-items-end">
+        <div class="col">
+            <label for="filterStartDate" th:text="#{start.cap} + #{date}"></label>
+            <input type="text" class="form-control date-picker date-picker-single"
+                   id="filterStartDate"
+                   th:field="*{startDate}" name="startDate">
+        </div>
+        <div class="col">
+            <label for="filterEndDate" th:text="#{end.cap} + #{date}"></label>
+            <input type="text" class="form-control date-picker date-picker-single"
+                   id="filterEndDate"
+                   th:field="*{endDate}" name="endDate">
+        </div>
+        <div class="col">
+            <label for="tourNameFilter" th:text="#{tour.cap} + #{name}"></label>
+            <input type="text" class="form-control" id="tourNameFilter" placeholder="type tour name" th:field="${tourFilter.tourName}"/>
+        </div>
+        <div class="col">
+            <button type="button" class="btn btn-outline-success btn-block" th:text="#{show.cap} + #{tour.pl}"></button>
+        </div>
+    </div>
+</div>
