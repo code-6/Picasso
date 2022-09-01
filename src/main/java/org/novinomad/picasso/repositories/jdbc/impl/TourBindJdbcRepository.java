@@ -35,16 +35,17 @@ public class TourBindJdbcRepository implements TourBindRepository {
 
 
     @Override
-    public List<TourBind> findOverlappedBinds(Long employeeId, LocalDateTime newBindStartDate, LocalDateTime newBindEndDate) {
+    public List<TourBind> findOverlappedBinds(Long tourId, Long employeeId, LocalDateTime newBindStartDate, LocalDateTime newBindEndDate) {
 
         String sql = """
                 select tb.* from TOUR_BIND tb
-                where (tb.START_DATE <= :newBindEndDate and tb.END_DATE >= :newBindStartDate)
-                and tb.EMPLOYEE_ID = :employeeId
+                where (tb.START_DATE <= :newBindEndDate and tb.END_DATE >= :newBindStartDate) and tb.TOUR_ID <> :tourId
+                and tb.EMPLOYEE_ID = :employeeId               
                 """;
         SqlParameterSource params = new MapSqlParameterSource()
                 .addValue("newBindEndDate", localDateTimeToDate(newBindEndDate))
                 .addValue("newBindStartDate", localDateTimeToDate(newBindStartDate))
+                .addValue("tourId", tourId)
                 .addValue("employeeId", employeeId);
 
         return jdbcTemplate.query(sql, params, tourBindRowMapper);

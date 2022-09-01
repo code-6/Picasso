@@ -78,9 +78,8 @@ public class TourBindService implements ITourBindService {
     public void validateBind(TourBind tourBind) throws BindException {
         Employee employee = tourBind.getEmployee();
 
-        List<TourBind> overlapsBinds = tourBindRepository.findOverlappedBinds(employee.getId(),
-                tourBind.getStartDate(),
-                tourBind.getEndDate());
+        List<TourBind> overlapsBinds = tourBindRepository.findOverlappedBinds(tourBind.getTour().getId(), employee.getId(),
+                tourBind.getStartDate(), tourBind.getEndDate());
 
         if (!overlapsBinds.isEmpty()) {
             Map<Tour, LocalDateTimeRange> overlapsToursAndRanges = overlapsBinds.stream()
@@ -94,22 +93,18 @@ public class TourBindService implements ITourBindService {
 
     @Override
     public void validateBind(Long tourId, Long employeeId, LocalDateTimeRange bindRange) throws PicassoException {
-        Employee employee = employeeService.get(employeeId)
-                .orElseThrow(() -> new PicassoException("Employee with id: {} not found in DB", employeeId));
-
-        Tour tour = tourService.get(tourId)
-                .orElseThrow(() -> new PicassoException("Tour with id: {} not found in DB", tourId));
-
-        List<TourBind> overlapsBinds = tourBindRepository.findOverlappedBinds(employee.getId(),
-                bindRange.getStartDate(),
-                bindRange.getEndDate());
+        List<TourBind> overlapsBinds = tourBindRepository.findOverlappedBinds(tourId, employeeId, bindRange.getStartDate(), bindRange.getEndDate());
 
         if (!overlapsBinds.isEmpty()) {
             Map<Tour, LocalDateTimeRange> overlapsToursAndRanges = overlapsBinds.stream()
-                    .collect(
-                            Collectors.toMap(TourBind::getTour,
-                                    tb -> findOverlappedRange(bindRange, tb.getDateRange()))
-                    );
+                    .collect(Collectors.toMap(TourBind::getTour, tb -> findOverlappedRange(bindRange, tb.getDateRange())));
+
+            Employee employee = employeeService.get(employeeId)
+                    .orElseThrow(() -> new PicassoException("Employee with id: {} not found in DB", employeeId));
+
+            Tour tour = tourService.get(tourId)
+                    .orElseThrow(() -> new PicassoException("Tour with id: {} not found in DB", tourId));
+
             throw new BindException(employee, tour, bindRange, overlapsToursAndRanges);
         }
     }

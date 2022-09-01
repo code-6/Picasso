@@ -108,7 +108,7 @@
                                     </div>
                                     <div class="col">
                                         <textarea id="bindResultTourDescription" class="form-control" disabled
-                                                  th:value="${tourBind.tour.description}"></textarea>
+                                                  th:text="${tourBind.tour.description}"></textarea>
                                     </div>
                                     <div class="col-sm-1"></div>
                                 </div>
@@ -430,11 +430,15 @@
                     $('.tourSelect').selectpicker('refresh');
 
                     initBindFormDatePickers();
+
                     if(!$(formDiv).hasClass('show')) {
                         $(formDiv).addClass('show')
                     }
-                    if($('#bindResultEmployeesControls').has('show')) {
+                    if(!$('#bindResultEmployeesControls').hasClass('show')) {
                         $('#bindResultEmployeesControls').addClass('show')
+                    }
+                    if(!$('#bindResultTourDetails').hasClass('show')) {
+                        $('#bindResultTourDetails').addClass('show')
                     }
                 },
                 error: function (responsePayload) {
