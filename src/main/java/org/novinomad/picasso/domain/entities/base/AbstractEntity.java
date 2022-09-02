@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.FieldDefaults;
 import org.novinomad.picasso.commons.PrettyPrintable;
+import org.novinomad.picasso.domain.IdAware;
 
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -16,7 +17,7 @@ import java.util.Objects;
 @FieldDefaults(level = AccessLevel.PROTECTED)
 @Getter
 @Setter
-public abstract class AbstractEntity implements PrettyPrintable {
+public abstract class AbstractEntity implements PrettyPrintable, IdAware<Long> {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

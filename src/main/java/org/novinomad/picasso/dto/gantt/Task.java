@@ -8,7 +8,9 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.RandomUtils;
 import org.novinomad.picasso.commons.LocalDateTimeRange;
+import org.novinomad.picasso.commons.serializers.ListOfEntitiesToCommaSeparatedString;
 import org.novinomad.picasso.commons.serializers.ListToCommaSeparatedString;
 import org.novinomad.picasso.commons.utils.CommonDateUtils;
 import org.novinomad.picasso.commons.utils.CommonMessageFormat;
@@ -17,23 +19,20 @@ import org.novinomad.picasso.domain.entities.impl.Employee;
 import org.novinomad.picasso.domain.entities.impl.Tour;
 import org.novinomad.picasso.domain.entities.impl.TourBind;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.util.CollectionUtils;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static org.novinomad.picasso.commons.utils.CommonMessageFormat.*;
 
 
-@EqualsAndHashCode
 @Getter
 @Setter
 @Slf4j
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class Task implements ITask {
+public class Task implements ITask, Comparable<Task> {
     @JsonProperty("pID")
     Long id;
     @JsonProperty("pName")
@@ -67,7 +66,7 @@ public class Task implements ITask {
     @JsonFormat(shape = JsonFormat.Shape.NUMBER)
     boolean expanded = false;
     @JsonProperty("pDepend")
-    @JsonSerialize(using = ListToCommaSeparatedString.class)
+    @JsonSerialize(using = ListOfEntitiesToCommaSeparatedString.class)
     List<Task> dependencies = new ArrayList<>();
     @JsonProperty("pCaption")
     String caption;
@@ -83,6 +82,19 @@ public class Task implements ITask {
     Long parentId = 0L;
     @JsonIgnore
     List<Task> children = new ArrayList<>();
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Task task = (Task) o;
+        return milestone == task.milestone && expanded == task.expanded && id.equals(task.id) && name.equals(task.name) && startDate.equals(task.startDate) && endDate.equals(task.endDate) && Objects.equals(plannedStartDate, task.plannedStartDate) && Objects.equals(plannedEndDate, task.plannedEndDate) && Objects.equals(cssClass, task.cssClass) && Objects.equals(webLink, task.webLink) && Objects.equals(resourceName, task.resourceName) && Objects.equals(completionPercent, task.completionPercent) && type == task.type && Objects.equals(caption, task.caption) && Objects.equals(notes, task.notes) && Objects.equals(cost, task.cost) && Objects.equals(barText, task.barText) && Objects.equals(parentId, task.parentId);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, name, startDate, endDate, plannedStartDate, plannedEndDate, type, parentId);
+    }
 
     public Task(Long id, String name, LocalDateTimeRange dateTimeRange) {
         this.id = id;
@@ -104,15 +116,18 @@ public class Task implements ITask {
     }
 
     public static List<Task> fromBindsWithChildrenInList(List<TourBind> binds) {
-        List<Task> tasks = fromBinds(binds);
+        List<Task> tasks = new ArrayList<>();
+        deTree(fromBinds(binds), tasks);
+        return new ArrayList<>(tasks);
+    }
 
-        List<Task> allTasks = new ArrayList<>();
-
-        tasks.forEach(gd -> {
-            allTasks.add(gd);
-            allTasks.addAll(gd.getChildren());
-        });
-        return allTasks;
+    private static void deTree(Collection<Task> tasks, List<Task> container) {
+        for (Task task : tasks)
+            if (task != null) {
+                container.add(task);
+                if (task.hasChildren()) deTree(task.getChildren(), container);
+                if (task.hasDependencies()) deTree(task.getDependencies(), container);
+            }
     }
 
     private static final String ANCHOR = """
@@ -120,7 +135,27 @@ public class Task implements ITask {
             """;
 
     private static Task build(Tour tour, List<TourBind> binds) {
+        Task ganttTourTask = buildTourTask(tour);
 
+        binds.stream().collect(Collectors.groupingBy(TourBind::getEmployee)).forEach((employee, employeeBinds) -> {
+
+            if(!CollectionUtils.isEmpty(employeeBinds) && employeeBinds.get(0) != null) {
+                TourBind firstBind = employeeBinds.get(0);
+                if(employeeBinds.size() > 1) {
+                    Task employeeCombinedTask = buildEmployeeTask(ganttTourTask, employee, Long.parseLong("838466" + firstBind.getId()), tour.getDateRange(), Type.COMBINED);
+                    Task employeeTask = null;
+                    for (TourBind bind : employeeBinds) {
+                        employeeTask = buildEmployeeTask(employeeCombinedTask, employee, Long.parseLong("66" + bind.getId()), bind.getDateRange(), Type.SINGLE, employeeTask);
+                    }
+                } else {
+                    buildEmployeeTask(ganttTourTask, employee, Long.parseLong("66" + firstBind.getId()), firstBind.getDateRange(), Type.SINGLE);
+                }
+            }
+        });
+        return ganttTourTask;
+    }
+
+    private static Task buildTourTask(Tour tour) {
         Long ganttTourTaskId = Long.parseLong("84" + tour.getId()); // 84 - ASCII symbol code (T)
 
         Task ganttTourTask = new Task(ganttTourTaskId,tour.getId() + ". " + tour.getName(), tour.getDateRange())
@@ -135,25 +170,32 @@ public class Task implements ITask {
         else
             ganttTourTask.cssClass(Task.CssClass.BLUE.getCssName());
 
-        binds.forEach(bind -> {
-            long ganttEmployeeTaskId = Long.parseLong("66" + bind.getId()); // 66 - ASCII symbol code (B)
-            Employee employee = bind.getEmployee();
-            Long employeeId = employee.getId();
-            Employee.Type employeeType = employee.getType();
-            String employeeName = employee.getName();
-
-            Task ganttEmployeeTask = new Task(ganttEmployeeTaskId, employeeType + " " + employeeId + ". " + employeeName, bind.getDateRange())
-                    .parent(ganttTourTask);
-
-            ganttTourTask.addChild(ganttEmployeeTask);
-
-            switch (employeeType) {
-                case GUIDE -> ganttEmployeeTask.cssClass(Task.CssClass.YELLOW.getCssName());
-                case DRIVER -> ganttEmployeeTask.cssClass(Task.CssClass.PURPLE.getCssName());
-                default -> ganttEmployeeTask.cssClass(Task.CssClass.PINK.getCssName());
-            }
-        });
         return ganttTourTask;
+    }
+
+    private static Task buildEmployeeTask(Task parentTask, Employee employee, Long taskId, LocalDateTimeRange taskDates, Task.Type type, Task ... dependencies) {
+
+        Long employeeId = employee.getId();
+        Employee.Type employeeType = employee.getType();
+        String employeeName = employee.getName();
+
+        Task ganttEmployeeTask = new Task(taskId, employeeType + " " + employeeId + ". " + employeeName, taskDates)
+                .parent(parentTask).type(type);
+
+        if(dependencies != null && dependencies.length > 0) {
+            ArrayList<Task> dependencyTasks = new ArrayList<>();
+            for (Task dependency : dependencies) {
+                if(dependency != null)
+                    dependencyTasks.add(dependency);
+            }
+            ganttEmployeeTask.dependencies(dependencyTasks);
+        }
+
+        ganttEmployeeTask.cssClass(employeeType.getCOLOR().getCssName());
+
+        parentTask.addChild(ganttEmployeeTask);
+
+        return ganttEmployeeTask;
     }
 
     public Task id(Long id) {
@@ -265,6 +307,14 @@ public class Task implements ITask {
     public void setParent(Task parent) {
         this.parent = parent;
         parentId = parent.getId();
+    }
+
+    @Override
+    public int compareTo(Task o) {
+        if(startDate.equals(o.getStartDate()))
+            return endDate.compareTo(o.getEndDate());
+
+        return startDate.compareTo(o.getStartDate());
     }
 
     @JsonFormat(shape = JsonFormat.Shape.NUMBER)

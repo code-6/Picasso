@@ -4,6 +4,7 @@ import lombok.*;
 import lombok.experimental.FieldDefaults;
 import org.hibernate.annotations.Nationalized;
 import org.novinomad.picasso.domain.entities.base.AbstractEntity;
+import org.novinomad.picasso.dto.gantt.Task;
 
 import javax.persistence.*;
 import java.util.Objects;
@@ -57,10 +58,13 @@ public class Employee extends AbstractEntity {
 
     @RequiredArgsConstructor
     public enum Type {
-        DRIVER("<i class=\"fa-thin fa-person-military-pointing\"></i>"),
-        GUIDE("<i class=\"fa-thin fa-person-hiking\"></i>");
+        DRIVER("<i class=\"fa-thin fa-person-military-pointing\"></i>", Task.CssClass.PINK),
+        GUIDE("<i class=\"fa-thin fa-person-hiking\"></i>", Task.CssClass.YELLOW);
 
         @Getter
         private final String ICON;
+
+        @Getter
+        private final Task.CssClass COLOR;
     }
 }

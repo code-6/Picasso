@@ -7,9 +7,9 @@ import com.fasterxml.jackson.databind.SerializerProvider;
 import java.io.IOException;
 import java.util.List;
 
-public class ListToCommaSeparatedString extends JsonSerializer<List<Long>> {
+public class ListToCommaSeparatedString extends JsonSerializer<List> {
     @Override
-    public void serialize(List<Long> value, JsonGenerator gen, SerializerProvider serializers) throws IOException {
+    public void serialize(List value, JsonGenerator gen, SerializerProvider serializers) throws IOException {
 
         StringBuilder sb = new StringBuilder();
 
