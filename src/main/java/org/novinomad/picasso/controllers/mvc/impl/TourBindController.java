@@ -70,11 +70,16 @@ public class TourBindController {
     }
 
     @GetMapping("/{tourId}")
-    public String editTourBind(@PathVariable Long tourId, Model model) {
-        TourCriteria tourCriteria = new TourCriteria();
-        tourCriteria.setTourIds(List.of(tourId));
-        List<TourBind> tourBinds = tourBindService.get(tourCriteria);
-        TourBindModel tourBind = TourBindModel.fromEntities(tourBinds);
+    public String getTourBindForm(@PathVariable Long tourId, Model model) {
+        TourBindModel tourBind;
+        if(tourId != null && tourId > 0) {
+            TourCriteria tourCriteria = new TourCriteria();
+            tourCriteria.setTourIds(List.of(tourId));
+            List<TourBind> tourBinds = tourBindService.get(tourCriteria);
+            tourBind = TourBindModel.fromEntities(tourBinds);
+        } else {
+            tourBind = new TourBindModel();
+        }
         model.addAttribute("tourBind", tourBind);
 
         return "tourBind/tourBind :: tourBindForm";

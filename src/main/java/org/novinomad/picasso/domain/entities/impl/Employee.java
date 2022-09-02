@@ -39,7 +39,7 @@ public class Employee extends AbstractEntity {
         if (o == null || getClass() != o.getClass()) return false;
         if (!super.equals(o)) return false;
         Employee employee = (Employee) o;
-        return name.equals(employee.name);
+        return Objects.equals(name, employee.name);
     }
 
     @Override
