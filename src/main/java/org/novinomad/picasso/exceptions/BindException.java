@@ -47,20 +47,20 @@ public class BindException extends PicassoException {
     }
 
     private static String buildOverlapsCauseMessage(Employee employee,
-                                                    Tour tour,
-                                                    LocalDateTimeRange dateTimeRange,
-                                                    Map<Tour, LocalDateTimeRange> overlapsToursAndRanges) {
-        String baseMessage = CommonMessageFormat.format(MSG_PATTERN, employee, tour, dateTimeRange, "overlaps with: \n");
+                                                    Tour newBindTour,
+                                                    LocalDateTimeRange newBindDateTimeRange,
+                                                    Map<Tour, LocalDateTimeRange> overlappedToursAndRanges) {
+        String baseMessage = CommonMessageFormat.format(MSG_PATTERN, employee, newBindTour, newBindDateTimeRange, "overlaps with: \n");
 
         StringBuilder overlapsCauseBuilder = new StringBuilder(baseMessage);
 
-        for (Map.Entry<Tour, LocalDateTimeRange> overlapsTourAndRange : overlapsToursAndRanges.entrySet()) {
+        for (Map.Entry<Tour, LocalDateTimeRange> overlapsTourAndRange : overlappedToursAndRanges.entrySet()) {
 
-            Tour overlapsTour = overlapsTourAndRange.getKey();
-            LocalDateTimeRange overlapsRange = overlapsTourAndRange.getValue();
+            Tour overlappedTour = overlapsTourAndRange.getKey();
+            LocalDateTimeRange overlappedRange = overlapsTourAndRange.getValue();
 
-            overlapsCauseBuilder.append(overlapsTour.toString()).append(" ")
-                    .append(overlapsRange.toString()).append("\n");
+            overlapsCauseBuilder.append(overlappedTour.toString()).append(" overlapped date range: ")
+                    .append(overlappedRange.toString()).append("\n");
         }
         return overlapsCauseBuilder.toString();
     }

@@ -13,7 +13,8 @@
     <link rel="stylesheet" type="text/css"
           th:href="@{/webjars/bootstrap-daterangepicker/3.1/css/bootstrap-daterangepicker.css}"/>
 
-    <link rel="stylesheet" type="text/css" th:href="@{/webjars/bootstrap-select/1.13.11/dist/css/bootstrap-select.min.css}"/>
+    <link rel="stylesheet" type="text/css"
+          th:href="@{/webjars/bootstrap-select/1.13.11/dist/css/bootstrap-select.min.css}"/>
 
     <link th:href="@{/vendor/popover/css/bootstrap-popover-x.min.css}" rel="stylesheet">
 
@@ -53,11 +54,12 @@
             <div class="row gx-5">
                 <div class="col">
                     <button class="btn btn-outline-primary" data-toggle="collapse" href="#tourCriteria" role="button"
-                       aria-expanded="false" aria-controls="tourCriteria">
+                            aria-expanded="false" aria-controls="tourCriteria">
                         <i class="fa-thin fa-filter"></i>
                         <span th:text="#{filter.cap.pl}"></span>
                     </button>
-                    <button class="btn btn-outline-primary" id="bindFormToggleBtn" data-toggle="collapse" href="#tourBind" role="button" type="button"
+                    <button class="btn btn-outline-primary" id="bindFormToggleBtn" data-toggle="collapse"
+                            href="#tourBind" role="button" type="button"
                             aria-expanded="false" aria-controls="tourBind">
                         <i class="fa-thin fa-square-plus"></i>
                         <span th:text="#{bindFormToggleBtn}"></span>
@@ -79,7 +81,9 @@
                 </a>
                 <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
                     <li><a class="dropdown-item" th:href="@{/logout}">Logout</a></li>
-                    <li><hr class="dropdown-divider" /></li>
+                    <li>
+                        <hr class="dropdown-divider"/>
+                    </li>
 
                 </ul>
             </li>
@@ -96,13 +100,15 @@
                 <div class="card">
                     <div class="card-header">Bind form</div>
                     <div class="card-body">
-                        <form id="tourBindForm" th:object="${tourBind}" th:method="post" th:action="@{/}" th:fragment="tourBindForm">
+                        <form id="tourBindForm" th:object="${tourBind}" th:method="post" th:action="@{/}"
+                              th:fragment="tourBindForm">
                             <div class="row form-group">
                                 <div class="col-sm-2">
                                     <label for="bindFormTourSelect" th:text="#{tour.cap}"></label>
                                 </div>
                                 <div class="col">
-                                    <select id="bindFormTourSelect" class="form-control selectpicker tourSelect show-tick"
+                                    <select id="bindFormTourSelect"
+                                            class="form-control selectpicker tourSelect show-tick"
                                             required
                                             data-live-search="true" data-selected-text-format="count > 1"
                                             th:field="*{tour}" name="tour">
@@ -154,7 +160,7 @@
                                     <div class="row form-group">
                                         <div class="col-sm-2">
                                             <select th:id="${'employeeTypeSelect_' + employeeBindRow.index}"
-                                                    class="form-control selectpicker employeeTypeSelect"
+                                                    class="form-control selectpicker employeeTypeSelect employeeTypeSelect-bindForm"
                                                     data-live-search="true" required
                                                     th:field="${tourBind.employees[__${employeeBindRow.index}__].employee.type}"
                                                     th:data-employee-select-id="${'employeeSelect_' + employeeBindRow.index}">
@@ -168,7 +174,8 @@
                                         </div>
                                         <div class="col">
                                             <select th:id="${'employeeSelect_' + employeeBindRow.index}"
-                                                    class="form-control selectpicker employeeSelect" required
+                                                    class="form-control selectpicker employeeSelect employeeSelect-bindForm"
+                                                    required
                                                     data-live-search="true"
                                                     th:field="${tourBind.employees[__${employeeBindRow.index}__].employee}">
                                                 <option th:value="${null}"></option>
@@ -180,7 +187,8 @@
                                         </div>
                                         <div class="col-sm-1">
                                             <!--                                            TODO 2022-08-15 enabled only if employee type and employee selected. Also allow to add more only if previously added date-range filled. Disallow to submit if any of date-ranges is empty.-->
-                                            <button class="btn btn-outline-success" type="button" id="bindEmployeeDateRangeBtn"
+                                            <button class="btn btn-outline-success" type="button"
+                                                    id="bindEmployeeDateRangeBtn"
                                                     th:data-employee-row-id="${employeeBindRow.index}"
                                                     onclick="onBindEmployeeDateRange($(this).attr('data-employee-row-id'))"
                                                     data-ctx="bindEmployeeDateRange"
@@ -190,7 +198,9 @@
                                         </div>
                                         <div class="col-sm-1">
                                             <button id="unbindEmployeeBtn" class="btn btn-outline-primary" type="button"
-                                                    title="Unbind employee" th:data-employee-row-id="${employeeBindRow.index}" onclick="onUnbindEmployee($(this).attr('data-employee-row-id'))">
+                                                    title="Unbind employee"
+                                                    th:data-employee-row-id="${employeeBindRow.index}"
+                                                    onclick="onUnbindEmployee($(this).attr('data-employee-row-id'))">
                                                 <i class="fa-solid fa-user-xmark"></i>
                                             </button>
                                         </div>
@@ -210,7 +220,8 @@
                                                        th:field="${tourBind.employees[__${employeeBindRow.index}__].bindIdsToDateRanges[__${employeeDateRangeRow.index}__]?.dateRange}">
                                             </div>
                                             <div class="col-sm-1">
-                                                <button class="btn btn-outline-primary" type="button" id="unbindEmployeeDateRangeBtn"
+                                                <button class="btn btn-outline-primary" type="button"
+                                                        id="unbindEmployeeDateRangeBtn"
                                                         th:data-employee-date-range-row-id="${employeeDateRangeRow.index}"
                                                         th:data-employee-row-id="${employeeBindRow.index}"
                                                         title="Remove custom date range"
@@ -249,11 +260,14 @@
                                     <!--                                    1) Tour is chosen-->
                                     <!--                                    2) At least one employee chosen-->
                                     <!--                                    3) There is no overlaps with other tours-->
-                                    <button class="btn btn-outline-success btn-block" type="submit" id="submitBindBtn" th:text="#{submit.cap}">
+                                    <button class="btn btn-outline-success btn-block" type="submit" id="submitBindBtn"
+                                            th:text="#{submit.cap}">
                                     </button>
                                 </div>
                                 <div class="col">
-                                    <button class="btn btn-outline-danger btn-block" id="resetBindFormBtn" type="button" th:title="#{reset-bind-form-btn-title}">Reset
+                                    <button class="btn btn-outline-warning btn-block" id="resetBindFormBtn"
+                                            type="button"
+                                            th:title="#{reset-bind-form-btn-title}">Reset
                                     </button>
                                 </div>
                                 <div class="col-sm-1"></div>
@@ -354,7 +368,8 @@
                                 <div class="col-md align-items-end">
                                     <button id="submitFilterBtn" type="button" onclick="submitGanttFilterForm()"
                                             title="Press to see filtered tours and employees"
-                                            class="btn btn-outline-success btn-block form-control" th:text="#{show.cap} + #{tour.pl}">
+                                            class="btn btn-outline-success btn-block form-control"
+                                            th:text="#{show.cap} + #{tour.pl}">
                                     </button>
                                 </div>
                             </div>
@@ -383,7 +398,8 @@
 
     <script type="text/javascript" th:src="@{/webjars/momentjs/2.29.4/moment.js}"></script>
 
-    <script type="text/javascript" th:src="@{/webjars/bootstrap-daterangepicker/3.1/js/bootstrap-daterangepicker.js}"></script>
+    <script type="text/javascript"
+            th:src="@{/webjars/bootstrap-daterangepicker/3.1/js/bootstrap-daterangepicker.js}"></script>
 
     <script type="text/javascript" th:src="@{/webjars/bootstrap-select/1.13.11/dist/js/bootstrap-select.js}"></script>
 
@@ -427,8 +443,21 @@
             })
         });
 
+        function initEmployeeSelectChangeListener() {
+            $('.employeeSelect-bindForm').on('changed.bs.select', function () {
+                let selectedTourId = $('#bindFormTourSelect').find(":selected").map((_, e) => e.value).get();
+
+                if (selectedTourId && selectedTourId[0] && selectedTourId[0] !== '') {
+                    selectedTourId = selectedTourId[0];
+
+                    let employeeId = $(this).find(":selected").map((_, e) => e.value).get();
+                    validateBind(tourId)
+                }
+            });
+        }
+
         function initBindFormSubmitButton() {
-            $('#tourBindForm').submit(function(event) {
+            $('#tourBindForm').submit(function (event) {
                 event.preventDefault();
 
                 $(this).unbind('submit').submit();
@@ -455,7 +484,7 @@
                         initBindFormTourSelect();
 
                         let formDiv = $('#tourBind');
-                        if(!$(formDiv).hasClass('show')) {
+                        if (!$(formDiv).hasClass('show')) {
                             $(formDiv).addClass('show')
                         }
                     },
@@ -500,6 +529,8 @@
                         $('#bindResultEmployeesControls').addClass('show');
                         $('#bindEmployeeBtn').text('Add employee to the ' + tour.name);
                         $('#resetBindFormBtn').prop('disabled', false)
+
+                        initBindFormDatePickers(tour)
                     } catch (e) {
                         resetEmployeeBindFormFields();
                         Swal.fire({
@@ -526,10 +557,10 @@
         }
 
         // event handler when bind, tour or employee edit button pressed.
-        function onEditEntity (entityId, ctx) {
-            if(!ctx) ctx = [[${ctx}]];
+        function onEditEntity(entityId, ctx) {
+            if (!ctx) ctx = [[${ctx}]];
 
-            if(ctx === '/') ctx = "";
+            if (ctx === '/') ctx = "";
 
             $.ajax({
                 url: mainUrl + ctx + '/' + entityId,
@@ -537,6 +568,13 @@
                 success: function (responsePayload) {
                     let form = $('#tourBindForm');
                     $(form).html(responsePayload);
+
+                    hideTooltips();
+
+                    $('#tourBind').collapse('show')
+                    $('#bindResultEmployeesControls').collapse('show')
+                    $('#bindResultTourDetails').collapse('show')
+
                     initEmployeeTypeSelectChangeListener();
 
                     $('.employeeTypeSelect').selectpicker('refresh');
@@ -548,12 +586,6 @@
                     initBindFormResetButton();
 
                     initBindFormSubmitButton();
-
-                    hideTooltips();
-
-                    $('#tourBind').collapse('show')
-                    $('#bindResultEmployeesControls').collapse('show')
-                    $('#bindResultTourDetails').collapse('show')
                 },
                 error: function (responsePayload) {
                     console.log('onEditEntity ' + responsePayload)
@@ -592,6 +624,7 @@
                 }
             });
         }
+
         function onBindEmployeeDateRange(employeeRowId) {
             $.ajax({
                 url: mainUrl + '/bindEmployeeDateRange/' + employeeRowId,
@@ -618,6 +651,14 @@
                     console.error('onBindEmployeeDateRange ' + error);
                 }
             });
+        }
+
+        function disableSubmitBindFormButton() {
+            $('#submitBindBtn').prop('disabled', true);
+        }
+
+        function enableSubmitBindFormButton() {
+            $('#submitBindBtn').prop('disabled', false);
         }
 
         function refreshBindFormEmployeeDetails(tourBindFormFragment) {
@@ -699,7 +740,7 @@
             });
         }
 
-        function initSingleDatePickers () {
+        function initSingleDatePickers() {
             $('.date-picker-single').daterangepicker({
                 singleDatePicker: true,
                 showDropdowns: true,
@@ -722,30 +763,33 @@
             $('#filterEndDate').data('daterangepicker').setStartDate(defaultEndDate);
         }
 
-        function initBindFormDatePickers() {
+        function initBindFormDatePickers(tour) {
             let tourStartDate = null;
             let tourEndDate = null;
             try {
-                const chosenTourId = $('#bindFormTourSelect').find(":selected").map((_, e) => e.value).get();
-                if(chosenTourId != null && chosenTourId[0] !== '') {
-                    let tour = getTour(chosenTourId, false);
-
-                    if(tour) {
-                        tourStartDate = new Date(tour.startDate);
-                        tourEndDate = new Date(tour.endDate);
+                // if tour not provided use selected tour
+                if (!tour) {
+                    const chosenTourId = $('#bindFormTourSelect').find(":selected").map((_, e) => e.value).get();
+                    if (chosenTourId != null && chosenTourId[0] !== '') {
+                        tour = getTour(chosenTourId, false);
                     }
+                }
+                if (tour) {
+                    tourStartDate = new Date(tour.startDate);
+                    tourEndDate = new Date(tour.endDate);
                 }
             } catch (e) {
                 console.log(e);
             }
-
             $('.date-picker-employee-tour-bind').daterangepicker({
                 showDropdowns: true,
                 timePicker: true,
                 timePicker24Hour: true,
                 timePickerIncrement: 5,
                 minDate: tourStartDate,
+                startDate: tourStartDate,
                 maxDate: tourEndDate,
+                endDate: tourEndDate,
                 autoApply: true,
                 autoUpdateInput: true,
                 locale: {
@@ -754,9 +798,10 @@
                 }
             }).on('apply.daterangepicker hideCalendar.daterangepicker hide.daterangepicker', function (e, clickedIndex, isSelected, previousValue) {
                 // validate bind when employee dates changed
+                let datePickerInputField = $(this);
                 let employeeId = $(this).attr('data-employee-id');
                 // in case if date-picker doesn't contains attribute data-employee-id try to search for value different way
-                if(!employeeId) {
+                if (!employeeId) {
                     // search for employee select related to this date-picker by id
                     // each date picker id has following format employeeTourDateRange_{employeeRowId}-{datePickerRowId} example employeeTourDateRange_0-0
                     // first number after employeeTourDateRange_ indicates to wich employee select its related.
@@ -772,18 +817,37 @@
                         employeeId = employeeSelect[0];
                     }
                 }
-                if(employeeId) {
-                    $.ajax({
-                        url: mainUrl + '/api/bind/validate/' + $(this).attr('data-tour-id') + '/' + employeeId + '/' + $(this).val(),
-                        type: "get",
-                        error: function (validateErrorMessage) {
-                            console.error('validate bind failed ' + validateErrorMessage);
-                            Swal.fire({
-                                icon: 'error',
-                                title: validateErrorMessage.responseJSON.message
-                            });
-                        }
-                    });
+                if (employeeId) {
+
+                    let tourId = $(this).attr('data-tour-id');
+                    let dateRange = $(this).val();
+
+                    try {
+                        validateBind(tourId, employeeId, dateRange)
+                        if ($(datePickerInputField).hasClass('is-invalid'))
+                            $(datePickerInputField).removeClass('is-invalid')
+
+                        enableSubmitBindFormButton();
+                    } catch (e) {
+                        $(datePickerInputField).addClass('is-invalid')
+                        disableSubmitBindFormButton();
+                        console.error('validate bind failed ' + e);
+                        Swal.fire({
+                            icon: 'error',
+                            title: e
+                        });
+                    }
+                }
+            });
+        }
+
+        function validateBind(tourId, employeeId, dateRange) {
+            $.ajax({
+                url: mainUrl + '/api/bind/validate/' + tourId + '/' + employeeId + '/' + dateRange,
+                type: "get",
+                error: function (validateErrorMessage) {
+                    console.error('validate bind failed ' + validateErrorMessage.responseJSON.message);
+                    throw validateErrorMessage.responseJSON.message;
                 }
             });
         }
@@ -834,7 +898,7 @@
             ganttChart.setTooltipTemplate(function (task) {
                 let tooltipHtml;
                 $.ajax({
-                    url: mainUrl + '/ganttTooltipFragment?taskId='+task.getDataObject().pID,
+                    url: mainUrl + '/ganttTooltipFragment?taskId=' + task.getDataObject().pID,
                     type: "get",
                     async: false,
                     success: function (responsePayload) {
@@ -856,11 +920,11 @@
         }
 
         function getTour(tourId, async) {
-            if(typeof async == "undefined")
+            if (typeof async == "undefined")
                 async = true;
             let tour;
             $.ajax({
-                url: mainUrl + '/api/tour/' + tourId ,
+                url: mainUrl + '/api/tour/' + tourId,
                 type: "get",
                 async: async,
                 success: function (t) {
@@ -874,6 +938,7 @@
             });
             return tour;
         }
+
         /*]]>*/
     </script>
 </div>
