@@ -21,6 +21,7 @@ import org.springframework.web.servlet.ModelAndView;
 import java.time.LocalDateTime;
 import java.time.temporal.TemporalAdjusters;
 import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
 
 @Slf4j
@@ -33,20 +34,28 @@ public class TourController {
 
     static final String TOUR_PAGE = "tour/tourPage";
 
+    @ModelAttribute("allTours")
+    public List<Tour> getAllTours() {
+        return tourService.get();
+    }
+
+    @ModelAttribute("userLocale")
+    public Locale getCurrentUserLocale() {
+        return new Locale("RU");
+    }
+
     @GetMapping
-    public ModelAndView list(@ModelAttribute("tourFilter") TourFilter tourFilter) {
+    public String list(@ModelAttribute("tourFilter") TourFilter tourFilter, Boolean fragment, Model model) {
+
+        if(fragment == null) fragment = false;
 
         tourFilter = Optional.ofNullable(tourFilter).orElse(new TourFilter());
 
-        List<Tour> tours = tourService.get(tourFilter);
+        model.addAttribute("tour", new Tour());
+        model.addAttribute("tours", tourService.get(tourFilter));
+        model.addAttribute("tourFilter", tourFilter);
 
-        log.debug("GET /tour requested. Filter: {} return allTours count: {}", tourFilter, tours.size());
-
-        ModelAndView modelAndView = new ModelAndView(TOUR_PAGE);
-        modelAndView.addObject("tour", new Tour());
-        modelAndView.addObject("tours", tours);
-        modelAndView.addObject("tourFilter", tourFilter);
-        return modelAndView;
+        return fragment ? "tour/toursTable :: toursTable" : TOUR_PAGE;
     }
 
     @PostMapping

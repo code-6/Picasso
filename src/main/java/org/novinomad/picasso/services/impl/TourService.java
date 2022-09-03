@@ -105,7 +105,7 @@ public class TourService implements ITourService {
     @Override
     public List<Tour> get(TourFilter tourFilter) {
         try {
-            return tourRepository.findByFilter(tourFilter.getStartDate(), tourFilter.getEndDate(), tourFilter.getTourName());
+            return tourRepository.findByFilter(tourFilter.getStartDate(), tourFilter.getEndDate(), tourFilter.getTourIds().isEmpty() ? null : tourFilter.getTourIds());
         } catch (Exception e) {
             log.error("unable to get Tours by filter: {} because: {}", tourFilter, e.getMessage(), e);
             throw e;

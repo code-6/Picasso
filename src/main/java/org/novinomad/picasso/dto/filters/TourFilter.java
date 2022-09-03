@@ -8,6 +8,8 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.TemporalAdjusters;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
 
 @Data
@@ -16,7 +18,8 @@ public class TourFilter {
     LocalDateTime startDate;
     @DateTimeFormat(pattern = CommonDateUtils.COMMON)
     LocalDateTime endDate;
-    String tourName;
+
+    List<Long> tourIds = new ArrayList<>();
 
     public TourFilter() {
         normalize();
@@ -25,13 +28,6 @@ public class TourFilter {
     public TourFilter(LocalDateTime startDate, LocalDateTime endDate) {
         this.startDate = startDate;
         this.endDate = endDate;
-
-        normalize();
-    }
-
-    public TourFilter(LocalDateTime startDate, LocalDateTime endDate, String tourName) {
-        this(startDate, endDate);
-        this.tourName = tourName;
 
         normalize();
     }

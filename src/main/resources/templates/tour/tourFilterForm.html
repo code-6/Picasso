@@ -13,11 +13,21 @@
                    th:field="*{endDate}" name="endDate">
         </div>
         <div class="col">
-            <label for="tourNameFilter" th:text="#{tour.cap} + #{name}"></label>
-            <input type="text" class="form-control" id="tourNameFilter" placeholder="type tour name" th:field="${tourFilter.tourName}"/>
+            <label for="filterTourSelect" th:text="#{tour.cap}"></label>
+            <select id="filterTourSelect" class="form-control selectpicker tourSelect"
+                    th:field="*{tourIds}" multiple
+                    data-live-search="true" data-selected-text-format="count > 1"
+                    name="tourIds">
+                <option th:each="tour : ${allTours}"
+                        th:value="${tour.id}"
+                        th:text="${tour.id + '. ' + tour.name}"
+                        th:selected="${tourFilter.tourIds.contains(tour.id)}">
+                </option>
+            </select>
         </div>
         <div class="col">
-            <button type="button" class="btn btn-outline-success btn-block" th:text="#{show.cap} + #{tour.pl}"></button>
+            <button id="submitFilterBtn" type="button" class="btn btn-outline-success btn-block" th:text="#{show.cap} + #{tour.pl}"></button>
+            <input type="hidden" name="fragment" th:value="${true}">
         </div>
     </div>
 </div>

@@ -3,6 +3,8 @@ package org.novinomad.picasso.commons;
 import lombok.Getter;
 import lombok.Setter;
 import org.novinomad.picasso.commons.utils.CommonDateUtils;
+import org.novinomad.picasso.commons.utils.SpringContextUtil;
+import org.novinomad.picasso.services.IUserService;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDateTime;
@@ -33,7 +35,7 @@ public class LocalDateTimeRange implements Comparable<LocalDateTimeRange> {
 
     @Override
     public String toString() {
-        DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern(COMMON, Locale.ENGLISH);
+        DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern(COMMON, SpringContextUtil.getBean(IUserService.class).getCurrentUserLocale());
         return startDate.format(dateTimeFormatter) + " ~ " + endDate.format(dateTimeFormatter);
     }
 
@@ -60,7 +62,7 @@ public class LocalDateTimeRange implements Comparable<LocalDateTimeRange> {
     }
 
     public static LocalDateTimeRange parse(String text) {
-        DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern(CommonDateUtils.COMMON, Locale.ENGLISH);
+        DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern(CommonDateUtils.COMMON, SpringContextUtil.getBean(IUserService.class).getCurrentUserLocale());
 
         String[] split = text.split("\s[~\\-]\s");
 

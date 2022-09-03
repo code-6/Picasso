@@ -1,6 +1,8 @@
 package org.novinomad.picasso.commons;
 
 import org.apache.commons.lang3.StringUtils;
+import org.novinomad.picasso.commons.utils.SpringContextUtil;
+import org.novinomad.picasso.services.IUserService;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -18,7 +20,7 @@ public interface IRange {
     LocalDateTime getEndDate();
 
     default String getEndDateAsString() {
-        return getEndDateAsString(null, Locale.ENGLISH);
+        return getEndDateAsString(null, SpringContextUtil.getBean(IUserService.class).getCurrentUserLocale());
     }
 
     default String getEndDateAsString(String format, Locale locale) {
@@ -30,7 +32,7 @@ public interface IRange {
     }
 
     default String getStartDateAsString() {
-        return getStartDateAsString(null, Locale.ENGLISH);
+        return getStartDateAsString(null, SpringContextUtil.getBean(IUserService.class).getCurrentUserLocale());
     }
     default String getStartDateAsString(String format, Locale locale) {
         if(getStartDate() == null) return "";

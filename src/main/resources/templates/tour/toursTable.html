@@ -1,25 +1,31 @@
 <table id="toursTable" class="display compact cell-border hover stripe" th:fragment="toursTable">
   <thead>
   <tr>
+    <th>ID</th>
     <th th:text="#{name.cap}"></th>
-    <th th:text="#{date.cap.pl}"></th>
+    <th th:text="#{start.cap} + #{date}"></th>
+    <th th:text="#{end.cap} + #{date}"></th>
     <th th:text="#{description.cap}"></th>
     <th></th>
   </tr>
   </thead>
   <tfoot>
   <tr>
+    <th>ID</th>
     <th th:text="#{name.cap}"></th>
-    <th th:text="#{date.cap.pl}"></th>
+    <th th:text="#{start.cap} + #{date}"></th>
+    <th th:text="#{end.cap} + #{date}"></th>
     <th th:text="#{description.cap}"></th>
     <th></th>
   </tr>
   </tfoot>
   <tbody>
 
-  <tr th:each="tour : ${tours}">
+  <tr th:each="tour, row : ${tours}">
+    <td><span th:text="${tour.id}"></span></td>
     <td><span th:text="${tour.name}"></span></td>
-    <td><span th:text="${tour.getDateRange().toString()}"></span></td>
+    <td><span th:text="${tour.getStartDateAsString()}"></span></td>
+    <td><span th:text="${tour.getEndDateAsString()}"></span></td>
     <td th:title="${tour.description}"><span th:text="${tour.description}"></span></td>
     <td>
 

@@ -14,9 +14,9 @@ public interface TourRepository extends JpaRepository<Tour, Long> {
             select * from tour t 
             where (:startDate is null or t.start_date >= :startDate) 
               and (:endDate is null or t.end_date <= :endDate)
-              and (:name is null or lower(t.name) like :name) 
+              and (t.id in (:tourIds) or :tourIds is null ) 
             """)
-    List<Tour> findByFilter(LocalDateTime startDate, LocalDateTime endDate, String name);
+    List<Tour> findByFilter(LocalDateTime startDate, LocalDateTime endDate, List<Long> tourIds);
 
     @Query("select t from Tour t order by t.startDate desc ")
     @Override

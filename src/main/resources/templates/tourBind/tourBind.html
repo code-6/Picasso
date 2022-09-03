@@ -4,7 +4,6 @@
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
       layout:decorate="~{fragments/layout}">
 <head>
-    <meta charset="UTF-8">
     <title>PCS</title>
 
     <!-- Latest compiled and minified CSS -->
@@ -408,9 +407,9 @@
     <script th:inline="javascript">
         /*<![CDATA[*/
         // main url stored in head tag of layout.html
-        const mainUrl = $("meta[name='mainUrl']").attr("content");
+        let mainUrl = $("meta[name='mainUrl']").attr("content");
 
-        const dateTimeFormat = 'DD MMM YYYY HH:mm';
+        let dateTimeFormat = 'DD MMM YYYY HH:mm';
 
         $(document).ready(function () {
 

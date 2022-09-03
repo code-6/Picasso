@@ -4,21 +4,23 @@
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
       layout:decorate="~{fragments/layout}">
 <head>
-    <meta charset="UTF-8">
     <title>PCS - Tours</title>
 
-    <link rel="stylesheet" type="text/css" th:href="@{/webjars/datatables/1.11.4/css/jquery.dataTables.css}">
-    <link rel="stylesheet" type="text/css" th:href="@{/webjars/bootstrap-daterangepicker/css/bootstrap-daterangepicker.css}" />
-    <link rel="stylesheet" type="text/css" th:href="@{/webjars/bootstrap-select/dist/css/bootstrap-select.min.css}" />
+    <link rel="stylesheet" type="text/css" th:href="@{/webjars/datatables/css/jquery.dataTables.css}">
+
+    <link rel="stylesheet" type="text/css"
+          th:href="@{/webjars/bootstrap-daterangepicker/css/bootstrap-daterangepicker.css}"/>
+
+    <link rel="stylesheet" type="text/css"
+          th:href="@{/webjars/bootstrap-select/dist/css/bootstrap-select.min.css}"/>
 </head>
-<body class="sb-nav-fixed" >
+<body class="sb-nav-fixed">
 <div layout:fragment="header">
     <nav class="sb-topnav navbar navbar-expand-sm navbar-light bg-light">
         <!-- Navbar Brand-->
         <a class="navbar-brand ps-3" th:href="@{/}">Picasso 2.0</a>
         <!-- Sidebar Toggle-->
-        <button class="btn btn-link btn-sm order-1 order-lg-0 me-4 me-lg-0" id="sidebarToggle" href="#!"
-        >
+        <button class="btn btn-link btn-sm order-1 order-lg-0 me-4 me-lg-0" id="sidebarToggle" href="#!">
             <i class="fas fa-bars"></i>
         </button>
 
@@ -26,13 +28,15 @@
         <div class="mx-auto order-0">
             <div class="row gx-5">
                 <div class="col">
-                    <button class="btn btn-outline-primary" data-toggle="collapse" href="#tourCriteria" role="button"
-                            aria-expanded="false" aria-controls="tourCriteria">
+                    <button class="btn btn-outline-primary" href="#tourCriteria" role="button"
+                            data-toggle="collapse" data-target="#tourFilterDiv"
+                            aria-expanded="false" aria-controls="tourFilterDiv">
                         <i class="fa-thin fa-filter"></i>
                         <span th:text="#{filter.cap.pl}"></span>
                     </button>
-                    <button class="btn btn-outline-primary" id="bindFormToggleBtn" data-toggle="collapse" href="#tourBind" role="button" type="button"
-                            aria-expanded="false" aria-controls="tourBind">
+                    <button class="btn btn-outline-primary" id="bindFormToggleBtn" data-toggle="collapse"
+                            data-target="#tourFormContainer"
+                            aria-expanded="false" aria-controls="tourFormContainer" href="#">
                         <i class="fa-thin fa-square-plus"></i>
                         <span th:text="#{bindFormToggleBtn}"></span>
                     </button>
@@ -53,7 +57,9 @@
                 </a>
                 <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
                     <li><a class="dropdown-item" th:href="@{/logout}">Logout</a></li>
-                    <li><hr class="dropdown-divider" /></li>
+                    <li>
+                        <hr class="dropdown-divider"/>
+                    </li>
 
                 </ul>
             </li>
@@ -62,64 +68,76 @@
 </div>
 
 <div layout:fragment="content">
-    <div class="card mb-4">
-        <div class="card-header">
-            <i class="fas fa-table me-1"></i>
-            <th:block th:text="#{tour.cap.pl}"></th:block>
-
-            <a class="btn btn-outline-primary" type="button" data-toggle="collapse" data-target="#toursTableOptions"
-               aria-expanded="false" aria-controls="toursTableOptions" href="#">
-                <i class="fa-thin fa-filter"></i>
-                <span th:text="#{filter.cap.pl}"></span>
-            </a>
-
-            <a class="btn btn-outline-success" type="button" data-toggle="collapse" data-target="#tourFormContainer"
-               aria-expanded="false" aria-controls="tourFormContainer" href="#">
-                <i class="fa-thin fa-square-plus"></i>
-                <span th:text="#{create.cap}"></span>
-            </a>
-        </div>
-        <div class="card-body">
-            <div class="collapse" id="toursTableOptions" th:object="${tourFilter}">
-                <div th:include="tour/tourFilterForm :: tourFilterFormContent"></div>
-                <hr>
-            </div>
-            <div class="collapse" id="tourFormContainer">
+    <!--    tour form-->
+    <div class="collapse" id="tourFormContainer">
+        <div class="card">
+            <div class="card-header">Tour form</div>
+            <div class="card-body">
                 <form th:object="${tour}" id="tourForm">
                     <div th:include="tour/tourForm :: tourFormContent"></div>
                 </form>
-                <hr>
             </div>
-            <div class="collapse show">
-                <table id="toursTable" class="display compact cell-border hover stripe" th:include="tour/toursTable :: toursTable"></table>
-                <hr>
+        </div>
+    </div>
+    <!--    filter form-->
+    <div class="collapse" id="tourFilterDiv">
+        <div class="card">
+            <div class="card-header">Tours filter form</div>
+            <div class="card-body">
+                <form th:object="${tourFilter}" id="tourFilterForm">
+                    <div th:include="tour/tourFilterForm :: tourFilterFormContent"></div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <!--    tours table -->
+    <div class="collapse show">
+        <div class="card">
+            <div class="card-header">Tours table</div>
+            <div class="card-body">
+                <table id="toursTable" class="display compact cell-border hover stripe"
+                       th:replace="tour/toursTable :: toursTable"></table>
             </div>
         </div>
     </div>
 </div>
-
 <div th:fragment="scripts">
-    <script type="text/javascript" charset="utf8" th:src="@{/webjars/datatables/js/jquery.dataTables.js}"></script>
-    <script type="text/javascript" charset="utf8" th:src="@{/webjars/momentjs/min/moment.min.js}"></script>
-    <script type="text/javascript" th:src="@{/webjars/bootstrap-daterangepicker/js/bootstrap-daterangepicker.js}"></script>
-    <script type="text/javascript" th:src="@{/webjars/bootstrap-select/dist/js/bootstrap-select.js}"></script>
-    <script type="text/javascript">
-        $(document).ready(function () {
-            $('#toursTable').DataTable({
-                paging: true,
-                searching: true,
-                ordering: true,
-                fixedHeader: true,
-                columnDefs: [{
-                    targets: 2,
-                    render: function (data, type, row) {
-                        return data.length > 80 ?
-                            data.substr(0, 80) + '…' :
-                            data;
-                    }
-                }]
-            });
 
+    <script type="text/javascript" th:src="@{/webjars/momentjs/moment.js}"></script>
+
+    <script type="text/javascript" charset="utf8"
+            th:src="@{/webjars/datatables/js/jquery.dataTables.js}"></script>
+
+    <script type="text/javascript" charset="utf8"
+            th:src="@{/js/datetime-moment.js}"></script>
+
+    <script type="text/javascript"
+            th:src="@{/webjars/bootstrap-daterangepicker/js/bootstrap-daterangepicker.js}"></script>
+
+    <script type="text/javascript"
+            th:src="@{/webjars/bootstrap-select/dist/js/bootstrap-select.js}"></script>
+
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        let mainUrl = $("meta[name='mainUrl']").attr("content");
+
+        let dateTimeFormat = 'DD MMM YYYY HH:mm';
+
+        let userLocale = [[${userLocale}]];
+
+        $(document).ready(function () {
+
+            initDataTable();
+
+            initFilterSingleDatePickers();
+
+            $('#submitFilterBtn').on('click', function (e) {
+                e.preventDefault();
+                submitToursFilterForm();
+            })
+        });
+
+        function initFilterSingleDatePickers() {
             $('.date-picker-single').daterangepicker({
                 singleDatePicker: true,
                 showDropdowns: true,
@@ -132,9 +150,65 @@
                     format: dateTimeFormat,
                 }
             });
-        });
+        }
+
+        function initDataTable() {
+            $.fn.dataTable.moment( dateTimeFormat ); // to correct sort by date columns
+            $('#toursTable').DataTable({
+                paging: true,
+                searching: true,
+                ordering: true,
+                fixedHeader: true,
+                columnDefs: [
+                    {
+                        targets: 4,
+                        render: function (data, type, row) {
+                            return data.length > 80 ?
+                                data.substr(0, 80) + '…' :
+                                data;
+                        }
+                    }
+                ]
+            });
+        }
+
+        function submitToursFilterForm() {
+            $('#submitFilterBtn').prop('disabled', true);
+            $.ajax({
+                url: mainUrl + '/tour',
+                type: "get",
+                data: $('#tourFilterForm').serialize(),
+                success: function (toursTableHtmlFragment) {
+                    $('#toursTable').DataTable().destroy();
+                    $('#toursTable').html(toursTableHtmlFragment);
+                    $('#toursTable').DataTable({
+                        columnDefs: [
+                            {
+                                targets: 4,
+                                render: function (data, type, row) {
+                                    return data.length > 80 ?
+                                        data.substr(0, 80) + '…' :
+                                        data;
+                                }
+                            }
+                        ]
+                    }).draw();
+                    // initDataTable();
+                    initFilterSingleDatePickers();
+                },
+                error: function (responseData) {
+                    console.error('unable to get tours table fragment ' + responseData.responseJSON.message);
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'unable to load tours ' + responseData.responseJSON.message
+                    });
+                }
+            });
+            $('#submitFilterBtn').prop('disabled', false);
+        }
+
+        /*]]>*/
     </script>
 </div>
-
 </body>
 </html>
