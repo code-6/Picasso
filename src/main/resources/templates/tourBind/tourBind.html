@@ -709,19 +709,39 @@
                     separator: ' ~ ',
                     format: dateTimeFormat,
                 }
-            }).on('apply.daterangepicker', function (e, clickedIndex, isSelected, previousValue) {
+            }).on('apply.daterangepicker hideCalendar.daterangepicker hide.daterangepicker', function (e, clickedIndex, isSelected, previousValue) {
                 // validate bind when employee dates changed
-                $.ajax({
-                    url: mainUrl + '/api/bind/validate/' + $(this).attr('data-tour-id') + '/' + $(this).attr('data-employee-id') + '/' + $(this).val(),
-                    type: "get",
-                    error: function (validateErrorMessage) {
-                        console.error('validate bind failed ' + validateErrorMessage);
-                        Swal.fire({
-                            icon: 'error',
-                            title: validateErrorMessage.responseJSON.message
-                        });
+                let employeeId = $(this).attr('data-employee-id');
+                // in case if date-picker doesn't contains attribute data-employee-id try to search for value different way
+                if(!employeeId) {
+                    // search for employee select related to this date-picker by id
+                    // each date picker id has following format employeeTourDateRange_{employeeRowId}-{datePickerRowId} example employeeTourDateRange_0-0
+                    // first number after employeeTourDateRange_ indicates to wich employee select its related.
+                    let datePickerId = $(this).attr('id');
+
+                    // extract first number after _
+                    let employeeSelectRowIndex = datePickerId.match(/_\d/)[0].substring(1);
+
+                    // find required employeeSelect and extract selected option value which contains employee id
+                    let employeeSelect = $('#' + 'employeeSelect_' + employeeSelectRowIndex).find(":selected").map((_, e) => e.value).get();
+
+                    if (employeeSelect && employeeSelect[0] && employeeSelect[0] !== '') {
+                        employeeId = employeeSelect[0];
                     }
-                });
+                }
+                if(employeeId) {
+                    $.ajax({
+                        url: mainUrl + '/api/bind/validate/' + $(this).attr('data-tour-id') + '/' + employeeId + '/' + $(this).val(),
+                        type: "get",
+                        error: function (validateErrorMessage) {
+                            console.error('validate bind failed ' + validateErrorMessage);
+                            Swal.fire({
+                                icon: 'error',
+                                title: validateErrorMessage.responseJSON.message
+                            });
+                        }
+                    });
+                }
             });
         }
 
