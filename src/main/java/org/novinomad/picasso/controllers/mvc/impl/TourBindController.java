@@ -128,13 +128,14 @@ public class TourBindController {
         return "tourBind/tourBind :: bindResultEmployees";
     }
 
-    @PostMapping("/bindEmployeeDateRange")
-    public String bindEmployeeDateRange(final TourBindModel tourBind, Model model, HttpServletRequest request) {
+    @PostMapping("/bindEmployeeDateRange/{employeeRowId}")
+    public String bindEmployeeDateRange(final TourBindModel tourBind, Model model, @PathVariable Integer employeeRowId) {
         try {
-            final int employeeRowId = Integer.parseInt(request.getParameter("employeeRowId"));
-            EmployeeBindModel employeeBindModel = tourBind.getEmployees().get(employeeRowId);
-            Tour tour = tourBind.getTour();
-            employeeBindModel.getBindIdsToDateRanges().add(new BindDateRange(tour.getDateRange()));
+            if(employeeRowId != null) {
+                EmployeeBindModel employeeBindModel = tourBind.getEmployees().get(employeeRowId);
+                Tour tour = tourBind.getTour();
+                employeeBindModel.getBindIdsToDateRanges().add(new BindDateRange(tour.getDateRange()));
+            }
         } catch (NumberFormatException e) {
             log.error(e.getMessage(), e);
         }
@@ -143,14 +144,14 @@ public class TourBindController {
         return "tourBind/tourBind :: bindResultEmployees";
     }
 
-    @PostMapping("/unbindEmployeeDateRange")
-    public String unbindEmployeeDateRange(final TourBindModel tourBind, Model model, HttpServletRequest request) {
+    @PostMapping("/unbindEmployeeDateRange/{employeeRowId}/{employeeDateRangeRowId}")
+    public String unbindEmployeeDateRange(final TourBindModel tourBind, Model model, @PathVariable Integer employeeRowId,
+                                          @PathVariable Integer employeeDateRangeRowId) {
         try {
-            final int employeeRowId = Integer.parseInt(request.getParameter("employeeRowId"));
-            final int dateRangeRowId = Integer.parseInt(request.getParameter("unbindEmployeeDateRange"));
-
-            EmployeeBindModel employeeBindModel = tourBind.getEmployees().get(employeeRowId);
-            employeeBindModel.getBindIdsToDateRanges().remove(dateRangeRowId);
+            if(employeeRowId != null && employeeDateRangeRowId != null) {
+                EmployeeBindModel employeeBindModel = tourBind.getEmployees().get(employeeRowId);
+                employeeBindModel.getBindIdsToDateRanges().remove(employeeDateRangeRowId.intValue());
+            }
         } catch (NumberFormatException e) {
             log.error(e.getMessage(), e);
         }

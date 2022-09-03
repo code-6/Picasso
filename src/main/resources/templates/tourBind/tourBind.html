@@ -180,8 +180,9 @@
                                         </div>
                                         <div class="col-sm-1">
                                             <!--                                            TODO 2022-08-15 enabled only if employee type and employee selected. Also allow to add more only if previously added date-range filled. Disallow to submit if any of date-ranges is empty.-->
-                                            <button class="btn btn-outline-success" type="button"
-                                                    onclick="onBindEmployee($(this).attr('data-ctx'))"
+                                            <button class="btn btn-outline-success" type="button" id="bindEmployeeDateRangeBtn"
+                                                    th:data-employee-row-id="${employeeBindRow.index}"
+                                                    onclick="onBindEmployeeDateRange($(this).attr('data-employee-row-id'))"
                                                     data-ctx="bindEmployeeDateRange"
                                                     title="Add custom date range. Optional action, if not chosen, employee will be utilized to full tour date range">
                                                 <i class="fa-solid fa-calendar-plus"></i>
@@ -209,15 +210,13 @@
                                                        th:field="${tourBind.employees[__${employeeBindRow.index}__].bindIdsToDateRanges[__${employeeDateRangeRow.index}__]?.dateRange}">
                                             </div>
                                             <div class="col-sm-1">
-                                                <button class="btn btn-outline-primary" type="button"
-                                                        name="unbindEmployeeDateRange" th:value="${employeeDateRangeRow.index}"
+                                                <button class="btn btn-outline-primary" type="button" id="unbindEmployeeDateRangeBtn"
+                                                        th:data-employee-date-range-row-id="${employeeDateRangeRow.index}"
+                                                        th:data-employee-row-id="${employeeBindRow.index}"
                                                         title="Remove custom date range"
-                                                        onclick="onBindEmployee($(this).attr('data-ctx'))"
+                                                        onclick="onUnbindEmployeeDateRange($(this).attr('data-employee-row-id'), $(this).attr('data-employee-date-range-row-id'))"
                                                         data-ctx="unbindEmployeeDateRange">
                                                     <i class="fa-solid fa-calendar-xmark"></i>
-<!--                                                    <input type="hidden" th:value="${employeeBindRow.index}" name="employeeRowId">-->
-<!--                                                    <input type="hidden" th:value="${employeeDateRangeRow.index}"-->
-<!--                                                           name="unbindEmployeeDateRange">-->
                                                 </button>
                                             </div>
                                         </div>
