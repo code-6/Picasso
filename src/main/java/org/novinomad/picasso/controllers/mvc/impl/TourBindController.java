@@ -85,24 +85,6 @@ public class TourBindController {
         return "tourBind/tourBind :: tourBindForm";
     }
 
-    @PostMapping
-    public String saveBind(final TourBindModel tourBind) {
-        try {
-            tourBindService.save(tourBind.toEntities());
-        } catch (BindException e) {
-            log.error(e.getMessage(), e);
-        }
-        return "redirect:/";
-    }
-
-    @PostMapping("/bindEmployee")
-    public String bindEmployee(final TourBindModel tourBind, Model model) {
-        tourBind.bindEmployee(new Employee());
-        model.addAttribute("tourBind", tourBind);
-
-        return "tourBind/tourBind :: bindResultEmployees";
-    }
-
     @GetMapping("/ganttTooltipFragment")
     public String getGanttTooltipFragment(@RequestParam String taskId, Model model) {
 
@@ -113,12 +95,31 @@ public class TourBindController {
         return "fragments/ganttTaskTooltip :: ganttTaskTooltip";
     }
 
-    @PostMapping("/unbindEmployee")
-    public String unbindEmployee(final TourBindModel tourBind, Model model, HttpServletRequest request) {
+    @PostMapping
+    public String saveBind(final TourBindModel tourBind) {
+        try {
+            tourBindService.save(tourBind.toEntities());
+        } catch (BindException e) {
+            log.error(e.getMessage(), e);
+        }
+        return "redirect:/";
+    }
+
+    @PostMapping(value = "/bindEmployee")
+    public String bindEmployee(final TourBindModel tourBind, Model model) {
+        tourBind.bindEmployee(new Employee());
+        model.addAttribute("tourBind", tourBind);
+
+        return "tourBind/tourBind :: bindResultEmployees";
+    }
+
+    @PostMapping("/unbindEmployee/{employeeRowId}")
+    public String unbindEmployee(final TourBindModel tourBind, Model model, @PathVariable Integer employeeRowId) {
 
         try {
-            final int employeeRowId = Integer.parseInt(request.getParameter("employeeRowId"));
-            tourBind.getEmployees().remove(employeeRowId);
+            if(employeeRowId != null) {
+                tourBind.getEmployees().remove(employeeRowId.intValue());
+            }
         } catch (NumberFormatException e) {
             log.error(e.getMessage(), e);
         }

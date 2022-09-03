@@ -150,14 +150,14 @@
                             </div>
 
                             <div id="bindResultEmployees" th:fragment="bindResultEmployees">
-                                <div th:each="employeeBind, i : ${tourBind.employees}">
+                                <div th:each="employeeBind, employeeBindRow : ${tourBind.employees}">
                                     <div class="row form-group">
                                         <div class="col-sm-2">
-                                            <select th:id="${'employeeTypeSelect_' + i.index}"
+                                            <select th:id="${'employeeTypeSelect_' + employeeBindRow.index}"
                                                     class="form-control selectpicker employeeTypeSelect"
                                                     data-live-search="true" required
-                                                    th:field="${tourBind.employees[__${i.index}__].employee.type}"
-                                                    th:data-employee-select-id="${'employeeSelect_' + i.index}">
+                                                    th:field="${tourBind.employees[__${employeeBindRow.index}__].employee.type}"
+                                                    th:data-employee-select-id="${'employeeSelect_' + employeeBindRow.index}">
                                                 <option th:value="${null}"></option>
                                                 <option th:each="employeeType : ${allEmployeeTypes}"
                                                         th:value="${employeeType}"
@@ -167,10 +167,10 @@
                                             </select>
                                         </div>
                                         <div class="col">
-                                            <select th:id="${'employeeSelect_' + i.index}"
+                                            <select th:id="${'employeeSelect_' + employeeBindRow.index}"
                                                     class="form-control selectpicker employeeSelect" required
                                                     data-live-search="true"
-                                                    th:field="${tourBind.employees[__${i.index}__].employee}">
+                                                    th:field="${tourBind.employees[__${employeeBindRow.index}__].employee}">
                                                 <option th:value="${null}"></option>
                                                 <option th:each="employee : ${@employeeService.getOrEmpty(employeeBind.employee?.type)}"
                                                         th:value="${employee.id}"
@@ -181,43 +181,43 @@
                                         <div class="col-sm-1">
                                             <!--                                            TODO 2022-08-15 enabled only if employee type and employee selected. Also allow to add more only if previously added date-range filled. Disallow to submit if any of date-ranges is empty.-->
                                             <button class="btn btn-outline-success" type="button"
-                                                    onclick="onBindEmployee($(this).attr('name'))"
-                                                    name="bindEmployeeDateRange" th:value="${i.index}"
+                                                    onclick="onBindEmployee($(this).attr('data-ctx'))"
+                                                    data-ctx="bindEmployeeDateRange"
                                                     title="Add custom date range. Optional action, if not chosen, employee will be utilized to full tour date range">
                                                 <i class="fa-solid fa-calendar-plus"></i>
                                             </button>
                                         </div>
                                         <div class="col-sm-1">
-                                            <button class="btn btn-outline-primary" type="button" name="unbindEmployee"
-                                                    title="Unbind employee" th:value="${i.index}"
-                                                    onclick="onBindEmployee($(this).attr('name'))">
+                                            <button id="unbindEmployeeBtn" class="btn btn-outline-primary" type="button"
+                                                    title="Unbind employee" th:data-employee-row-id="${employeeBindRow.index}" onclick="onUnbindEmployee($(this).attr('data-employee-row-id'))">
                                                 <i class="fa-solid fa-user-xmark"></i>
                                             </button>
                                         </div>
                                     </div>
-                                    <div th:each="bindDateRange, j : ${employeeBind.getBindIdsToDateRanges}">
+                                    <div th:each="employeeDateRange, employeeDateRangeRow : ${employeeBind.getBindIdsToDateRanges}">
                                         <div class="row form-group">
                                             <div class="col-sm-2"></div>
                                             <div class="col">
                                                 <input type="hidden" name="bindId"
-                                                       th:field="${tourBind.employees[__${i.index}__].bindIdsToDateRanges[__${j.index}__]?.bindId}">
+                                                       th:field="${tourBind.employees[__${employeeBindRow.index}__].bindIdsToDateRanges[__${employeeDateRangeRow.index}__]?.bindId}">
 
                                                 <input type="text" required
                                                        class="form-control date-picker date-picker-employee-tour-bind"
-                                                       th:id="${'employeeTourDateRange_'+i.index+'-'+j.index}"
+                                                       th:id="${'employeeTourDateRange_'+employeeBindRow.index+'-'+employeeDateRangeRow.index}"
                                                        th:data-employee-id="${employeeBind?.employee?.id}"
                                                        th:data-tour-id="${tourBind.tour.id}" name="dateRange"
-                                                       th:field="${tourBind.employees[__${i.index}__].bindIdsToDateRanges[__${j.index}__]?.dateRange}">
+                                                       th:field="${tourBind.employees[__${employeeBindRow.index}__].bindIdsToDateRanges[__${employeeDateRangeRow.index}__]?.dateRange}">
                                             </div>
                                             <div class="col-sm-1">
                                                 <button class="btn btn-outline-primary" type="button"
-                                                        th:value="${j.index}"
-                                                        name="unbindEmployeeDateRange" title="Remove custom date range"
-                                                        onclick="onBindEmployee($(this).attr('name'))">
+                                                        name="unbindEmployeeDateRange" th:value="${employeeDateRangeRow.index}"
+                                                        title="Remove custom date range"
+                                                        onclick="onBindEmployee($(this).attr('data-ctx'))"
+                                                        data-ctx="unbindEmployeeDateRange">
                                                     <i class="fa-solid fa-calendar-xmark"></i>
-                                                    <input type="hidden" th:value="${i.index}" name="employeeRowId">
-                                                    <input type="hidden" th:value="${j.index}"
-                                                           name="unbindEmployeeDateRange">
+<!--                                                    <input type="hidden" th:value="${employeeBindRow.index}" name="employeeRowId">-->
+<!--                                                    <input type="hidden" th:value="${employeeDateRangeRow.index}"-->
+<!--                                                           name="unbindEmployeeDateRange">-->
                                                 </button>
                                             </div>
                                         </div>
@@ -230,9 +230,8 @@
                                     <div class="col-sm-2"></div>
                                     <div class="col">
                                         <button class="btn btn-outline-success btn-block" type="button"
-                                                name="bindEmployee" id="bindEmployeeBtn"
-                                                th:text="#{bind-employee-to-the} + ${tourBind.tour?.name}"
-                                                onclick="onBindEmployee($(this).attr('name'))">
+                                                id="bindEmployeeBtn" onclick="onBindEmployee()"
+                                                th:text="#{bind-employee-to-the} + ${tourBind.tour?.name}">
                                         </button>
                                     </div>
                                     <div class="col-sm-1">
@@ -567,26 +566,71 @@
             });
         }
 
-        function onBindEmployee(ctxPath) {
+        function onBindEmployee() {
             $.ajax({
-                url: mainUrl + '/' + ctxPath,
+                url: mainUrl + '/bindEmployee',
                 type: "post",
                 data: $('#tourBindForm').serialize(),
                 success: function (tourBindFormFragment) {
-                    $('#bindResultEmployees').html(tourBindFormFragment);
-
-                    initEmployeeTypeSelectChangeListener();
-
-                    $('.employeeTypeSelect').selectpicker('refresh');
-                    $('.employeeSelect').selectpicker('refresh');
-                    $('.tourSelect').selectpicker('refresh');
-
-                    initBindFormDatePickers();
+                    refreshBindFormEmployeeDetails(tourBindFormFragment);
                 },
                 error: function (error) {
                     console.error('onBindEmployee ' + error);
                 }
             });
+        }
+
+        function onUnbindEmployee(employeeRowId) {
+            $.ajax({
+                url: mainUrl + '/unbindEmployee/' + employeeRowId,
+                type: "post",
+                data: $('#tourBindForm').serialize(),
+                success: function (tourBindFormFragment) {
+                    refreshBindFormEmployeeDetails(tourBindFormFragment);
+                },
+                error: function (error) {
+                    console.error('onUnbindEmployee ' + error);
+                }
+            });
+        }
+        function onBindEmployeeDateRange(employeeRowId) {
+            $.ajax({
+                url: mainUrl + '/bindEmployeeDateRange/' + employeeRowId,
+                type: "post",
+                data: $('#tourBindForm').serialize(),
+                success: function (tourBindFormFragment) {
+                    refreshBindFormEmployeeDetails(tourBindFormFragment);
+                },
+                error: function (error) {
+                    console.error('onBindEmployeeDateRange ' + error);
+                }
+            });
+        }
+
+        function onUnbindEmployeeDateRange(employeeRowId, dateRangeRowId) {
+            $.ajax({
+                url: mainUrl + '/unbindEmployeeDateRange/' + employeeRowId + '/' + dateRangeRowId,
+                type: "post",
+                data: $('#tourBindForm').serialize(),
+                success: function (tourBindFormFragment) {
+                    refreshBindFormEmployeeDetails(tourBindFormFragment);
+                },
+                error: function (error) {
+                    console.error('onBindEmployeeDateRange ' + error);
+                }
+            });
+        }
+
+        function refreshBindFormEmployeeDetails(tourBindFormFragment) {
+            $('#bindResultEmployees').html(tourBindFormFragment);
+
+            initEmployeeTypeSelectChangeListener();
+
+            $('.employeeTypeSelect').selectpicker('refresh');
+            $('.employeeSelect').selectpicker('refresh');
+            $('.tourSelect').selectpicker('refresh');
+
+            initBindFormDatePickers();
         }
 
         function initEmployeeTypeSelectChangeListener() {
