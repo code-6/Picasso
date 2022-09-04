@@ -4,14 +4,22 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.novinomad.picasso.domain.entities.impl.Tour;
 import org.novinomad.picasso.dto.filters.TourFilter;
+import org.novinomad.picasso.exceptions.StorageException;
 import org.novinomad.picasso.exceptions.base.PicassoException;
 import org.novinomad.picasso.repositories.jpa.TourRepository;
 import org.novinomad.picasso.services.ITourService;
+import org.novinomad.picasso.services.StorageService;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import javax.annotation.PostConstruct;
 import javax.transaction.Transactional;
+import java.io.IOException;
+import java.nio.file.*;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -22,9 +30,44 @@ import java.util.Optional;
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class TourService implements ITourService {
-    
+
     final TourRepository tourRepository;
-    
+
+    final StorageService storageService;
+
+    private static final String PATH_SEPARATOR = FileSystems.getDefault().getSeparator();
+    private static final String DEFAULT_ROOT_DIR = "." + PATH_SEPARATOR + "toursFiles";
+
+    private Path rootLocation;
+
+    @Value("${tour-files-folder}")
+    private String filesRootDir;
+
+    /**
+     * Makes sure that root folder exists.
+     * If root folder doesn't exist then create new by default in folder from where application was started.
+     */
+    @PostConstruct
+    public void initializeRootDirectoryForTourFiles() {
+
+        // make sure that path to rot directory is provided, if not then use default value
+        if (StringUtils.isBlank(filesRootDir)) filesRootDir = DEFAULT_ROOT_DIR;
+
+        if (storageService.isValidPath(filesRootDir)){
+            if (!storageService.existsFolder(filesRootDir)) {
+                try {
+                    rootLocation = storageService.createDir(filesRootDir);
+                    log.info("root directory {} for tour files created successfully", rootLocation.getFileName());
+                } catch (IOException | StorageException e) {
+                    log.error("root directory {} for tour files not created because {}", filesRootDir, e.getMessage(), e);
+                    throw new RuntimeException(e);
+                }
+            } else {
+                rootLocation = Paths.get(filesRootDir);
+            }
+        }
+    }
+
     @Override
     public Tour save(Tour tour) throws PicassoException {
         try {
@@ -47,7 +90,7 @@ public class TourService implements ITourService {
                 // ignored because save contains logging.
             }
         });
-        if(savedTours.size() != tours.size())
+        if (savedTours.size() != tours.size())
             log.warn("not all Tours are saved. To be saved: {} saved: {}", tours.size(), savedTours.size());
 
         return savedTours;
@@ -75,7 +118,7 @@ public class TourService implements ITourService {
                 // ignored because save contains logging.
             }
         });
-        if(deletedTours.size() != ids.size())
+        if (deletedTours.size() != ids.size())
             log.warn("not all Tours are deleted. To be deleted: {} deleted: {}", deletedTours.size(), ids.size());
 
         return deletedTours;
@@ -110,5 +153,22 @@ public class TourService implements ITourService {
             log.error("unable to get Tours by filter: {} because: {}", tourFilter, e.getMessage(), e);
             throw e;
         }
+    }
+
+    @Override
+    public Tour save(Tour tour, List<MultipartFile> files) throws PicassoException {
+        tour.addFile(files);
+        tour = tourRepository.save(tour);
+        String newDir = rootLocation.toString() + PATH_SEPARATOR + tour.getId();
+        try {
+            if(!storageService.existsFolder(newDir))
+                storageService.createDir(newDir);
+
+            for (MultipartFile file : files)
+                storageService.store(file, newDir);
+        } catch (IOException e) {
+            log.error(e.getMessage(), e);
+        }
+        return tour;
     }
 }

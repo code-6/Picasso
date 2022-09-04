@@ -9,13 +9,17 @@
     </div>
     <div class="row form-group">
         <div class="col-sm-2">
-            <label for="datepickerForm" class="form-label">Date range</label>
+            <label for="datepickerForm" th:text="#{date.cap.pl}"></label>
         </div>
         <div class="col">
             <div class="input-daterange input-group" id="datepickerForm" data-provide="datepicker">
-                <input type="text" class="input-sm form-control" name="startDate"/>
-                <span class="input-group-addon">to</span>
-                <input type="text" class="input-sm form-control" name="endDate"/>
+                <input type="text" class="form-control date-picker date-picker-single date-picker-single-tour-form"
+                       id="filterStartDate"
+                       th:field="*{startDate}" name="startDate">
+                <span class="input-group-addon from-to-date-fields-divider">to</span>
+                <input type="text" class="form-control date-picker date-picker-single date-picker-single-tour-form"
+                       id="filterEndDate"
+                       th:field="*{endDate}" name="endDate">
             </div>
         </div>
     </div>
@@ -30,24 +34,36 @@
     </div>
     <div class="row form-group">
         <div class="col-sm-2">
-            <label for="formFileMultiple" class="form-label">Files</label>
+            <label for="tourFilesInput" class="form-label">Files</label>
 
         </div>
         <div class="col">
-            <input class="form-control" type="file" id="formFileMultiple" multiple name="files">
-
+            <input class="form-control" type="file" id="tourFilesInput" multiple name="tourFiles">
         </div>
     </div>
     <div class="row form-group">
         <div class="col-sm-2"></div>
         <div class="col">
 
-            <button type="submit" class="btn btn-outline-success btn-block">Submit</button>
+            <button type="submit" class="btn btn-outline-success btn-block">
+                <i class="fas fa-check-square"></i>
+                <span th:text="#{submit.cap}"></span>
+            </button>
         </div>
         <div class="col">
             <button type="button" class="btn btn-outline-secondary btn-block" data-toggle="collapse"
                     href="#tourFormContainer"
-                    aria-expanded="true" aria-controls="tourFormContainer">Close
+                    aria-expanded="true" aria-controls="tourFormContainer">
+                <i class="fas fa-window-close"></i>
+                <span th:text="#{close.cap}"></span>
+            </button>
+        </div>
+        <div class="col">
+            <button class="btn btn-outline-warning btn-block" id="resetTourFormBtn"
+                    type="button"
+                    th:title="#{clear.title}" >
+                <i class="fas fa-eraser"></i>
+                <span th:text="#{clear.cap} + #{form}"></span>
             </button>
         </div>
     </div>

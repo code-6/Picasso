@@ -29,10 +29,18 @@
     <td th:title="${tour.description}"><span th:text="${tour.description}"></span></td>
     <td>
 
-      <div class="btn-group" role="group" aria-label="Basic example">
-        <button type="button" class="btn btn-sm btn-outline-primary"><i class="fa-thin fa-pen-to-square"></i></button>
-        <button type="button" class="btn btn-sm btn-outline-success"><i class="fa-thin fa-file"></i></button>
-        <button type="button" class="btn btn-sm btn-outline-danger"><i class="fa-thin fa-trash-can"></i></button>
+      <div class="btn-group" role="group" aria-label="Tour entries management buttons">
+        <button type="button" class="btn btn-sm btn-outline-primary" th:title="#{edit.title}">
+            <i class="fas fa-edit"></i>
+        </button>
+
+        <button type="button" class="btn btn-sm btn-outline-success" th:title="#{file.title}">
+            <i class="fas fa-file"></i>
+        </button>
+
+        <button type="button" class="btn btn-sm btn-outline-danger" th:title="#{delete.title}">
+            <i class="fas fa-trash-alt"></i>
+        </button>
       </div>
     </td>
   </tr>

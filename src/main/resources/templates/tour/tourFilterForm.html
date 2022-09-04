@@ -2,13 +2,13 @@
     <div class="row align-items-end">
         <div class="col">
             <label for="filterStartDate" th:text="#{start.cap} + #{date}"></label>
-            <input type="text" class="form-control date-picker date-picker-single"
+            <input type="text" class="form-control date-picker date-picker-single date-picker-single-tour-filter-form"
                    id="filterStartDate"
                    th:field="*{startDate}" name="startDate">
         </div>
         <div class="col">
             <label for="filterEndDate" th:text="#{end.cap} + #{date}"></label>
-            <input type="text" class="form-control date-picker date-picker-single"
+            <input type="text" class="form-control date-picker date-picker-single date-picker-single-tour-filter-form"
                    id="filterEndDate"
                    th:field="*{endDate}" name="endDate">
         </div>

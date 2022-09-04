@@ -13,6 +13,14 @@
 
     <link rel="stylesheet" type="text/css"
           th:href="@{/webjars/bootstrap-select/dist/css/bootstrap-select.min.css}"/>
+
+    <style>
+        .from-to-date-fields-divider {
+            padding-right: 1rem;
+            padding-left: 1rem;
+            text-align: center;
+        }
+    </style>
 </head>
 <body class="sb-nav-fixed">
 <div layout:fragment="header">
@@ -26,20 +34,22 @@
 
         <!-- Page management components -->
         <div class="mx-auto order-0">
-            <div class="row gx-5">
-                <div class="col">
-                    <button class="btn btn-outline-primary" href="#tourCriteria" role="button"
-                            data-toggle="collapse" data-target="#tourFilterDiv"
-                            aria-expanded="false" aria-controls="tourFilterDiv">
-                        <i class="fa-thin fa-filter"></i>
+            <div class="btn-toolbar" role="toolbar" aria-label="Toolbar with button groups">
+                <div class="btn-group mr-2" role="group" aria-label="First group">
+                    <a class="btn btn-outline-primary" href="#tourCriteria" role="button" type="button"
+                       data-toggle="collapse" data-target="#tourFilterDiv"
+                       aria-expanded="false" aria-controls="tourFilterDiv">
+                        <i class="fas fa-filter"></i>
                         <span th:text="#{filter.cap.pl}"></span>
-                    </button>
-                    <button class="btn btn-outline-primary" id="bindFormToggleBtn" data-toggle="collapse"
-                            data-target="#tourFormContainer"
-                            aria-expanded="false" aria-controls="tourFormContainer" href="#">
-                        <i class="fa-thin fa-square-plus"></i>
-                        <span th:text="#{bindFormToggleBtn}"></span>
-                    </button>
+                    </a>
+                </div>
+                <div class="btn-group mr-2" role="group" aria-label="Second group">
+                    <a class="btn btn-outline-primary" id="tourFormToggleBtn" data-toggle="collapse"
+                       data-target="#tourFormContainer" role="button"
+                       aria-expanded="false" aria-controls="tourFormContainer" href="#tourFormContainer" type="button">
+                        <i id="tourFormToggleBtnIcon" class="fas fa-eye"></i>
+                        <span th:text="#{tourFormToggleBtn}"></span>
+                    </a>
                 </div>
             </div>
         </div>
@@ -73,7 +83,7 @@
         <div class="card">
             <div class="card-header">Tour form</div>
             <div class="card-body">
-                <form th:object="${tour}" id="tourForm">
+                <form th:object="${tour}" th:action="@{/tour}" th:method="post" id="tourForm" enctype="multipart/form-data">
                     <div th:include="tour/tourForm :: tourFormContent"></div>
                 </form>
             </div>
@@ -125,35 +135,29 @@
 
         let userLocale = [[${userLocale}]];
 
+        // change tourFormToggleBtn icon on toggle
+        let tourFormContainer = $('#tourFormContainer');
+        let tourFormToggleBtnIcon = $('#tourFormToggleBtnIcon');
+
+        $(tourFormContainer).on('shown.bs.collapse', function (e) {
+            $(tourFormToggleBtnIcon).removeClass('fa-eye')
+            $(tourFormToggleBtnIcon).addClass('fa-eye-slash')
+        })
+
+        $(tourFormContainer).on('hidden.bs.collapse', function (e) {
+            $(tourFormToggleBtnIcon).removeClass('fa-eye-slash')
+            $(tourFormToggleBtnIcon).addClass('fa-eye')
+        })
+
         $(document).ready(function () {
 
             initDataTable();
 
             initFilterSingleDatePickers();
-
-            $('#submitFilterBtn').on('click', function (e) {
-                e.preventDefault();
-                submitToursFilterForm();
-            })
         });
 
-        function initFilterSingleDatePickers() {
-            $('.date-picker-single').daterangepicker({
-                singleDatePicker: true,
-                showDropdowns: true,
-                timePicker: true,
-                timePicker24Hour: true,
-                timePickerIncrement: 5,
-                autoApply: true,
-                autoUpdateInput: true,
-                locale: {
-                    format: dateTimeFormat,
-                }
-            });
-        }
-
         function initDataTable() {
-            $.fn.dataTable.moment( dateTimeFormat ); // to correct sort by date columns
+            $.fn.dataTable.moment(dateTimeFormat); // to fix sort by date columns
             $('#toursTable').DataTable({
                 paging: true,
                 searching: true,
@@ -172,29 +176,51 @@
             });
         }
 
+        function initFilterSingleDatePickers() {
+            $('.date-picker-single').daterangepicker({
+                singleDatePicker: true,
+                showDropdowns: true,
+                timePicker: true,
+                timePicker24Hour: true,
+                timePickerIncrement: 5,
+                autoApply: true,
+                autoUpdateInput: true,
+                locale: {
+                    format: dateTimeFormat,
+                }
+            });
+        }
+
+        let submitFilterBtn = $('#submitFilterBtn');
+
+        $(submitFilterBtn).on('click', function (e) {
+            e.preventDefault();
+            submitToursFilterForm();
+        });
+
         function submitToursFilterForm() {
-            $('#submitFilterBtn').prop('disabled', true);
+            $(submitFilterBtn).prop('disabled', true);
             $.ajax({
                 url: mainUrl + '/tour',
                 type: "get",
                 data: $('#tourFilterForm').serialize(),
                 success: function (toursTableHtmlFragment) {
-                    $('#toursTable').DataTable().destroy();
-                    $('#toursTable').html(toursTableHtmlFragment);
-                    $('#toursTable').DataTable({
-                        columnDefs: [
-                            {
-                                targets: 4,
-                                render: function (data, type, row) {
-                                    return data.length > 80 ?
-                                        data.substr(0, 80) + '…' :
-                                        data;
-                                }
+                    let toursTable = $('#toursTable');
+                    $(toursTable).DataTable().destroy();
+                    $(toursTable).html(toursTableHtmlFragment);
+                    $(toursTable).DataTable({
+                        columnDefs: [{
+                            targets: 4,
+                            render: function (data, type, row) {
+                                return data.length > 80 ?
+                                    data.substr(0, 80) + '…' :
+                                    data;
                             }
-                        ]
+                        }]
                     }).draw();
-                    // initDataTable();
                     initFilterSingleDatePickers();
+
+                    $(submitFilterBtn).prop('disabled', false);
                 },
                 error: function (responseData) {
                     console.error('unable to get tours table fragment ' + responseData.responseJSON.message);
@@ -202,9 +228,9 @@
                         icon: 'error',
                         title: 'unable to load tours ' + responseData.responseJSON.message
                     });
+                    $(submitFilterBtn).prop('disabled', false);
                 }
             });
-            $('#submitFilterBtn').prop('disabled', false);
         }
 
         /*]]>*/

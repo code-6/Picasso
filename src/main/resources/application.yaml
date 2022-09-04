@@ -30,3 +30,8 @@ logging:
     org.novinomad.picasso: info
     org.hibernate.SQL: error
 
+jobs:
+  enabled: false
+
+tour-files-folder: ${PCS_TOUR_FILES_FOLDER:./toursFiles}
+

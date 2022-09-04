@@ -6,6 +6,13 @@ server:
       timeout: ${PCS_SERVLET_SESSION_TIMEOUT:5m}
 
 spring:
+  servlet:
+    multipart:
+      max-file-size: ${PCS_MAX_FILE_SIZE:10MB}
+      max-request-size: ${spring.servlet.multipart.max-file-size}
+  devtools:
+    livereload:
+      enabled: true
   thymeleaf:
     cache: false
   jpa:
@@ -31,3 +38,4 @@ logging:
 jobs:
   enabled: false
 
+tour-files-folder: ${PCS_TOUR_FILES_FOLDER:}

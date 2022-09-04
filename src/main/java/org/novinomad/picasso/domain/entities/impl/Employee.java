@@ -58,7 +58,7 @@ public class Employee extends AbstractEntity {
 
     @RequiredArgsConstructor
     public enum Type {
-        DRIVER("<i class=\"fa-thin fa-person-military-pointing\"></i>", Task.CssClass.PINK),
+        DRIVER("<i class=\"driver-icon\"></i>", Task.CssClass.PINK),
         GUIDE("<i class=\"fa-thin fa-person-hiking\"></i>", Task.CssClass.YELLOW);
 
         @Getter

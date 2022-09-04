@@ -14,6 +14,7 @@ import javax.persistence.*;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
+import java.util.HashSet;
 import java.util.Locale;
 import java.util.Objects;
 import java.util.Set;
@@ -51,7 +52,12 @@ public class Tour extends AbstractEntity implements ITour, IRange {
     LocalDateTime endDate;
 
     @ElementCollection
-    Set<String> files;
+    Set<String> files = new HashSet<>();
+
+    @Override
+    public Set<String> getFiles() {
+        return files;
+    }
 
     public Tour(String name, LocalDateTime startDate, LocalDateTime endDate) {
         this.name = name;
