@@ -318,14 +318,14 @@
                                     <label for="filterStartDate" th:text="#{start.cap} + #{date}"></label>
                                     <input type="text" class="form-control date-picker date-picker-single"
                                            id="filterStartDate"
-                                           th:field="*{startDate}" name="startDate">
+                                           th:field="*{startDate}" th:value="${tourCriteria.getStartDateAsString()}" name="startDate">
                                 </div>
 
                                 <div class="col-md align-items-end">
                                     <label for="filterEndDate" th:text="#{end.cap} + #{date}"></label>
                                     <input type="text" class="form-control date-picker date-picker-single"
                                            id="filterEndDate"
-                                           th:field="*{endDate}" name="endDate">
+                                           th:field="*{endDate}" th:value="${tourCriteria.getEndDateAsString()}" name="endDate">
                                 </div>
 
                                 <div class="col-md align-items-end">

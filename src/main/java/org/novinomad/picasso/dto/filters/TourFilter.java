@@ -1,6 +1,7 @@
 package org.novinomad.picasso.dto.filters;
 
 import lombok.Data;
+import org.novinomad.picasso.commons.IRange;
 import org.novinomad.picasso.commons.utils.CommonDateUtils;
 import org.springframework.format.annotation.DateTimeFormat;
 
@@ -13,7 +14,7 @@ import java.util.List;
 import java.util.Locale;
 
 @Data
-public class TourFilter {
+public class TourFilter implements IRange {
     @DateTimeFormat(pattern = CommonDateUtils.COMMON)
     LocalDateTime startDate;
     @DateTimeFormat(pattern = CommonDateUtils.COMMON)

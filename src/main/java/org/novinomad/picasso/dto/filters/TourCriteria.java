@@ -3,6 +3,7 @@ package org.novinomad.picasso.dto.filters;
 import lombok.AccessLevel;
 import lombok.Data;
 import lombok.experimental.FieldDefaults;
+import org.novinomad.picasso.commons.IRange;
 import org.novinomad.picasso.commons.utils.CommonDateUtils;
 import org.novinomad.picasso.domain.entities.impl.Employee;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -14,7 +15,7 @@ import java.util.List;
 
 @Data
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class TourCriteria {
+public class TourCriteria implements IRange {
     @DateTimeFormat(pattern = CommonDateUtils.COMMON)
     LocalDateTime startDate;
     @DateTimeFormat(pattern = CommonDateUtils.COMMON)
