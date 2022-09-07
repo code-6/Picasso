@@ -756,8 +756,8 @@
         }
 
         function initFilterDates() {
-            let defaultStartDate = new Date([[${tourCriteria.startDate}]].toString());
-            let defaultEndDate = new Date([[${tourCriteria.endDate}]].toString());
+            let defaultStartDate = new Date([[${tourCriteria.getStartDateAsString()}]].toString());
+            let defaultEndDate = new Date([[${tourCriteria.getEndDateAsString()}]].toString());
 
             $('#filterStartDate').data('daterangepicker').setStartDate(defaultStartDate);
             $('#filterEndDate').data('daterangepicker').setStartDate(defaultEndDate);
