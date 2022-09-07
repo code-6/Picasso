@@ -17,7 +17,7 @@ import static org.novinomad.picasso.commons.utils.CommonDateUtils.COMMON;
 
 @Getter
 @Setter
-public class LocalDateTimeRange implements Comparable<LocalDateTimeRange> {
+public class LocalDateTimeRange implements IRange, Comparable<LocalDateTimeRange> {
 
     @DateTimeFormat(pattern = COMMON)
     private LocalDateTime startDate;
@@ -36,7 +36,7 @@ public class LocalDateTimeRange implements Comparable<LocalDateTimeRange> {
     @Override
     public String toString() {
         DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern(COMMON, SpringContextUtil.getBean(IUserService.class).getCurrentUserLocale());
-        return startDate.format(dateTimeFormatter) + " ~ " + endDate.format(dateTimeFormatter);
+        return getStartDateAsString() + " ~ " + getEndDateAsString();
     }
 
     @Override

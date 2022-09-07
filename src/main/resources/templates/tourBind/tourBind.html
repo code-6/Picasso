@@ -216,7 +216,8 @@
                                                        th:id="${'employeeTourDateRange_'+employeeBindRow.index+'-'+employeeDateRangeRow.index}"
                                                        th:data-employee-id="${employeeBind?.employee?.id}"
                                                        th:data-tour-id="${tourBind.tour.id}" name="dateRange"
-                                                       th:field="${tourBind.employees[__${employeeBindRow.index}__].bindIdsToDateRanges[__${employeeDateRangeRow.index}__]?.dateRange}">
+                                                       th:field="${tourBind.employees[__${employeeBindRow.index}__].bindIdsToDateRanges[__${employeeDateRangeRow.index}__]?.dateRange}"
+                                                       th:value="${tourBind.employees[__${employeeBindRow.index}__].bindIdsToDateRanges[__${employeeDateRangeRow.index}__]?.dateRange.toString()}">
                                             </div>
                                             <div class="col-sm-1">
                                                 <button class="btn btn-outline-primary" type="button"
