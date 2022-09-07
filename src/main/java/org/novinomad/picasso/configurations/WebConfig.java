@@ -24,24 +24,24 @@ public class WebConfig implements WebMvcConfigurer {
     public LayoutDialect layoutDialect() {
         return new LayoutDialect();
     }
-    @Bean
-    public LocaleResolver localeResolver() {
-        SessionLocaleResolver sessionLocaleResolver = new SessionLocaleResolver();
-        sessionLocaleResolver.setDefaultLocale(Locale.ENGLISH);
-
-        return sessionLocaleResolver;
-    }
-
-    @Bean
-    public LocaleChangeInterceptor localeChangeInterceptor() {
-        LocaleChangeInterceptor localeChangeInterceptor = new LocaleChangeInterceptor();
-        localeChangeInterceptor.setParamName("lang");
-        return localeChangeInterceptor;
-    }
-
-    @Override
-    public void addInterceptors(InterceptorRegistry registry) {
-        WebMvcConfigurer.super.addInterceptors(registry);
-        registry.addInterceptor(localeChangeInterceptor());
-    }
+//    @Bean
+//    public LocaleResolver localeResolver() {
+//        SessionLocaleResolver sessionLocaleResolver = new SessionLocaleResolver();
+//        sessionLocaleResolver.setDefaultLocale(Locale.ENGLISH);
+//
+//        return sessionLocaleResolver;
+//    }
+//
+//    @Bean
+//    public LocaleChangeInterceptor localeChangeInterceptor() {
+//        LocaleChangeInterceptor localeChangeInterceptor = new LocaleChangeInterceptor();
+//        localeChangeInterceptor.setParamName("lang");
+//        return localeChangeInterceptor;
+//    }
+//
+//    @Override
+//    public void addInterceptors(InterceptorRegistry registry) {
+//        WebMvcConfigurer.super.addInterceptors(registry);
+//        registry.addInterceptor(localeChangeInterceptor());
+//    }
 }
