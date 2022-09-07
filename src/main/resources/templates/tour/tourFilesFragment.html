@@ -1,0 +1,40 @@
+<table th:fragment="tourFilesFragment" id="uploadedFilesTable" class="table table-sm table-borderless">
+    <thead>
+    <tr>
+        <th scope="col"><span th:title="#{file.uploaded}"></span></th>
+        <th scope="col"></th>
+    </tr>
+    </thead>
+    <tbody>
+
+    <tr th:each="fileName, row : ${tour.fileNames}">
+        <td><span th:text="${fileName}"></span></td>
+        <td>
+            <div class="btn-group" role="group" aria-label="Tour entries management buttons">
+                <a class="btn btn-sm btn-outline-success tourDownloadFileBtn"
+                   th:data-tour-id="${tour.id}"
+                   th:data-tour-file-name="${fileName}"
+                   th:title="#{file.download}"
+                   th:href="@{/tour/{id}/file/{name}(id=${tour.id},name=${fileName})}"
+                   th:attr="download=${fileName}">
+                    <i class="fas fa-download"></i>
+                </a>
+
+                <button type="button" class="btn btn-sm btn-outline-danger tourDeleteFileBtn"
+                        th:data-tour-id="${tour.id}"
+                        th:data-tour-file-name="${fileName}"
+                        th:title="#{file.delete}">
+                    <i class="fas fa-trash-alt"></i>
+                </button>
+            </div>
+        </td>
+    </tr>
+
+    </tbody>
+    <tfoot>
+    <tr>
+        <th scope="col"><span th:title="#{file.uploaded}"></span></th>
+        <th scope="col"></th>
+    </tr>
+    </tfoot>
+</table>

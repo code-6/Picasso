@@ -5,13 +5,16 @@ import org.apache.commons.lang3.StringUtils;
 import org.novinomad.picasso.exceptions.StorageException;
 import org.novinomad.picasso.services.StorageService;
 import org.springframework.core.io.Resource;
+import org.springframework.core.io.UrlResource;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.MalformedURLException;
 import java.nio.file.*;
+import java.util.List;
 import java.util.stream.Stream;
 
 @Service
@@ -71,16 +74,41 @@ public class TourFileSystemStorage implements StorageService {
 
     @Override
     public Stream<Path> loadAll(String pathToFolder) throws StorageException {
+        if (isValidPath(pathToFolder) && existsFolder(pathToFolder)) {
+            Path destinationPath = Paths.get(pathToFolder);
+            try (Stream<Path> stream = Files.walk(destinationPath, 1)) {
+                return stream.filter(path -> !path.equals(destinationPath))
+                        .map(destinationPath::relativize);
+            } catch (IOException e) {
+                throw new StorageException("Failed to read stored files", e);
+            }
+        }
         return null;
     }
 
     @Override
     public Path load(String filename) {
-        return null;
+        return Paths.get(filename);
     }
 
     @Override
-    public Resource loadAsResource(String filename) throws FileNotFoundException, StorageException {
+    public Resource loadAsResource(String filename) throws StorageException {
+        try {
+            Path file = load(filename);
+            Resource resource = new UrlResource(file.toUri());
+            if (resource.exists() || resource.isReadable()) {
+                return resource;
+            } else {
+                throw new StorageException(
+                        "Could not read file: " + filename);
+
+            }
+        } catch (MalformedURLException e) {
+            throw new StorageException("Could not read file: " + filename, e);
+        }
+    }
+
+    public List<MultipartFile> loadAsMultipart(String folder) throws StorageException {
         return null;
     }
 
@@ -90,8 +118,13 @@ public class TourFileSystemStorage implements StorageService {
     }
 
     @Override
+    public void delete(String pathToFolder) throws IOException {
+        Files.delete(Paths.get(pathToFolder));
+    }
+
+    @Override
     public Path createDir(String path) throws IOException, StorageException {
-        if(isValidPath(path))
+        if (isValidPath(path))
             return Files.createDirectory(Paths.get(path));
 
         throw new StorageException("unable to create new directory {}", path);

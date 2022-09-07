@@ -24,6 +24,7 @@ public interface StorageService {
     Resource loadAsResource(String filename) throws FileNotFoundException, StorageException;
 
     void deleteAll(String pathToFolder);
+    void delete(String pathToFolder) throws IOException;
 
     Path createDir(String path) throws IOException, StorageException;
 

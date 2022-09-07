@@ -13,11 +13,13 @@ import org.novinomad.picasso.repositories.jpa.TourRepository;
 import org.novinomad.picasso.services.ITourService;
 import org.novinomad.picasso.services.StorageService;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.PostConstruct;
 import javax.transaction.Transactional;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.*;
 import java.util.ArrayList;
@@ -39,6 +41,10 @@ public class TourService implements ITourService {
     private static final String DEFAULT_ROOT_DIR = "." + PATH_SEPARATOR + "toursFiles";
 
     private Path rootLocation;
+
+    public String getRootLocation() {
+        return rootLocation.toString() + PATH_SEPARATOR;
+    }
 
     @Value("${tour-files-folder}")
     private String filesRootDir;
@@ -170,5 +176,22 @@ public class TourService implements ITourService {
             log.error(e.getMessage(), e);
         }
         return tour;
+    }
+
+    @Override
+    public void deleteTourFile(Long tourId, String fileName) throws IOException {
+        String filePath = rootLocation.toString() + PATH_SEPARATOR + tourId + PATH_SEPARATOR + fileName;
+        try {
+            storageService.delete(filePath);
+        } catch (Exception e) {
+            log.error("unable to delete tour file {} because {}", filePath, e.getMessage(), e);
+            throw e;
+        }
+    }
+
+    @Override
+    public Resource getTourFile(Long tourId, String fileName) throws FileNotFoundException, StorageException {
+        String filePath = rootLocation.toString() + PATH_SEPARATOR + tourId + PATH_SEPARATOR + fileName;
+        return storageService.loadAsResource(filePath);
     }
 }

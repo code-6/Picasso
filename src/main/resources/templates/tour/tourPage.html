@@ -36,7 +36,7 @@
         <div class="mx-auto order-0">
             <div class="btn-toolbar" role="toolbar" aria-label="Toolbar with button groups">
                 <div class="btn-group mr-2" role="group" aria-label="First group">
-                    <a class="btn btn-outline-primary" href="#tourCriteria" role="button" type="button"
+                    <a class="nav-link" href="#tourCriteria"
                        data-toggle="collapse" data-target="#tourFilterDiv"
                        aria-expanded="false" aria-controls="tourFilterDiv">
                         <i class="fas fa-filter"></i>
@@ -44,9 +44,9 @@
                     </a>
                 </div>
                 <div class="btn-group mr-2" role="group" aria-label="Second group">
-                    <a class="btn btn-outline-primary" id="tourFormToggleBtn" data-toggle="collapse"
-                       data-target="#tourFormContainer" role="button"
-                       aria-expanded="false" aria-controls="tourFormContainer" href="#tourFormContainer" type="button">
+                    <a class="nav-link" id="tourFormToggleBtn" data-toggle="collapse"
+                       data-target="#tourFormContainer"
+                       aria-expanded="false" aria-controls="tourFormContainer" href="#tourFormContainer">
                         <i id="tourFormToggleBtnIcon" class="fas fa-eye"></i>
                         <span th:text="#{tourFormToggleBtn}"></span>
                     </a>
@@ -83,14 +83,15 @@
         <div class="card">
             <div class="card-header">Tour form</div>
             <div class="card-body">
-                <form th:object="${tour}" th:action="@{/tour}" th:method="post" id="tourForm" enctype="multipart/form-data">
+                <form th:object="${tour}" th:action="@{/tour}" th:method="post" id="tourForm"
+                      enctype="multipart/form-data">
                     <div th:include="tour/tourForm :: tourFormContent"></div>
                 </form>
             </div>
         </div>
     </div>
     <!--    filter form-->
-    <div class="collapse" id="tourFilterDiv">
+    <div class="collapse show" id="tourFilterDiv">
         <div class="card">
             <div class="card-header">Tours filter form</div>
             <div class="card-body">
@@ -133,11 +134,10 @@
 
         let dateTimeFormat = 'DD MMM YYYY HH:mm';
 
-        let userLocale = [[${userLocale}]];
-
         // change tourFormToggleBtn icon on toggle
         let tourFormContainer = $('#tourFormContainer');
         let tourFormToggleBtnIcon = $('#tourFormToggleBtnIcon');
+        let tourForm = $('#tourForm');
 
         $(tourFormContainer).on('shown.bs.collapse', function (e) {
             $(tourFormToggleBtnIcon).removeClass('fa-eye')
@@ -153,7 +153,11 @@
 
             initDataTable();
 
-            initFilterSingleDatePickers();
+            initSingleDatePickers();
+
+            initTourFormButtons();
+
+            initEditTourButtons();
         });
 
         function initDataTable() {
@@ -176,7 +180,7 @@
             });
         }
 
-        function initFilterSingleDatePickers() {
+        function initSingleDatePickers() {
             $('.date-picker-single').daterangepicker({
                 singleDatePicker: true,
                 showDropdowns: true,
@@ -218,7 +222,8 @@
                             }
                         }]
                     }).draw();
-                    initFilterSingleDatePickers();
+                    // initSingleDatePickers();
+                    initEditTourButtons();
 
                     $(submitFilterBtn).prop('disabled', false);
                 },
@@ -230,6 +235,63 @@
                     });
                     $(submitFilterBtn).prop('disabled', false);
                 }
+            });
+        }
+
+        function initEditTourButtons() {
+            $('.tourEditBtn').on('click', function (e) {
+                e.preventDefault();
+                let btn = $(this);
+                let tourId = $(btn).attr('data-tour-id');
+
+                $(this).prop('disabled', true);
+                $.ajax({
+                    url: mainUrl + '/tour/' + tourId,
+                    type: "get",
+                    success: function (tourFormContent) {
+                        if (tourFormContent) {
+                            $(tourForm).html(tourFormContent);
+                        }
+                        $(btn).prop('disabled', false);
+                        initTourFormButtons();
+                        initSingleDatePickers();
+                        $(tourFormContainer).collapse('show');
+                    },
+                    error: function (error) {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'unable to load form to edit tour because' + error.responseJSON.message
+                        });
+                    }
+                })
+            });
+        }
+
+        function initTourFormButtons() {
+            $('.tourDeleteFileBtn').on('click', function (e) {
+                e.preventDefault();
+                let btn = $(this);
+                let tourId = $(btn).attr('data-tour-id');
+                let fileName = $(btn).attr('data-tour-file-name');
+                $(this).prop('disabled', true);
+                $.ajax({
+                    url: mainUrl + '/tour/' + tourId + '/file/'  + fileName,
+                    type: "delete",
+                    success: function (tourFormFilesTable) {
+                        if (tourFormFilesTable) {
+                            $('#uploadedFilesTable').html(tourFormFilesTable);
+                        }
+                        $(btn).prop('disabled', false);
+                        initTourFormButtons();
+                    },
+                    error: function (error) {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'unable to delete tour file because' + error.responseJSON.message
+                        });
+                        initTourFormButtons();
+                    }
+                })
             });
         }
 

@@ -3,7 +3,6 @@ package org.novinomad.picasso.domain.entities.impl;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
-import org.apache.commons.lang3.StringUtils;
 import org.hibernate.annotations.Nationalized;
 import org.novinomad.picasso.commons.IRange;
 import org.novinomad.picasso.domain.entities.ITour;
@@ -14,10 +13,7 @@ import javax.persistence.*;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
-import java.util.HashSet;
-import java.util.Locale;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 
 import static org.novinomad.picasso.commons.utils.CommonDateUtils.COMMON;
 
@@ -52,11 +48,11 @@ public class Tour extends AbstractEntity implements ITour, IRange {
     LocalDateTime endDate;
 
     @ElementCollection
-    Set<String> files = new HashSet<>();
+    Set<String> fileNames = new HashSet<>();
 
     @Override
-    public Set<String> getFiles() {
-        return files;
+    public Set<String> getFileNames() {
+        return fileNames;
     }
 
     public Tour(String name, LocalDateTime startDate, LocalDateTime endDate) {
@@ -111,7 +107,7 @@ public class Tour extends AbstractEntity implements ITour, IRange {
                 ", name='" + name + '\'' +
                 ", startDate=" + (startDate == null ? null : startDate.format(dateTimeFormatter)) +
                 ", endDate=" + (endDate == null ? null : endDate.format(dateTimeFormatter)) +
-                ", files=" + files +
+                ", files=" + fileNames +
                 '}';
     }
     //endregion

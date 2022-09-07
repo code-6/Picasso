@@ -6,10 +6,13 @@ import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.novinomad.picasso.commons.ICrud;
 import org.novinomad.picasso.domain.entities.impl.Tour;
+import org.novinomad.picasso.exceptions.StorageException;
 import org.novinomad.picasso.exceptions.base.PicassoException;
 import org.novinomad.picasso.services.impl.TourService;
+import org.springframework.core.io.Resource;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.FileNotFoundException;
 import java.util.List;
 import java.util.NoSuchElementException;
 

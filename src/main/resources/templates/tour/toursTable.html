@@ -30,15 +30,13 @@
     <td>
 
       <div class="btn-group" role="group" aria-label="Tour entries management buttons">
-        <button type="button" class="btn btn-sm btn-outline-primary" th:title="#{edit.title}">
+        <button type="button" class="btn btn-sm btn-outline-primary tourEditBtn"
+                th:data-tour-id="${tour.id}" th:title="#{edit.title}">
             <i class="fas fa-edit"></i>
         </button>
 
-        <button type="button" class="btn btn-sm btn-outline-success" th:title="#{file.title}">
-            <i class="fas fa-file"></i>
-        </button>
-
-        <button type="button" class="btn btn-sm btn-outline-danger" th:title="#{delete.title}">
+        <button type="button" class="btn btn-sm btn-outline-danger tourDeleteBtn"
+                th:data-tour-id="${tour.id}" th:title="#{delete.title}">
             <i class="fas fa-trash-alt"></i>
         </button>
       </div>

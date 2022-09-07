@@ -4,7 +4,8 @@
             <label for="tourNameForm" class="form-label">Name</label>
         </div>
         <div class="col">
-            <input type="text" class="form-control" id="tourNameForm" placeholder="enter tour name" name="name">
+            <input type="text" class="form-control" id="tourNameForm" placeholder="enter tour name" name="name"
+                   th:value="${tour.name}">
         </div>
     </div>
     <div class="row form-group">
@@ -15,11 +16,11 @@
             <div class="input-daterange input-group" id="datepickerForm" data-provide="datepicker">
                 <input type="text" class="form-control date-picker date-picker-single date-picker-single-tour-form"
                        id="filterStartDate"
-                       th:field="*{startDate}" name="startDate">
+                       th:field="${tour.startDate}" name="startDate">
                 <span class="input-group-addon from-to-date-fields-divider">to</span>
                 <input type="text" class="form-control date-picker date-picker-single date-picker-single-tour-form"
                        id="filterEndDate"
-                       th:field="*{endDate}" name="endDate">
+                       th:field="${tour.endDate}" name="endDate">
             </div>
         </div>
     </div>
@@ -29,16 +30,24 @@
         </div>
         <div class="col">
 
-            <textarea class="form-control" id="tourDescription" rows="3" name="description"></textarea>
+            <textarea class="form-control" id="tourDescription" rows="3" name="description"
+                      th:text="${tour.description}"></textarea>
         </div>
     </div>
     <div class="row form-group">
         <div class="col-sm-2">
-            <label for="tourFilesInput" class="form-label">Files</label>
-
+            <label for="tourFilesInput" class="form-label" th:title="#{file.upload}"></label>
         </div>
         <div class="col">
-            <input class="form-control" type="file" id="tourFilesInput" multiple name="tourFiles">
+            <input id="tourFilesInput" class="form-control" type="file" multiple name="tourFiles">
+        </div>
+    </div>
+    <div class="row form-group">
+        <div class="col-sm-2">
+            <label class="form-label" th:title="#{file.uploaded}"></label>
+        </div>
+        <div class="col">
+            <table th:include="tour/tourFilesFragment :: tourFilesFragment" id="uploadedFilesTable" class="table table-sm table-borderless"></table>
         </div>
     </div>
     <div class="row form-group">
@@ -61,10 +70,11 @@
         <div class="col">
             <button class="btn btn-outline-warning btn-block" id="resetTourFormBtn"
                     type="button"
-                    th:title="#{clear.title}" >
+                    th:title="#{clear.title}">
                 <i class="fas fa-eraser"></i>
                 <span th:text="#{clear.cap} + #{form}"></span>
             </button>
         </div>
     </div>
+    <input type="hidden" name="id" th:value="${tour.id}">
 </div>
