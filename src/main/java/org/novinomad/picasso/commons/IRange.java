@@ -1,6 +1,8 @@
 package org.novinomad.picasso.commons;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.apache.commons.lang3.StringUtils;
+import org.novinomad.picasso.commons.utils.CommonDateUtils;
 import org.novinomad.picasso.commons.utils.SpringContextUtil;
 import org.novinomad.picasso.services.IUserService;
 
@@ -20,7 +22,7 @@ public interface IRange {
     LocalDateTime getEndDate();
 
     default String getEndDateAsString() {
-        return getEndDateAsString(null, SpringContextUtil.getBean(IUserService.class).getCurrentUserLocale());
+        return getEndDateAsString(null, CommonDateUtils.DEFAULT_LOCALE);
     }
 
     default String getEndDateAsString(String format, Locale locale) {
@@ -32,7 +34,7 @@ public interface IRange {
     }
 
     default String getStartDateAsString() {
-        return getStartDateAsString(null, SpringContextUtil.getBean(IUserService.class).getCurrentUserLocale());
+        return getStartDateAsString(null, CommonDateUtils.DEFAULT_LOCALE);
     }
     default String getStartDateAsString(String format, Locale locale) {
         if(getStartDate() == null) return "";
@@ -42,7 +44,8 @@ public interface IRange {
         return getStartDate().format(DateTimeFormatter.ofPattern(format, locale));
     }
 
-    default LocalDateTimeRange getDateRange() {
+    @JsonIgnore // fix StackOverflowError because of infinity recursion
+    default IRange getDateRange() {
         return getStartDate() != null && getEndDate() != null
                 ? new LocalDateTimeRange(getStartDate(), getEndDate())
                 : null;

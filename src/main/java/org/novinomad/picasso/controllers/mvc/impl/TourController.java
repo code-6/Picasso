@@ -34,7 +34,7 @@ public class TourController {
 
     static final String TOUR_PAGE = "tour/tourPage";
 
-    @Value("${tour-files-folder}")
+    @Value("${app.tour-files-folder}")
     private String tourFolder;
 
     @ModelAttribute("allTours")

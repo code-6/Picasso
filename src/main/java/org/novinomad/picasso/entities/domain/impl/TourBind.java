@@ -42,25 +42,25 @@ public class TourBind extends AbstractEntity implements IRange {
 
     public TourBind(@NotNull Employee employee,
                     @NotNull Tour tour,
-                    @NotNull LocalDateTimeRange dateTimeRange) throws BindException {
+                    @NotNull IRange dateTimeRange) throws BindException {
         this.employee = employee;
         this.tour = tour;
         this.startDate = dateTimeRange.getStartDate();
         this.endDate = dateTimeRange.getEndDate();
 
         if (isOutOfTourDateRange())
-            throw new BindException(employee, tour, getDateRange(), "out of tour date range");
+            throw new BindException(employee, tour, new LocalDateTimeRange(startDate, endDate), "out of tour date range");
     }
 
     public TourBind(Long id,
                     @NotNull Employee employee,
                     @NotNull Tour tour,
-                    @NotNull LocalDateTimeRange dateTimeRange) throws BindException {
+                    @NotNull IRange dateTimeRange) throws BindException {
         this(employee, tour, dateTimeRange);
         this.id = id;
 
         if (isOutOfTourDateRange())
-            throw new BindException(employee, tour, getDateRange(), "out of tour date range");
+            throw new BindException(employee, tour, new LocalDateTimeRange(startDate, endDate), "out of tour date range");
     }
 
     public TourBind(@NotNull Employee employee,

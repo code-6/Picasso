@@ -1,5 +1,6 @@
 package org.novinomad.picasso.exceptions;
 
+import org.novinomad.picasso.commons.IRange;
 import org.novinomad.picasso.commons.LocalDateTimeRange;
 import org.novinomad.picasso.commons.utils.CommonMessageFormat;
 import org.novinomad.picasso.entities.domain.impl.Employee;
@@ -14,15 +15,15 @@ public class BindException extends PicassoException {
     
     public BindException(Employee employee,
                          Tour tour,
-                         LocalDateTimeRange dateTimeRange,
+                         IRange dateTimeRange,
                          String reason) {
         this(MSG_PATTERN, employee, tour, dateTimeRange, reason);
     }
 
     public BindException(Employee employee,
                          Tour tour,
-                         LocalDateTimeRange dateTimeRange,
-                         Map<Tour, LocalDateTimeRange> overlapsToursAndRanges) {
+                         IRange dateTimeRange,
+                         Map<Tour, IRange> overlapsToursAndRanges) {
         super(buildOverlapsCauseMessage(employee, tour, dateTimeRange, overlapsToursAndRanges));
     }
 
@@ -48,16 +49,16 @@ public class BindException extends PicassoException {
 
     private static String buildOverlapsCauseMessage(Employee employee,
                                                     Tour newBindTour,
-                                                    LocalDateTimeRange newBindDateTimeRange,
-                                                    Map<Tour, LocalDateTimeRange> overlappedToursAndRanges) {
+                                                    IRange newBindDateTimeRange,
+                                                    Map<Tour, IRange> overlappedToursAndRanges) {
         String baseMessage = CommonMessageFormat.format(MSG_PATTERN, employee, newBindTour, newBindDateTimeRange, "overlaps with: \n");
 
         StringBuilder overlapsCauseBuilder = new StringBuilder(baseMessage);
 
-        for (Map.Entry<Tour, LocalDateTimeRange> overlapsTourAndRange : overlappedToursAndRanges.entrySet()) {
+        for (Map.Entry<Tour, IRange> overlapsTourAndRange : overlappedToursAndRanges.entrySet()) {
 
             Tour overlappedTour = overlapsTourAndRange.getKey();
-            LocalDateTimeRange overlappedRange = overlapsTourAndRange.getValue();
+            IRange overlappedRange = overlapsTourAndRange.getValue();
 
             overlapsCauseBuilder.append(overlappedTour.toString()).append(" overlapped date range: ")
                     .append(overlappedRange.toString()).append("\n");

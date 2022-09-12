@@ -3,16 +3,11 @@ package org.novinomad.picasso.commons;
 import lombok.Getter;
 import lombok.Setter;
 import org.novinomad.picasso.commons.utils.CommonDateUtils;
-import org.novinomad.picasso.commons.utils.SpringContextUtil;
-import org.novinomad.picasso.services.IUserService;
-import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Locale;
 import java.util.Objects;
-
-import static org.novinomad.picasso.commons.utils.CommonDateUtils.UI_DATE_TIME_NO_SEC;
 
 @Getter
 @Setter
@@ -26,7 +21,7 @@ public class LocalDateTimeRange implements IRange, Comparable<LocalDateTimeRange
 
     public LocalDateTimeRange(LocalDateTime startDate, LocalDateTime endDate) {
         if(startDate == null || endDate == null)
-            throw new IllegalArgumentException("start and and dates may not be null");
+            throw new IllegalArgumentException("start and end dates may not be null");
 
         this.startDate = startDate;
         this.endDate = endDate;
@@ -34,7 +29,6 @@ public class LocalDateTimeRange implements IRange, Comparable<LocalDateTimeRange
 
     @Override
     public String toString() {
-        DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern(UI_DATE_TIME_NO_SEC, SpringContextUtil.getBean(IUserService.class).getCurrentUserLocale());
         return getStartDateAsString() + " ~ " + getEndDateAsString();
     }
 
@@ -61,7 +55,7 @@ public class LocalDateTimeRange implements IRange, Comparable<LocalDateTimeRange
     }
 
     public static LocalDateTimeRange parse(String text) {
-        DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern(CommonDateUtils.UI_DATE_TIME_NO_SEC, SpringContextUtil.getBean(IUserService.class).getCurrentUserLocale());
+        DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern(CommonDateUtils.UI_DATE_TIME_NO_SEC, CommonDateUtils.DEFAULT_LOCALE);
 
         String[] split = text.split("\s[~\\-]\s");
 

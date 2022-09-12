@@ -8,10 +8,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.RandomUtils;
 import org.novinomad.picasso.commons.utils.CarUtils;
 import org.novinomad.picasso.commons.utils.CommonDateUtils;
+import org.novinomad.picasso.entities.AppSettings;
 import org.novinomad.picasso.entities.domain.impl.*;
-import org.novinomad.picasso.entities.impl.*;
 import org.novinomad.picasso.exceptions.BindException;
 import org.novinomad.picasso.exceptions.base.PicassoException;
+import org.novinomad.picasso.repositories.jpa.AppSettingsRepository;
 import org.novinomad.picasso.repositories.jpa.DriverRepository;
 import org.novinomad.picasso.repositories.jpa.GuideRepository;
 import org.novinomad.picasso.repositories.jpa.TourRepository;
@@ -54,13 +55,26 @@ public class DevEnvInitializer implements IDevEnvInitializer {
     final TourRepository tourRepository;
     final TourBindService tourBindService;
 
+    final AppSettingsRepository appSettingsRepository;
+
     @PostConstruct
     void init() {
         log.info("initialize DB with test data");
         try {
-            List<Employee> employees = createEmployees();
-            List<Tour> tours = createTours();
-            createTourBindings(tours, employees);
+
+            Optional<AppSettings> setting = appSettingsRepository.findById(AppSettings.TEST_DATA_INITIALIZED.getId());
+
+            boolean shouldInitialize = true;
+            if(setting.isPresent()) {
+                shouldInitialize = !Boolean.parseBoolean(setting.get().getSettingValue());
+            }
+            if(shouldInitialize) {
+                List<Employee> employees = createEmployees();
+                List<Tour> tours = createTours();
+                createTourBindings(tours, employees);
+
+                appSettingsRepository.save(AppSettings.TEST_DATA_INITIALIZED.value("true"));
+            }
         } catch (Exception e) {
             log.error("unable to initialize DB with test data because: {}", e.getMessage());
         }

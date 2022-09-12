@@ -8,6 +8,7 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
+import org.novinomad.picasso.commons.IRange;
 import org.novinomad.picasso.commons.LocalDateTimeRange;
 import org.novinomad.picasso.commons.serializers.ListOfEntitiesToCommaSeparatedString;
 import org.novinomad.picasso.entities.domain.impl.Employee;
@@ -88,7 +89,7 @@ public class Task implements ITask, Comparable<Task> {
         return Objects.hash(id, name, startDate, endDate, plannedStartDate, plannedEndDate, type, parentId);
     }
 
-    public Task(Long id, String name, LocalDateTimeRange dateTimeRange) {
+    public Task(Long id, String name, IRange dateTimeRange) {
         this.id = id;
         this.name = name;
         this.caption = name;
@@ -165,7 +166,7 @@ public class Task implements ITask, Comparable<Task> {
         return ganttTourTask;
     }
 
-    private static Task buildEmployeeTask(Task parentTask, Employee employee, Long taskId, LocalDateTimeRange taskDates, Task.Type type, Task ... dependencies) {
+    private static Task buildEmployeeTask(Task parentTask, Employee employee, Long taskId, IRange taskDates, Task.Type type, Task ... dependencies) {
 
         Long employeeId = employee.getId();
         Employee.Type employeeType = employee.getType();

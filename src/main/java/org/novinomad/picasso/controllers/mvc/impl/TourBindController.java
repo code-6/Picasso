@@ -5,13 +5,13 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
+import org.novinomad.picasso.dto.filters.TourBindFilter;
 import org.novinomad.picasso.entities.domain.impl.Employee;
 import org.novinomad.picasso.entities.domain.impl.Tour;
 import org.novinomad.picasso.entities.domain.impl.TourBind;
 import org.novinomad.picasso.dto.bind.BindDateRange;
 import org.novinomad.picasso.dto.bind.EmployeeBindModel;
 import org.novinomad.picasso.dto.bind.TourBindModel;
-import org.novinomad.picasso.dto.filters.TourCriteria;
 import org.novinomad.picasso.exceptions.BindException;
 import org.novinomad.picasso.services.IEmployeeService;
 import org.novinomad.picasso.services.ITourBindService;
@@ -60,21 +60,21 @@ public class TourBindController {
     }
 
     @GetMapping
-    public ModelAndView index(@ModelAttribute("tourCriteria") final TourCriteria tourCriteria) {
+    public ModelAndView index(@ModelAttribute("tourBindFilter") final TourBindFilter tourBindFilter) {
 
         return new ModelAndView("tourBind/tourBind")
-                .addObject("tourCriteria", tourCriteria)
+                .addObject("tourBindFilter", tourBindFilter)
                 .addObject("tourBind", new TourBindModel())
-                .addObject("toursForGantt", tourBindService.getForGanttChart(tourCriteria));
+                .addObject("toursForGantt", tourBindService.getForGanttChart(tourBindFilter));
     }
 
     @GetMapping("/{tourId}")
     public String getTourBindForm(@PathVariable Long tourId, Model model) {
         TourBindModel tourBind;
         if(tourId != null && tourId > 0) {
-            TourCriteria tourCriteria = new TourCriteria();
-            tourCriteria.setTourIds(List.of(tourId));
-            List<TourBind> tourBinds = tourBindService.get(tourCriteria);
+            TourBindFilter tourBindFilter = new TourBindFilter();
+            tourBindFilter.setTourIds(List.of(tourId));
+            List<TourBind> tourBinds = tourBindService.get(tourBindFilter);
             tourBind = TourBindModel.fromEntities(tourBinds);
         } else {
             tourBind = new TourBindModel();

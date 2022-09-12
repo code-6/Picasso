@@ -3,6 +3,7 @@ package org.novinomad.picasso.dto.bind;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.novinomad.picasso.commons.IRange;
 import org.novinomad.picasso.commons.LocalDateTimeRange;
 
 @Data
@@ -10,9 +11,9 @@ import org.novinomad.picasso.commons.LocalDateTimeRange;
 @AllArgsConstructor
 public class BindDateRange {
     private Long bindId;
-    private LocalDateTimeRange dateRange;
+    private IRange dateRange;
 
-    public BindDateRange(LocalDateTimeRange dateRange) {
+    public BindDateRange(IRange dateRange) {
         this.dateRange = dateRange;
     }
 }

@@ -40,19 +40,22 @@
 
 <!-- Page management components -->
 <div th:fragment="pageManageComponents" class="mx-auto order-0">
-    <div class="row gx-5">
-        <div class="col">
-            <button class="btn btn-outline-primary" data-toggle="collapse" href="#tourCriteria" role="button"
-                    aria-expanded="false" aria-controls="tourCriteria">
-                <i class="fa-thin fa-filter"></i>
+
+    <div class="btn-toolbar" role="toolbar" aria-label="Toolbar with button groups">
+        <div class="btn-group mr-2" role="group" aria-label="First group">
+            <a class="nav-link" href="#tourBindFilter" data-target="#tourBindFilter" data-toggle="collapse" aria-controls="tourBindFilter"
+               aria-expanded="false">
+                <i class="fas fa-filter"></i>
                 <span th:text="#{filter.cap.pl}"></span>
-            </button>
-            <button class="btn btn-outline-primary" id="bindFormToggleBtn" data-toggle="collapse"
-                    href="#tourBind" role="button" type="button"
-                    aria-expanded="false" aria-controls="tourBind">
-                <i class="fa-thin fa-square-plus"></i>
-                <span th:text="#{bindFormToggleBtn}"></span>
-            </button>
+            </a>
+        </div>
+
+        <div class="btn-group mr-2" role="group" aria-label="Second group">
+            <a class="nav-link" id="bindFormToggleBtn" data-toggle="collapse" data-target="#tourBind"
+               aria-expanded="false" aria-controls="tourBind" href="#tourBind">
+                <i id="tourFormToggleBtnIcon" class="fas fa-eye"></i>
+                <span th:text="#{tourFormToggleBtn}"></span>
+            </a>
         </div>
     </div>
 </div>
@@ -275,25 +278,25 @@
     <!--            tour bind filter form (filter gantt chart)-->
     <div class="row">
         <div class="col">
-            <div class="collapse show" id="tourCriteria">
+            <div class="collapse show" id="tourBindFilter">
                 <div class="card">
                     <div class="card-header">Gantt chart filter form</div>
                     <div class="card-body">
-                        <form th:object="${tourCriteria}" th:id="tourCriteriaForm">
+                        <form th:object="${tourBindFilter}" th:id="tourBindFilterForm">
                             <div class="row g-2 align-items-end">
 
                                 <div class="col-md align-items-end">
                                     <label for="filterStartDate" th:text="#{start.cap} + #{date}"></label>
                                     <input type="text" class="form-control date-picker date-picker-single"
                                            id="filterStartDate"
-                                           th:field="*{startDate}" th:value="${tourCriteria.getStartDateAsString()}" name="startDate">
+                                           th:field="*{startDate}" name="startDate">
                                 </div>
 
                                 <div class="col-md align-items-end">
                                     <label for="filterEndDate" th:text="#{end.cap} + #{date}"></label>
                                     <input type="text" class="form-control date-picker date-picker-single"
                                            id="filterEndDate"
-                                           th:field="*{endDate}" th:value="${tourCriteria.getEndDateAsString()}" name="endDate">
+                                           th:field="*{endDate}" name="endDate">
                                 </div>
 
                                 <div class="col-md align-items-end">
@@ -305,7 +308,7 @@
                                         <option th:each="tour : ${allTours}"
                                                 th:value="${tour.id}"
                                                 th:text="${tour.id + '. ' + tour.name}"
-                                                th:selected="${tourCriteria.tourIds.contains(tour.id)}">
+                                                th:selected="${tourBindFilter.tourIds.contains(tour.id)}">
                                         </option>
                                     </select>
                                 </div>
@@ -319,7 +322,7 @@
                                             data-employee-select-id="filterEmployeeSelect">
                                         <option th:each="employeeType : ${allEmployeeTypes}"
                                                 th:value="${employeeType}" th:text="${employeeType.name()}"
-                                                th:selected="${tourCriteria.employeeTypes.contains(employeeType)}">
+                                                th:selected="${tourBindFilter.employeeTypes.contains(employeeType)}">
                                         </option>
                                     </select>
                                 </div>
@@ -659,7 +662,7 @@
             $.ajax({
                 url: mainUrl + '/api/bind/gantt-tasks',
                 type: "post",
-                data: $('#tourCriteriaForm').serialize(),
+                data: $('#tourBindFilterForm').serialize(),
                 success: function (tasks) {
                     initGanttChart(tasks);
                     $('#submitFilterBtn').prop('disabled', false);
@@ -729,8 +732,8 @@
         }
 
         function initFilterDates() {
-            let defaultStartDate = new Date([[${tourCriteria.getStartDateAsString()}]].toString());
-            let defaultEndDate = new Date([[${tourCriteria.getEndDateAsString()}]].toString());
+            let defaultStartDate = new Date([[${tourBindFilter.getStartDateAsString()}]].toString());
+            let defaultEndDate = new Date([[${tourBindFilter.getEndDateAsString()}]].toString());
 
             $('#filterStartDate').data('daterangepicker').setStartDate(defaultStartDate);
             $('#filterEndDate').data('daterangepicker').setStartDate(defaultEndDate);

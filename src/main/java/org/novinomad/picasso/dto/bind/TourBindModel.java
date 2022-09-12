@@ -1,6 +1,7 @@
 package org.novinomad.picasso.dto.bind;
 
 import lombok.Data;
+import org.novinomad.picasso.commons.IRange;
 import org.novinomad.picasso.commons.LocalDateTimeRange;
 import org.novinomad.picasso.entities.domain.impl.Employee;
 import org.novinomad.picasso.entities.domain.impl.Tour;
@@ -11,7 +12,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @Data
-public class TourBindModel {
+public class TourBindModel{
 
     private Tour tour = new Tour();
 
@@ -23,7 +24,7 @@ public class TourBindModel {
         }
     }
 
-    public void bindEmployee(Long bindId, Employee employee, LocalDateTimeRange dateRange) {
+    public void bindEmployee(Long bindId, Employee employee, IRange dateRange) {
         getBoundEmployee(employee).ifPresentOrElse(employeeBindModel -> {
             List<BindDateRange> dateRanges = employeeBindModel.getBindIdsToDateRanges();
             if (dateRanges.stream().noneMatch(bindDateRange -> bindDateRange.getDateRange().equals(dateRange)))

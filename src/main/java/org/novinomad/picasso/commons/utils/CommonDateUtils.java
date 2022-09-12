@@ -1,6 +1,7 @@
 package org.novinomad.picasso.commons.utils;
 
 import lombok.experimental.UtilityClass;
+import org.novinomad.picasso.commons.IRange;
 import org.novinomad.picasso.commons.LocalDateTimeRange;
 import org.springframework.core.env.Environment;
 
@@ -38,9 +39,9 @@ public class CommonDateUtils {
         return java.sql.Timestamp.valueOf(dateToConvert);
     }
     
-    public static LocalDateTimeRange findOverlappedRange(LocalDateTimeRange range1, LocalDateTimeRange range2) {
+    public static IRange findOverlappedRange(IRange range1, IRange range2) {
         LocalDateTime overlapsStart = null, overlapsEnd = null;
-        LocalDateTimeRange overlapsRange = null;
+        IRange overlapsRange = null;
 
         if (range1.getStartDate().isBefore(range2.getStartDate())) {
             overlapsStart = range2.getStartDate();

@@ -4,12 +4,12 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
-import org.novinomad.picasso.commons.LocalDateTimeRange;
+import org.novinomad.picasso.commons.IRange;
+import org.novinomad.picasso.dto.filters.TourBindFilter;
+import org.novinomad.picasso.dto.gantt.Task;
 import org.novinomad.picasso.entities.domain.impl.Employee;
 import org.novinomad.picasso.entities.domain.impl.Tour;
 import org.novinomad.picasso.entities.domain.impl.TourBind;
-import org.novinomad.picasso.dto.filters.TourCriteria;
-import org.novinomad.picasso.dto.gantt.Task;
 import org.novinomad.picasso.exceptions.BindException;
 import org.novinomad.picasso.exceptions.base.PicassoException;
 import org.novinomad.picasso.repositories.jpa.TourBindRepository;
@@ -21,7 +21,6 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
-import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -49,9 +48,9 @@ public class TourBindService implements ITourBindService {
      * 2. Intersects with dates of other allTours.
      * */
     @Override
-    public TourBind bind(Employee employee, Tour tour, LocalDateTime startDate, LocalDateTime endDate) throws PicassoException {
+    public TourBind bind(Employee employee, Tour tour, IRange dateRange) throws PicassoException {
         try {
-            TourBind tourBind = new TourBind(employee, tour, startDate, endDate);
+            TourBind tourBind = new TourBind(employee, tour, dateRange);
 
             validateBind(tourBind);
 
@@ -63,14 +62,14 @@ public class TourBindService implements ITourBindService {
     }
 
     @Override
-    public TourBind bind(Long employeeID, Long tourId, LocalDateTime startDate, LocalDateTime endDate) throws PicassoException {
+    public TourBind bind(Long employeeID, Long tourId, IRange dateRange) throws PicassoException {
         Employee employee = employeeService.get(employeeID)
                 .orElseThrow(() -> new PicassoException("Employee with id: {} not found in DB", employeeID));
 
         Tour tour = tourService.get(tourId)
                 .orElseThrow(() -> new PicassoException("Tour with id: {} not found in DB", tourId));
 
-        return bind(employee, tour, startDate, endDate);
+        return bind(employee, tour, dateRange);
     }
 
     @Override
@@ -81,7 +80,7 @@ public class TourBindService implements ITourBindService {
                 tourBind.getStartDate(), tourBind.getEndDate());
 
         if (!overlapsBinds.isEmpty()) {
-            Map<Tour, LocalDateTimeRange> overlapsToursAndRanges = overlapsBinds.stream()
+            Map<Tour, IRange> overlapsToursAndRanges = overlapsBinds.stream()
                     .collect(
                             Collectors.toMap(TourBind::getTour,
                                     tb -> findOverlappedRange(tourBind.getDateRange(), tb.getDateRange()))
@@ -91,11 +90,11 @@ public class TourBindService implements ITourBindService {
     }
 
     @Override
-    public void validateBind(Long tourId, Long employeeId, LocalDateTimeRange bindRange) throws PicassoException {
+    public void validateBind(Long tourId, Long employeeId, IRange bindRange) throws PicassoException {
         List<TourBind> overlapsBinds = tourBindRepository.findOverlappedBinds(tourId, employeeId, bindRange.getStartDate(), bindRange.getEndDate());
 
         if (!overlapsBinds.isEmpty()) {
-            Map<Tour, LocalDateTimeRange> overlapsToursAndRanges = overlapsBinds.stream()
+            Map<Tour, IRange> overlapsToursAndRanges = overlapsBinds.stream()
                     .collect(Collectors.toMap(TourBind::getTour, tb -> findOverlappedRange(bindRange, tb.getDateRange())));
 
             Employee employee = employeeService.get(employeeId)
@@ -190,18 +189,18 @@ public class TourBindService implements ITourBindService {
     }
 
     @Override
-    public List<TourBind> get(TourCriteria tourCriteria) {
-        List<Long> tourIds = tourCriteria.getTourIds().isEmpty() ? null : tourCriteria.getTourIds();
-        List<Long> employeeIds = tourCriteria.getEmployeeIds().isEmpty() ? null : tourCriteria.getEmployeeIds();
+    public List<TourBind> get(TourBindFilter tourBindFilter) {
+        List<Long> tourIds = tourBindFilter.getTourIds().isEmpty() ? null : tourBindFilter.getTourIds();
+        List<Long> employeeIds = tourBindFilter.getEmployeeIds().isEmpty() ? null : tourBindFilter.getEmployeeIds();
 
-        return tourBindJdbcRepository.findByFilter(tourCriteria.getStartDate(), tourCriteria.getEndDate(), tourIds, employeeIds);
+        return tourBindJdbcRepository.findByFilter(tourBindFilter.getStartDate(), tourBindFilter.getEndDate(), tourIds, employeeIds);
     }
 
     @Override
-    public List<Task> getForGanttChart(TourCriteria tourCriteria) {
-        if (tourCriteria == null)
-            tourCriteria = new TourCriteria();
+    public List<Task> getForGanttChart(TourBindFilter tourBindFilter) {
+        if (tourBindFilter == null)
+            tourBindFilter = new TourBindFilter();
 
-        return Task.fromBindsWithChildrenInList(get(tourCriteria));
+        return Task.fromBindsWithChildrenInList(get(tourBindFilter));
     }
 }

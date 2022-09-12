@@ -25,7 +25,7 @@ import static org.novinomad.picasso.commons.utils.CommonDateUtils.UI_DATE_TIME_N
         @Index(columnList = "startDate, endDate", name = "tour_date_range_idx"),
         @Index(columnList = "name", name = "tour_name_idx")
 })
-public class Tour extends AbstractEntity implements ITour, IRange {
+public class Tour extends AbstractEntity implements ITour {
 
     @Nationalized
     String name;
@@ -34,10 +34,8 @@ public class Tour extends AbstractEntity implements ITour, IRange {
     @Column(columnDefinition = "NVARCHAR2(1000)")
     String description;
 
-    
     LocalDateTime startDate;
 
-    
     LocalDateTime endDate;
 
     @ElementCollection
