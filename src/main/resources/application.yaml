@@ -10,6 +10,11 @@ spring:
   profiles:
     active: ${PCS_SPRING_PROFILE}
 
+  servlet:
+    multipart:
+      max-file-size: ${PCS_MAX_FILE_SIZE:10MB}
+      max-request-size: ${spring.servlet.multipart.max-file-size}
+
   jpa:
     database-platform: org.hibernate.dialect.${PCS_HIBERNATE_DIALECT:MySQLDialect}
     hibernate:

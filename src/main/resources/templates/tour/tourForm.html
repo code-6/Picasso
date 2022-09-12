@@ -1,7 +1,7 @@
 <div th:fragment="tourFormContent">
     <div class="row form-group">
         <div class="col-sm-2">
-            <label for="tourNameForm" class="form-label">Name</label>
+            <label for="tourNameForm" class="form-label" th:text="#{name.cap}"></label>
         </div>
         <div class="col">
             <input type="text" class="form-control" id="tourNameForm" placeholder="enter tour name" name="name"
@@ -26,7 +26,7 @@
     </div>
     <div class="row form-group">
         <div class="col-sm-2">
-            <label for="tourDescription" class="form-label">Description</label>
+            <label for="tourDescription" class="form-label" th:text="#{description.cap}"></label>
         </div>
         <div class="col">
 
@@ -40,6 +40,7 @@
         </div>
         <div class="col">
             <input id="tourFilesInput" class="form-control" type="file" multiple name="tourFiles">
+            <small id="tourFilesInputHelp" class="form-text text-muted" th:text="#{tourFilesInputHelp} + ${@environment.getProperty('spring.servlet.multipart.max-file-size')}"></small>
         </div>
     </div>
     <div class="row form-group">
