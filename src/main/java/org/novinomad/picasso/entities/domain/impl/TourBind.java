@@ -1,4 +1,4 @@
-package org.novinomad.picasso.domain.entities.impl;
+package org.novinomad.picasso.entities.domain.impl;
 
 import com.sun.istack.NotNull;
 import lombok.AccessLevel;
@@ -8,10 +8,8 @@ import lombok.Setter;
 import lombok.experimental.FieldDefaults;
 import org.novinomad.picasso.commons.IRange;
 import org.novinomad.picasso.commons.LocalDateTimeRange;
-import org.novinomad.picasso.commons.utils.CommonDateUtils;
-import org.novinomad.picasso.domain.entities.base.AbstractEntity;
+import org.novinomad.picasso.entities.base.AbstractEntity;
 import org.novinomad.picasso.exceptions.BindException;
-import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;

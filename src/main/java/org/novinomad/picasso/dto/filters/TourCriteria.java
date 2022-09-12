@@ -4,9 +4,7 @@ import lombok.AccessLevel;
 import lombok.Data;
 import lombok.experimental.FieldDefaults;
 import org.novinomad.picasso.commons.IRange;
-import org.novinomad.picasso.commons.utils.CommonDateUtils;
-import org.novinomad.picasso.domain.entities.impl.Employee;
-import org.springframework.format.annotation.DateTimeFormat;
+import org.novinomad.picasso.entities.domain.impl.Employee;
 
 import java.time.LocalDateTime;
 import java.time.LocalTime;

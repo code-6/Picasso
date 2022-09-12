@@ -1,6 +1,6 @@
 package org.novinomad.picasso.repositories.jdbc.impl;
 
-import org.novinomad.picasso.domain.entities.impl.TourBind;
+import org.novinomad.picasso.entities.domain.impl.TourBind;
 import org.novinomad.picasso.repositories.jpa.TourBindRepository;
 import org.novinomad.picasso.services.conversion.rowmappers.TourBindRowMapper;
 import org.springframework.beans.factory.annotation.Autowired;

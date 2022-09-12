@@ -1,4 +1,4 @@
-package org.novinomad.picasso.domain.entities;
+package org.novinomad.picasso.entities.domain;
 
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.web.multipart.MultipartFile;

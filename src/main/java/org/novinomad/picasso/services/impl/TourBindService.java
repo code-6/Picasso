@@ -1,14 +1,13 @@
 package org.novinomad.picasso.services.impl;
 
-import com.sun.xml.bind.v2.TODO;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.novinomad.picasso.commons.LocalDateTimeRange;
-import org.novinomad.picasso.domain.entities.impl.Employee;
-import org.novinomad.picasso.domain.entities.impl.Tour;
-import org.novinomad.picasso.domain.entities.impl.TourBind;
+import org.novinomad.picasso.entities.domain.impl.Employee;
+import org.novinomad.picasso.entities.domain.impl.Tour;
+import org.novinomad.picasso.entities.domain.impl.TourBind;
 import org.novinomad.picasso.dto.filters.TourCriteria;
 import org.novinomad.picasso.dto.gantt.Task;
 import org.novinomad.picasso.exceptions.BindException;

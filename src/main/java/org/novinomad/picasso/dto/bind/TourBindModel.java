@@ -2,9 +2,9 @@ package org.novinomad.picasso.dto.bind;
 
 import lombok.Data;
 import org.novinomad.picasso.commons.LocalDateTimeRange;
-import org.novinomad.picasso.domain.entities.impl.Employee;
-import org.novinomad.picasso.domain.entities.impl.Tour;
-import org.novinomad.picasso.domain.entities.impl.TourBind;
+import org.novinomad.picasso.entities.domain.impl.Employee;
+import org.novinomad.picasso.entities.domain.impl.Tour;
+import org.novinomad.picasso.entities.domain.impl.TourBind;
 import org.novinomad.picasso.exceptions.BindException;
 
 import java.util.*;

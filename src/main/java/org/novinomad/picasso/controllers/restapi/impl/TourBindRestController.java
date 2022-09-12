@@ -4,7 +4,7 @@ import groovy.util.logging.Slf4j;
 import lombok.RequiredArgsConstructor;
 import org.novinomad.picasso.commons.ICrud;
 import org.novinomad.picasso.commons.LocalDateTimeRange;
-import org.novinomad.picasso.domain.entities.impl.TourBind;
+import org.novinomad.picasso.entities.domain.impl.TourBind;
 import org.novinomad.picasso.dto.filters.TourCriteria;
 import org.novinomad.picasso.dto.gantt.Task;
 import org.novinomad.picasso.exceptions.base.PicassoException;

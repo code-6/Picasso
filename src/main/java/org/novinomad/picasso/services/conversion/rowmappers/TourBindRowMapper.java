@@ -1,7 +1,7 @@
 package org.novinomad.picasso.services.conversion.rowmappers;
 
 import org.novinomad.picasso.commons.utils.CommonDateUtils;
-import org.novinomad.picasso.domain.entities.impl.TourBind;
+import org.novinomad.picasso.entities.domain.impl.TourBind;
 import org.novinomad.picasso.services.IEmployeeService;
 import org.novinomad.picasso.services.ITourService;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -1,6 +1,7 @@
 package org.novinomad.picasso.services;
 
-import org.novinomad.picasso.domain.entities.impl.*;
+import org.novinomad.picasso.entities.domain.impl.*;
+import org.novinomad.picasso.entities.impl.*;
 import org.novinomad.picasso.exceptions.base.PicassoException;
 
 import java.util.ArrayList;

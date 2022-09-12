@@ -1,9 +1,9 @@
-package org.novinomad.picasso.domain.entities.impl;
+package org.novinomad.picasso.entities.domain.impl;
 
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 import org.apache.commons.lang3.RandomUtils;
-import org.novinomad.picasso.domain.entities.IGuide;
+import org.novinomad.picasso.entities.domain.IGuide;
 
 import javax.persistence.*;
 import java.util.*;

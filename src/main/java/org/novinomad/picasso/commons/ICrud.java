@@ -1,6 +1,6 @@
 package org.novinomad.picasso.commons;
 
-import org.novinomad.picasso.domain.entities.base.AbstractEntity;
+import org.novinomad.picasso.entities.base.AbstractEntity;
 import org.novinomad.picasso.exceptions.base.PicassoException;
 
 import java.util.Collections;

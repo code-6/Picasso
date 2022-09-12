@@ -4,7 +4,7 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
-import org.novinomad.picasso.domain.entities.impl.Guide;
+import org.novinomad.picasso.entities.domain.impl.Guide;
 import org.novinomad.picasso.exceptions.base.PicassoException;
 import org.novinomad.picasso.repositories.jpa.GuideRepository;
 import org.novinomad.picasso.services.IGuideService;

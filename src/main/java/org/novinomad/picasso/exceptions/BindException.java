@@ -2,8 +2,8 @@ package org.novinomad.picasso.exceptions;
 
 import org.novinomad.picasso.commons.LocalDateTimeRange;
 import org.novinomad.picasso.commons.utils.CommonMessageFormat;
-import org.novinomad.picasso.domain.entities.impl.Employee;
-import org.novinomad.picasso.domain.entities.impl.Tour;
+import org.novinomad.picasso.entities.domain.impl.Employee;
+import org.novinomad.picasso.entities.domain.impl.Tour;
 import org.novinomad.picasso.exceptions.base.PicassoException;
 
 import java.util.Map;

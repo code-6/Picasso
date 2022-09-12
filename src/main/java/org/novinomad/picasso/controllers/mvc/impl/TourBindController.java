@@ -5,9 +5,9 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
-import org.novinomad.picasso.domain.entities.impl.Employee;
-import org.novinomad.picasso.domain.entities.impl.Tour;
-import org.novinomad.picasso.domain.entities.impl.TourBind;
+import org.novinomad.picasso.entities.domain.impl.Employee;
+import org.novinomad.picasso.entities.domain.impl.Tour;
+import org.novinomad.picasso.entities.domain.impl.TourBind;
 import org.novinomad.picasso.dto.bind.BindDateRange;
 import org.novinomad.picasso.dto.bind.EmployeeBindModel;
 import org.novinomad.picasso.dto.bind.TourBindModel;
@@ -21,7 +21,6 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
-import javax.servlet.http.HttpServletRequest;
 import java.util.Arrays;
 import java.util.List;
 

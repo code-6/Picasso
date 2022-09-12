@@ -1,6 +1,6 @@
 package org.novinomad.picasso.repositories.jpa;
 
-import org.novinomad.picasso.domain.entities.impl.Employee;
+import org.novinomad.picasso.entities.domain.impl.Employee;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;

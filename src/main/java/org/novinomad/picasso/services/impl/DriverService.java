@@ -4,7 +4,7 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
-import org.novinomad.picasso.domain.entities.impl.Driver;
+import org.novinomad.picasso.entities.domain.impl.Driver;
 import org.novinomad.picasso.exceptions.base.PicassoException;
 import org.novinomad.picasso.repositories.jpa.DriverRepository;
 import org.novinomad.picasso.services.IDriverService;

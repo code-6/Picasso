@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/web/thymeleaf/layout" layout:decorate="~{fragments/layout}">
-<nav class="sb-topnav navbar navbar-expand-sm navbar-dark bg-dark" th:fragment="header" layout:fragment="header">
+<nav class="sb-topnav navbar navbar-expand-sm navbar-light bg-dark" th:fragment="header" layout:fragment="header">
     <!-- Navbar Brand-->
     <a class="navbar-brand ps-3" th:href="@{/}">Picasso 2.0</a>
     <!-- Sidebar Toggle-->
@@ -8,6 +8,10 @@
             >
         <i class="fas fa-bars"></i>
     </button>
+
+    <!-- Page management components -->
+    <div class="mx-auto order-0" th:replace="~{this :: pageManageComponents}"></div>
+
     <!-- Navbar Search-->
     <form class="d-none d-md-inline-block form-inline ms-auto me-0 me-md-3 my-2 my-md-0">
         <div class="input-group">

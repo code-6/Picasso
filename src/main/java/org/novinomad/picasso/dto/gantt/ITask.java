@@ -1,6 +1,6 @@
 package org.novinomad.picasso.dto.gantt;
 
-import org.novinomad.picasso.domain.IdAware;
+import org.novinomad.picasso.entities.base.IdAware;
 import org.springframework.util.CollectionUtils;
 
 import java.util.Collection;

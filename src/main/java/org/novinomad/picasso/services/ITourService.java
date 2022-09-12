@@ -1,7 +1,7 @@
 package org.novinomad.picasso.services;
 
 import org.novinomad.picasso.commons.ICrud;
-import org.novinomad.picasso.domain.entities.impl.Tour;
+import org.novinomad.picasso.entities.domain.impl.Tour;
 import org.novinomad.picasso.dto.filters.TourFilter;
 import org.novinomad.picasso.exceptions.StorageException;
 import org.novinomad.picasso.exceptions.base.PicassoException;

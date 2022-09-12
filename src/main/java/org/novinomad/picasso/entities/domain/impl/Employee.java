@@ -1,9 +1,9 @@
-package org.novinomad.picasso.domain.entities.impl;
+package org.novinomad.picasso.entities.domain.impl;
 
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 import org.hibernate.annotations.Nationalized;
-import org.novinomad.picasso.domain.entities.base.AbstractEntity;
+import org.novinomad.picasso.entities.base.AbstractEntity;
 import org.novinomad.picasso.dto.gantt.Task;
 
 import javax.persistence.*;

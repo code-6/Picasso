@@ -8,24 +8,16 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.RandomUtils;
 import org.novinomad.picasso.commons.LocalDateTimeRange;
 import org.novinomad.picasso.commons.serializers.ListOfEntitiesToCommaSeparatedString;
-import org.novinomad.picasso.commons.serializers.ListToCommaSeparatedString;
-import org.novinomad.picasso.commons.utils.CommonDateUtils;
-import org.novinomad.picasso.commons.utils.CommonMessageFormat;
-import org.novinomad.picasso.commons.utils.SpringContextUtil;
-import org.novinomad.picasso.domain.entities.impl.Employee;
-import org.novinomad.picasso.domain.entities.impl.Tour;
-import org.novinomad.picasso.domain.entities.impl.TourBind;
-import org.springframework.format.annotation.DateTimeFormat;
+import org.novinomad.picasso.entities.domain.impl.Employee;
+import org.novinomad.picasso.entities.domain.impl.Tour;
+import org.novinomad.picasso.entities.domain.impl.TourBind;
 import org.springframework.util.CollectionUtils;
 
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
-
-import static org.novinomad.picasso.commons.utils.CommonMessageFormat.*;
 
 
 @Getter

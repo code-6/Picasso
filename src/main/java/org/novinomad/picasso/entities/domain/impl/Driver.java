@@ -1,8 +1,8 @@
-package org.novinomad.picasso.domain.entities.impl;
+package org.novinomad.picasso.entities.domain.impl;
 
 import lombok.*;
 import lombok.experimental.FieldDefaults;
-import org.novinomad.picasso.domain.entities.IDriver;
+import org.novinomad.picasso.entities.domain.IDriver;
 
 import javax.persistence.*;
 import java.util.HashSet;

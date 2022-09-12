@@ -1,12 +1,11 @@
-package org.novinomad.picasso.domain.entities.impl;
+package org.novinomad.picasso.entities.domain.impl;
 
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 import org.hibernate.annotations.Nationalized;
 import org.novinomad.picasso.commons.IRange;
-import org.novinomad.picasso.domain.entities.ITour;
-import org.novinomad.picasso.domain.entities.base.AbstractEntity;
-import org.springframework.format.annotation.DateTimeFormat;
+import org.novinomad.picasso.entities.domain.ITour;
+import org.novinomad.picasso.entities.base.AbstractEntity;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;

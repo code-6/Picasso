@@ -1,6 +1,6 @@
-package org.novinomad.picasso.domain.entities;
+package org.novinomad.picasso.entities.domain;
 
-import org.novinomad.picasso.domain.entities.impl.Driver;
+import org.novinomad.picasso.entities.domain.impl.Driver;
 
 import java.util.Arrays;
 import java.util.Collection;

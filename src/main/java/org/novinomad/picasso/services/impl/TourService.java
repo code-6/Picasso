@@ -5,7 +5,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.novinomad.picasso.domain.entities.impl.Tour;
+import org.novinomad.picasso.entities.domain.impl.Tour;
 import org.novinomad.picasso.dto.filters.TourFilter;
 import org.novinomad.picasso.exceptions.StorageException;
 import org.novinomad.picasso.exceptions.base.PicassoException;

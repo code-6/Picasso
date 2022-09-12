@@ -2,9 +2,9 @@ package org.novinomad.picasso.services.impl;
 
 import com.github.javafaker.Faker;
 import org.junit.jupiter.api.*;
-import org.novinomad.picasso.domain.entities.impl.Driver;
-import org.novinomad.picasso.domain.entities.impl.Guide;
-import org.novinomad.picasso.domain.entities.impl.Tour;
+import org.novinomad.picasso.entities.domain.impl.Driver;
+import org.novinomad.picasso.entities.domain.impl.Guide;
+import org.novinomad.picasso.entities.domain.impl.Tour;
 
 import java.time.LocalDateTime;
 import java.util.*;

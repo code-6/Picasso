@@ -1,11 +1,10 @@
-package org.novinomad.picasso.domain.entities.base;
+package org.novinomad.picasso.entities.base;
 
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.FieldDefaults;
 import org.novinomad.picasso.commons.PrettyPrintable;
-import org.novinomad.picasso.domain.IdAware;
 
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
