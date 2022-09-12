@@ -2,18 +2,31 @@ package org.novinomad.picasso.commons.utils;
 
 import lombok.experimental.UtilityClass;
 import org.novinomad.picasso.commons.LocalDateTimeRange;
+import org.springframework.core.env.Environment;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.Date;
+import java.util.Locale;
+import java.util.Optional;
 
 @UtilityClass
 public class CommonDateUtils {
 
-    public static final String ISO_8601 = "yyyy-MM-dd HH:mm:ss";
-    public static final String ISO_8601_WITHOUT_SECONDS = "yyyy-MM-dd HH:mm";
+    /**
+     * Format used in frontend client.
+     * */
+    public static final String UI_DATE_TIME_NO_SEC;
+    public static final String UI_DATE;
 
-    public static final String COMMON = "dd MMM yyyy HH:mm";
+    public static Locale DEFAULT_LOCALE = Locale.ENGLISH;
+
+    static {
+        Environment environment = SpringContextUtil.getBean(Environment.class);
+
+        UI_DATE_TIME_NO_SEC = Optional.ofNullable(environment.getProperty("app.date.format.ui-date-time")).orElse("dd MMM yyyy HH:mm");
+        UI_DATE = Optional.ofNullable(environment.getProperty("app.date.format.ui-date")).orElse("dd MMM yyyy");
+    }
 
     public static LocalDateTime dateToLocalDateTime(Date dateToConvert) {
         return dateToConvert.toInstant()

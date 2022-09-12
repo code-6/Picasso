@@ -12,17 +12,16 @@ import java.time.format.DateTimeFormatter;
 import java.util.Locale;
 import java.util.Objects;
 
-import static org.novinomad.picasso.commons.utils.CommonDateUtils.ISO_8601;
-import static org.novinomad.picasso.commons.utils.CommonDateUtils.COMMON;
+import static org.novinomad.picasso.commons.utils.CommonDateUtils.UI_DATE_TIME_NO_SEC;
 
 @Getter
 @Setter
 public class LocalDateTimeRange implements IRange, Comparable<LocalDateTimeRange> {
 
-    @DateTimeFormat(pattern = COMMON)
+    
     private LocalDateTime startDate;
 
-    @DateTimeFormat(pattern = COMMON)
+    
     private LocalDateTime endDate;
 
     public LocalDateTimeRange(LocalDateTime startDate, LocalDateTime endDate) {
@@ -35,7 +34,7 @@ public class LocalDateTimeRange implements IRange, Comparable<LocalDateTimeRange
 
     @Override
     public String toString() {
-        DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern(COMMON, SpringContextUtil.getBean(IUserService.class).getCurrentUserLocale());
+        DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern(UI_DATE_TIME_NO_SEC, SpringContextUtil.getBean(IUserService.class).getCurrentUserLocale());
         return getStartDateAsString() + " ~ " + getEndDateAsString();
     }
 
@@ -62,7 +61,7 @@ public class LocalDateTimeRange implements IRange, Comparable<LocalDateTimeRange
     }
 
     public static LocalDateTimeRange parse(String text) {
-        DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern(CommonDateUtils.COMMON, SpringContextUtil.getBean(IUserService.class).getCurrentUserLocale());
+        DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern(CommonDateUtils.UI_DATE_TIME_NO_SEC, SpringContextUtil.getBean(IUserService.class).getCurrentUserLocale());
 
         String[] split = text.split("\s[~\\-]\s");
 
@@ -75,7 +74,7 @@ public class LocalDateTimeRange implements IRange, Comparable<LocalDateTimeRange
     }
 
     public static LocalDateTimeRange parse(String text, Locale locale) {
-        DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern(CommonDateUtils.COMMON, locale);
+        DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern(CommonDateUtils.UI_DATE_TIME_NO_SEC, locale);
 
         String[] split = text.split("\s[~\\-]\s");
 

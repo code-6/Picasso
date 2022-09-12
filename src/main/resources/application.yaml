@@ -30,8 +30,17 @@ logging:
     org.novinomad.picasso: info
     org.hibernate.SQL: error
 
-jobs:
-  enabled: false
+app:
+  jobs:
+    enabled: false
 
-tour-files-folder: ${PCS_TOUR_FILES_FOLDER:./toursFiles}
+  tour-files-folder: ${PCS_TOUR_FILES_FOLDER:./toursFiles}
+
+  date:
+    format:
+      ui-date-time: ${PCS_UI_DATE_TIME_FORMAT:dd MMM yyyy HH:mm}
+      ui-date: ${PCS_UI_DATE_FORMAT:dd MMM yyyy}
+      gantt-task: ${PCS_GANTT_TASK_DATE_TIME_FORMAT:dd mon yyyy HH:mi}
+      gantt-major: ${PCS_GANTT_MAJOR_DATE_FORMAT:dd mon yyyy}
+      date-range-picker: ${PCS_DATE_RANGE_PICKER_DATE_TIME_FORMAT:DD MMM YYYY HH:mm}
 

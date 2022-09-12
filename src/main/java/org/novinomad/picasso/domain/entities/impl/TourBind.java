@@ -8,6 +8,7 @@ import lombok.Setter;
 import lombok.experimental.FieldDefaults;
 import org.novinomad.picasso.commons.IRange;
 import org.novinomad.picasso.commons.LocalDateTimeRange;
+import org.novinomad.picasso.commons.utils.CommonDateUtils;
 import org.novinomad.picasso.domain.entities.base.AbstractEntity;
 import org.novinomad.picasso.exceptions.BindException;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -18,8 +19,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.Locale;
 import java.util.Objects;
 
-import static org.novinomad.picasso.commons.utils.CommonDateUtils.COMMON;
-import static org.novinomad.picasso.commons.utils.CommonDateUtils.ISO_8601;
+import static org.novinomad.picasso.commons.utils.CommonDateUtils.UI_DATE_TIME_NO_SEC;
 
 @Entity
 @Getter
@@ -35,11 +35,10 @@ public class TourBind extends AbstractEntity implements IRange {
     @OneToOne
     Tour tour;
 
-    @DateTimeFormat(pattern = COMMON)
     @Column(nullable = false)
     LocalDateTime startDate;
 
-    @DateTimeFormat(pattern = COMMON)
+    
     @Column(nullable = false)
     LocalDateTime endDate;
 
@@ -103,7 +102,7 @@ public class TourBind extends AbstractEntity implements IRange {
 
     @Override
     public String toString() {
-        DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern(COMMON, Locale.ENGLISH);
+        DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern(UI_DATE_TIME_NO_SEC, Locale.ENGLISH);
         return super.toString().replace("}", "") +
                 ", tour=" + tour +
                 ", employee=" + employee +

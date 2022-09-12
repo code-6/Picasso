@@ -132,7 +132,14 @@
         /*<![CDATA[*/
         let mainUrl = $("meta[name='mainUrl']").attr("content");
 
-        let dateTimeFormat = 'DD MMM YYYY HH:mm';
+        let userLocale = $("meta[name='userLocale']").attr('content');
+
+        moment.locale(userLocale); // to fix different locale issue in date-range picker
+
+        let dateRangePickerDateFormat = $("meta[name='dateRangePickerDateFormat']").attr('content');
+        let ganttTaskDateFormat = $("meta[name='ganttTaskDateFormat']").attr('content');
+        let ganttMajorDateFormat = $("meta[name='ganttMajorDateFormat']").attr('content');
+
 
         // change tourFormToggleBtn icon on toggle
         let tourFormContainer = $('#tourFormContainer');
@@ -161,7 +168,7 @@
         });
 
         function initDataTable() {
-            $.fn.dataTable.moment(dateTimeFormat); // to fix sort by date columns
+            $.fn.dataTable.moment(dateRangePickerDateFormat, userLocale); // to fix sort by date columns
             $('#toursTable').DataTable({
                 paging: true,
                 searching: true,
@@ -190,7 +197,7 @@
                 autoApply: true,
                 autoUpdateInput: true,
                 locale: {
-                    format: dateTimeFormat,
+                    format: dateRangePickerDateFormat,
                 }
             });
         }

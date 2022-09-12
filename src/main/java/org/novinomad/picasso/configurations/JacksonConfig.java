@@ -22,7 +22,7 @@ public class JacksonConfig {
 
         objectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
 
-        objectMapper.setDateFormat(new SimpleDateFormat(CommonDateUtils.COMMON));
+        objectMapper.setDateFormat(new SimpleDateFormat(CommonDateUtils.UI_DATE_TIME_NO_SEC));
 
         return objectMapper;
     }

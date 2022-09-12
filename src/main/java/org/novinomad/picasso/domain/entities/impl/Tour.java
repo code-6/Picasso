@@ -1,6 +1,5 @@
 package org.novinomad.picasso.domain.entities.impl;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 import org.hibernate.annotations.Nationalized;
@@ -15,7 +14,7 @@ import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
 
-import static org.novinomad.picasso.commons.utils.CommonDateUtils.COMMON;
+import static org.novinomad.picasso.commons.utils.CommonDateUtils.UI_DATE_TIME_NO_SEC;
 
 @Entity
 @Getter
@@ -29,11 +28,6 @@ import static org.novinomad.picasso.commons.utils.CommonDateUtils.COMMON;
 })
 public class Tour extends AbstractEntity implements ITour, IRange {
 
-    @Transient
-    @JsonIgnore
-    @Getter
-    public static final String ICON = "<i class=\"fa-thin fa-earth-asia\"></i>";
-
     @Nationalized
     String name;
 
@@ -41,10 +35,10 @@ public class Tour extends AbstractEntity implements ITour, IRange {
     @Column(columnDefinition = "NVARCHAR2(1000)")
     String description;
 
-    @DateTimeFormat(pattern = COMMON)
+    
     LocalDateTime startDate;
 
-    @DateTimeFormat(pattern = COMMON)
+    
     LocalDateTime endDate;
 
     @ElementCollection
@@ -92,7 +86,7 @@ public class Tour extends AbstractEntity implements ITour, IRange {
 
     @Override
     public String toString() {
-        DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern(COMMON, Locale.ENGLISH);
+        DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern(UI_DATE_TIME_NO_SEC, Locale.ENGLISH);
         return super.toString().replace("}", "") +
                 ", name='" + name + '\'' +
                 ", startDate=" + (startDate == null ? null : startDate.format(dateTimeFormatter)) +
@@ -102,7 +96,7 @@ public class Tour extends AbstractEntity implements ITour, IRange {
 
     @Override
     public String toStringFull() {
-        DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern(COMMON, Locale.ENGLISH);
+        DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern(UI_DATE_TIME_NO_SEC, Locale.ENGLISH);
         return super.toString().replace("}", "") +
                 ", name='" + name + '\'' +
                 ", startDate=" + (startDate == null ? null : startDate.format(dateTimeFormatter)) +

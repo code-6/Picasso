@@ -16,9 +16,11 @@ import java.util.List;
 @Data
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class TourCriteria implements IRange {
-    @DateTimeFormat(pattern = CommonDateUtils.COMMON)
+
+    
     LocalDateTime startDate;
-    @DateTimeFormat(pattern = CommonDateUtils.COMMON)
+
+    
     LocalDateTime endDate;
 
     List<Employee.Type> employeeTypes = new ArrayList<>();

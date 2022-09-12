@@ -38,16 +38,16 @@ public class Task implements ITask, Comparable<Task> {
     @JsonProperty("pName")
     String name;
     @JsonProperty("pStart")
-    @DateTimeFormat(pattern = CommonDateUtils.ISO_8601_WITHOUT_SECONDS)
+    
     LocalDateTime startDate;
     @JsonProperty("pEnd")
-    @DateTimeFormat(pattern = CommonDateUtils.ISO_8601_WITHOUT_SECONDS)
+    
     LocalDateTime endDate;
     @JsonProperty("pPlanStart")
-    @DateTimeFormat(pattern = CommonDateUtils.ISO_8601_WITHOUT_SECONDS)
+    
     LocalDateTime plannedStartDate;
     @JsonProperty("pPlanEnd")
-    @DateTimeFormat(pattern = CommonDateUtils.ISO_8601_WITHOUT_SECONDS)
+    
     LocalDateTime plannedEndDate;
     @JsonProperty("pClass")
     String cssClass = CssClass.BLUE.cssName;

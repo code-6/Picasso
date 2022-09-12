@@ -11,7 +11,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Locale;
 
-import static org.novinomad.picasso.commons.utils.CommonDateUtils.COMMON;
+import static org.novinomad.picasso.commons.utils.CommonDateUtils.UI_DATE_TIME_NO_SEC;
 
 public interface IRange {
 
@@ -26,7 +26,7 @@ public interface IRange {
     default String getEndDateAsString(String format, Locale locale) {
         if(getEndDate() == null) return "";
 
-        if(StringUtils.isBlank(format)) format = COMMON;
+        if(StringUtils.isBlank(format)) format = UI_DATE_TIME_NO_SEC;
 
         return getEndDate().format(DateTimeFormatter.ofPattern(format, locale));
     }
@@ -37,7 +37,7 @@ public interface IRange {
     default String getStartDateAsString(String format, Locale locale) {
         if(getStartDate() == null) return "";
 
-        if(StringUtils.isBlank(format)) format = COMMON;
+        if(StringUtils.isBlank(format)) format = UI_DATE_TIME_NO_SEC;
 
         return getStartDate().format(DateTimeFormatter.ofPattern(format, locale));
     }

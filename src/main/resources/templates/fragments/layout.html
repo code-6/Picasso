@@ -7,6 +7,11 @@
     <meta name="description" content="">
     <meta name="author" content="Stanislav Wong">
     <meta name="mainUrl" th:content="${#httpServletRequest.getScheme()} + '://' + ${#httpServletRequest.getServerName()} + ':' + ${#httpServletRequest.getServerPort()} + ${#httpServletRequest.getContextPath()}" />
+    <meta name="userLocale" th:content="${@userService.getCurrentUserLocale()}" />
+    <meta name="userLanguage" th:content="${@userService.getCurrentUserLocale().getLanguage()}" />
+    <meta name="ganttTaskDateFormat" th:content="${@environment.getProperty('app.date.format.gantt-task')}" />
+    <meta name="ganttMajorDateFormat" th:content="${@environment.getProperty('app.date.format.gantt-major')}" />
+    <meta name="dateRangePickerDateFormat" th:content="${@environment.getProperty('app.date.format.date-range-picker')}" />
 
     <title>Picasso</title>
 <!--    common dependencies-->

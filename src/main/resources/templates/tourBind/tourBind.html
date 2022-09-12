@@ -4,7 +4,7 @@
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
       layout:decorate="~{fragments/layout}">
 <head>
-    <title>PCS</title>
+    <title>Bind | PCS</title>
 
     <!-- Latest compiled and minified CSS -->
     <link th:href="@{/vendor/jsgantt-improved/dist/jsgantt.css}" rel="stylesheet" type="text/css"/>
@@ -410,7 +410,13 @@
         // main url stored in head tag of layout.html
         let mainUrl = $("meta[name='mainUrl']").attr("content");
 
-        let dateTimeFormat = 'DD MMM YYYY HH:mm';
+        let userLanguage = $("meta[name='userLanguage']").attr('content');
+
+        moment.locale(userLanguage); // to fix different locale issue in date-range picker
+
+        let dateRangePickerDateFormat = $("meta[name='dateRangePickerDateFormat']").attr('content');
+        let ganttTaskDateFormat = $("meta[name='ganttTaskDateFormat']").attr('content');
+        let ganttMajorDateFormat = $("meta[name='ganttMajorDateFormat']").attr('content');
 
         $(document).ready(function () {
 
@@ -750,7 +756,7 @@
                 autoApply: true,
                 autoUpdateInput: true,
                 locale: {
-                    format: dateTimeFormat,
+                    format: dateRangePickerDateFormat,
                 }
             });
         }
@@ -794,7 +800,7 @@
                 autoUpdateInput: true,
                 locale: {
                     separator: ' ~ ',
-                    format: dateTimeFormat,
+                    format: dateRangePickerDateFormat,
                 }
             }).on('apply.daterangepicker hideCalendar.daterangepicker hide.daterangepicker', function (e, clickedIndex, isSelected, previousValue) {
                 // validate bind when employee dates changed
@@ -854,9 +860,6 @@
 
         function initGanttChart(ganttTasks) {
 
-            const dateTimeFormat = 'dd mon yyyy HH:mi';
-            const dateFormat = 'dd mon yyyy';
-
             if (!ganttTasks)
                 ganttTasks = [[${toursForGantt}]];
 
@@ -880,9 +883,9 @@
             ganttChart.setDayColWidth(22);
 
             // configure ganttChart date format displayed on top and bottom of the table
-            ganttChart.setDayMajorDateDisplayFormat(dateFormat);
-            ganttChart.setDateTaskTableDisplayFormat(dateFormat);
-            ganttChart.setDateTaskDisplayFormat(dateTimeFormat);
+            ganttChart.setDayMajorDateDisplayFormat(ganttMajorDateFormat);
+            ganttChart.setDateTaskTableDisplayFormat(ganttTaskDateFormat);
+            ganttChart.setDateTaskDisplayFormat(ganttTaskDateFormat);
 
             // configure ganttChart tooltip information
             ganttChart.setShowTaskInfoRes(0)
