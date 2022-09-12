@@ -1,0 +1,60 @@
+<div class="row g-2 align-items-end" th:fragment="tourBindFilterFormContent">
+
+  <div class="col-md align-items-end">
+    <label for="filterStartDate" th:text="#{start.cap} + #{date}"></label>
+    <input type="text" class="form-control date-picker date-picker-single"
+           id="filterStartDate"
+           th:field="*{startDate}" name="startDate">
+  </div>
+
+  <div class="col-md align-items-end">
+    <label for="filterEndDate" th:text="#{end.cap} + #{date}"></label>
+    <input type="text" class="form-control date-picker date-picker-single"
+           id="filterEndDate"
+           th:field="*{endDate}" name="endDate">
+  </div>
+
+  <div class="col-md align-items-end">
+    <label for="filterTourSelect" th:text="#{tour.cap}"></label>
+    <select id="filterTourSelect" class="form-control selectpicker tourSelect"
+            th:field="*{tourIds}" multiple
+            data-live-search="true" data-selected-text-format="count > 1"
+            name="tourIds">
+      <option th:each="tour : ${allTours}"
+              th:value="${tour.id}"
+              th:text="${tour.id + '. ' + tour.name}"
+              th:selected="${tourBindFilter.tourIds.contains(tour.id)}">
+      </option>
+    </select>
+  </div>
+
+  <div class="col-md align-items-end">
+    <label for="filterEmployeeTypeSelect" th:text="#{employee-type}"></label>
+    <select id="filterEmployeeTypeSelect"
+            class="form-control selectpicker employeeTypeSelect"
+            th:field="*{employeeTypes}" name="employeeTypes"
+            multiple data-live-search="true" data-selected-text-format="count > 3"
+            data-employee-select-id="filterEmployeeSelect">
+      <option th:each="employeeType : ${allEmployeeTypes}"
+              th:value="${employeeType}" th:text="${employeeType.name()}"
+              th:selected="${tourBindFilter.employeeTypes.contains(employeeType)}">
+      </option>
+    </select>
+  </div>
+
+  <div class="col-md align-items-end">
+    <label for="filterEmployeeSelect">Employee</label>
+    <select id="filterEmployeeSelect" class="form-control selectpicker employeeSelect"
+            th:field="*{employeeIds}" name="employeeIds"
+            multiple data-live-search="true" data-selected-text-format="count > 2">
+    </select>
+  </div>
+
+  <div class="col-md align-items-end">
+    <button id="submitFilterBtn" type="button" onclick="submitGanttFilterForm()"
+            title="Press to see filtered tours and employees"
+            class="btn btn-outline-success btn-block form-control"
+            th:text="#{show.cap} + #{tour.pl}">
+    </button>
+  </div>
+</div>

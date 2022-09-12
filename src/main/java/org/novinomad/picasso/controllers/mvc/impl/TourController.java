@@ -42,11 +42,6 @@ public class TourController {
         return tourService.get();
     }
 
-    @ModelAttribute("userLocale")
-    public Locale getCurrentUserLocale() {
-        return new Locale("RU");
-    }
-
     @GetMapping("/{tourId}")
     public String getTourFormFragment(@PathVariable Long tourId, Model model) {
         if(tourId != null) {
@@ -64,6 +59,12 @@ public class TourController {
             tourService.deleteTourFile(tourId, fileName);
             tourService.get(tourId).ifPresent(tour -> {
                 tour.removeFile(fileName);
+                try {
+                    tourService.save(tour);
+                } catch (PicassoException e) {
+                    log.error(e.getMessage(), e);
+                    throw new RuntimeException(e);
+                }
                 model.addAttribute("tour", tour);
             });
         } catch (IOException e) {

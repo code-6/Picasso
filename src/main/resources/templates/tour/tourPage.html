@@ -138,7 +138,11 @@
 
         function initDataTable() {
             $.fn.dataTable.moment(dateRangePickerDateFormat, userLocale); // to fix sort by date columns
+
             $('#toursTable').DataTable({
+                "drawCallback": function( settings ) {
+                    initEditTourButtons();
+                },
                 paging: true,
                 searching: true,
                 ordering: true,
