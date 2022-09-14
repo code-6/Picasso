@@ -1,2 +1,0 @@
-const MAX_CONTENT_LENGTH_PER_COLUMN = 90;
-const DATE_TIME_FORMAT = 'yyyy-MM-dd HH:mm'

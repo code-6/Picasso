@@ -1,81 +1,86 @@
-<div th:fragment="tourFormContent">
-    <div class="row form-group">
-        <div class="col-sm-2">
-            <label for="tourNameForm" class="form-label" th:text="#{name.cap}"></label>
-        </div>
-        <div class="col">
-            <input type="text" class="form-control" id="tourNameForm" placeholder="enter tour name" name="name"
-                   th:value="${tour.name}">
-        </div>
-    </div>
-    <div class="row form-group">
-        <div class="col-sm-2">
-            <label for="datepickerForm" th:text="#{date.cap.pl}"></label>
-        </div>
-        <div class="col">
-            <div class="input-daterange input-group" id="datepickerForm" data-provide="datepicker">
-                <input type="text" class="form-control date-picker date-picker-single date-picker-single-tour-form"
-                       id="filterStartDate"
-                       th:field="${tour.startDate}" name="startDate">
-                <span class="input-group-addon from-to-date-fields-divider">to</span>
-                <input type="text" class="form-control date-picker date-picker-single date-picker-single-tour-form"
-                       id="filterEndDate"
-                       th:field="${tour.endDate}" name="endDate">
+<form th:object="${tour}" th:action="@{/tour}" th:method="post" id="tourForm" th:fragment="tourForm"
+      enctype="multipart/form-data">
+    <div>
+        <div class="row form-group">
+            <div class="col-sm-2">
+                <label for="tourNameForm" class="form-label" th:text="#{name.cap}"></label>
+            </div>
+            <div class="col">
+                <input type="text" class="form-control" id="tourNameForm" placeholder="enter tour name" name="name"
+                       th:value="${tour.name}">
             </div>
         </div>
-    </div>
-    <div class="row form-group">
-        <div class="col-sm-2">
-            <label for="tourDescription" class="form-label" th:text="#{description.cap}"></label>
+        <div class="row form-group">
+            <div class="col-sm-2">
+                <label for="datepickerForm" th:text="#{date.cap.pl}"></label>
+            </div>
+            <div class="col">
+                <div class="input-daterange input-group" id="datepickerForm" data-provide="datepicker">
+                    <input type="text" class="form-control date-picker date-picker-single date-picker-single-tour-form"
+                           id="filterStartDate"
+                           th:field="${tour.startDate}" name="startDate">
+                    <span class="input-group-addon from-to-date-fields-divider">to</span>
+                    <input type="text" class="form-control date-picker date-picker-single date-picker-single-tour-form"
+                           id="filterEndDate"
+                           th:field="${tour.endDate}" name="endDate">
+                </div>
+            </div>
         </div>
-        <div class="col">
+        <div class="row form-group">
+            <div class="col-sm-2">
+                <label for="tourDescription" class="form-label" th:text="#{description.cap}"></label>
+            </div>
+            <div class="col">
 
             <textarea class="form-control" id="tourDescription" rows="3" name="description"
                       th:text="${tour.description}"></textarea>
+            </div>
         </div>
-    </div>
-    <div class="row form-group">
-        <div class="col-sm-2">
-            <label for="tourFilesInput" class="form-label" th:title="#{file.upload}"></label>
+        <div class="row form-group">
+            <div class="col-sm-2">
+                <label for="tourFilesInput" class="form-label" th:title="#{file.upload}"></label>
+            </div>
+            <div class="col">
+                <input id="tourFilesInput" class="form-control" type="file" multiple name="tourFiles">
+                <small id="tourFilesInputHelp" class="form-text text-muted"
+                       th:text="#{tourFilesInputHelp} + ${@environment.getProperty('spring.servlet.multipart.max-file-size')}"></small>
+            </div>
         </div>
-        <div class="col">
-            <input id="tourFilesInput" class="form-control" type="file" multiple name="tourFiles">
-            <small id="tourFilesInputHelp" class="form-text text-muted" th:text="#{tourFilesInputHelp} + ${@environment.getProperty('spring.servlet.multipart.max-file-size')}"></small>
+        <div class="row form-group">
+            <div class="col-sm-2">
+                <label class="form-label" th:title="#{file.uploaded}"></label>
+            </div>
+            <div class="col">
+                <table th:include="tour/tourFilesFragment :: tourFilesFragment" id="uploadedFilesTable"
+                       class="table table-sm table-borderless"></table>
+            </div>
         </div>
-    </div>
-    <div class="row form-group">
-        <div class="col-sm-2">
-            <label class="form-label" th:title="#{file.uploaded}"></label>
-        </div>
-        <div class="col">
-            <table th:include="tour/tourFilesFragment :: tourFilesFragment" id="uploadedFilesTable" class="table table-sm table-borderless"></table>
-        </div>
-    </div>
-    <div class="row form-group">
-        <div class="col-sm-2"></div>
-        <div class="col">
+        <div class="row form-group">
+            <div class="col-sm-2"></div>
+            <div class="col">
 
-            <button type="submit" class="btn btn-outline-success btn-block">
-                <i class="fas fa-check-square"></i>
-                <span th:text="#{submit.cap}"></span>
-            </button>
+                <button type="submit" class="btn btn-outline-success btn-block">
+                    <i class="fas fa-check-square"></i>
+                    <span th:text="#{submit.cap}"></span>
+                </button>
+            </div>
+            <div class="col">
+                <button type="button" class="btn btn-outline-secondary btn-block" data-toggle="collapse"
+                        href="#tourFormContainer"
+                        aria-expanded="true" aria-controls="tourFormContainer">
+                    <i class="fas fa-window-close"></i>
+                    <span th:text="#{close.cap}"></span>
+                </button>
+            </div>
+            <div class="col">
+                <button class="btn btn-outline-warning btn-block" id="resetTourFormBtn"
+                        type="button"
+                        th:title="#{clear.title}">
+                    <i class="fas fa-eraser"></i>
+                    <span th:text="#{clear.cap} + #{form}"></span>
+                </button>
+            </div>
         </div>
-        <div class="col">
-            <button type="button" class="btn btn-outline-secondary btn-block" data-toggle="collapse"
-                    href="#tourFormContainer"
-                    aria-expanded="true" aria-controls="tourFormContainer">
-                <i class="fas fa-window-close"></i>
-                <span th:text="#{close.cap}"></span>
-            </button>
-        </div>
-        <div class="col">
-            <button class="btn btn-outline-warning btn-block" id="resetTourFormBtn"
-                    type="button"
-                    th:title="#{clear.title}">
-                <i class="fas fa-eraser"></i>
-                <span th:text="#{clear.cap} + #{form}"></span>
-            </button>
-        </div>
+        <input type="hidden" name="id" th:value="${tour.id}">
     </div>
-    <input type="hidden" name="id" th:value="${tour.id}">
-</div>
+</form>

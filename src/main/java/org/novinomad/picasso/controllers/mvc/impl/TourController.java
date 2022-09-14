@@ -6,6 +6,7 @@ import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.novinomad.picasso.entities.domain.impl.Tour;
 import org.novinomad.picasso.dto.filters.TourFilter;
+import org.novinomad.picasso.exceptions.StorageException;
 import org.novinomad.picasso.exceptions.base.PicassoException;
 import org.novinomad.picasso.services.ITourService;
 import org.springframework.beans.factory.annotation.Value;
@@ -18,6 +19,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
@@ -49,28 +51,7 @@ public class TourController {
                     .ifPresentOrElse(tour -> model.addAttribute("tour", tour),
                             () -> model.addAttribute("tour", new Tour()));
         }
-        return "tour/tourForm :: tourFormContent";
-    }
-
-    @DeleteMapping("/{tourId}/file/{fileName}")
-    public String deleteTourFile(@PathVariable("tourId") Long tourId, @PathVariable("fileName") String fileName, Model model) {
-
-        try {
-            tourService.deleteTourFile(tourId, fileName);
-            tourService.get(tourId).ifPresent(tour -> {
-                tour.removeFile(fileName);
-                try {
-                    tourService.save(tour);
-                } catch (PicassoException e) {
-                    log.error(e.getMessage(), e);
-                    throw new RuntimeException(e);
-                }
-                model.addAttribute("tour", tour);
-            });
-        } catch (IOException e) {
-            model.addAttribute("exception", e.getMessage());
-        }
-        return "tour/tourFilesFragment :: tourFilesFragment";
+        return "tour/tourForm :: tourForm";
     }
 
     @DeleteMapping
@@ -115,9 +96,33 @@ public class TourController {
             return new ResponseEntity<>(tourFile,
                     httpHeaders,
                     HttpStatus.OK);
+        } catch (FileNotFoundException e) {
+            log.error(e.getMessage(),e );
+            return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
         } catch (Exception e) {
             log.error(e.getMessage(),e );
             return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
         }
+    }
+
+    @DeleteMapping("/{tourId}/file/{fileName}")
+    public String deleteTourFile(@PathVariable("tourId") Long tourId, @PathVariable("fileName") String fileName, Model model) {
+
+        try {
+            tourService.deleteTourFile(tourId, fileName);
+            tourService.get(tourId).ifPresent(tour -> {
+                tour.removeFile(fileName);
+                try {
+                    tourService.save(tour);
+                } catch (PicassoException e) {
+                    log.error(e.getMessage(), e);
+                    throw new RuntimeException(e);
+                }
+                model.addAttribute("tour", tour);
+            });
+        } catch (IOException e) {
+            model.addAttribute("exception", e.getMessage());
+        }
+        return "tour/tourFilesFragment :: tourFilesFragment";
     }
 }
