@@ -7,7 +7,7 @@ import org.novinomad.picasso.commons.IRange;
 import org.novinomad.picasso.dto.filters.TourBindFilter;
 import org.novinomad.picasso.entities.domain.impl.TourBind;
 import org.novinomad.picasso.dto.gantt.Task;
-import org.novinomad.picasso.exceptions.base.PicassoException;
+import org.novinomad.picasso.exceptions.base.BaseException;
 import org.novinomad.picasso.services.IEmployeeService;
 import org.novinomad.picasso.services.ITourBindService;
 import org.springframework.http.MediaType;
@@ -29,20 +29,20 @@ public class TourBindRestController implements ICrud<TourBind> {
     @GetMapping("/validate/{tourId}/{employeeId}/{localDateTimeRange}")
     public void validate(@PathVariable Long tourId,
                          @PathVariable Long employeeId,
-                         @PathVariable IRange localDateTimeRange) throws PicassoException {
+                         @PathVariable IRange localDateTimeRange) throws BaseException {
         tourBindService.validateBind(tourId, employeeId, localDateTimeRange);
     }
 
 
     @Override
     @PostMapping
-    public TourBind save(TourBind tourBind) throws PicassoException {
+    public TourBind save(TourBind tourBind) throws BaseException {
         return tourBindService.save(tourBind);
     }
 
     @Override
     @DeleteMapping
-    public void delete(Long id) throws PicassoException {
+    public void delete(Long id) throws BaseException {
         tourBindService.delete(id);
     }
 

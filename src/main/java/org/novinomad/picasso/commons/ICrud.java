@@ -1,7 +1,7 @@
 package org.novinomad.picasso.commons;
 
 import org.novinomad.picasso.entities.base.AbstractEntity;
-import org.novinomad.picasso.exceptions.base.PicassoException;
+import org.novinomad.picasso.exceptions.base.BaseException;
 
 import java.util.Collections;
 import java.util.List;
@@ -9,11 +9,11 @@ import java.util.Optional;
 
 public interface ICrud<T extends AbstractEntity> {
 
-    T save(T t) throws PicassoException;
+    T save(T t) throws BaseException;
 
-    void delete(Long id) throws PicassoException;
+    void delete(Long id) throws BaseException;
 
-    default void delete(T t) throws PicassoException {
+    default void delete(T t) throws BaseException {
         delete(t.getId());
     }
 

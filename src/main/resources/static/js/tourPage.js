@@ -14,6 +14,9 @@ const tourFormFragmentSubject = new FragmentSubject()
     .subscribe(initSingleDatePickers) // reinitialize tour form date pickers
     .subscribe(initTourFormButtons); // reinitialize tour form buttons
 
+const tourFormFilesFragmentSubject = new FragmentSubject()
+    .subscribe(initTourFormButtons);
+
 // page load initialization
 moment.locale(userLocale); // to fix different locale issue in date-range picker
 
@@ -137,20 +140,21 @@ function initTourFormButtons () {
         let btn = $(this);
         btn.prop('disabled', true);
 
-        let tourId = $(btn).attr('data-tour-id');
         let fileName = $(btn).attr('data-tour-file-name');
-        let url = mainUrl + '/tour/' + tourId + '/file/'  + fileName;
+        let url = mainUrl + '/tour/file/'  + fileName;
+        let tourFormData = $('#tourForm').serialize();
 
-        ajaxUtil.del(url)
-            .then((tourFormFilesTableHtml) => $('#uploadedFilesTable').html(tourFormFilesTableHtml))
-            .catch((error) => {
-                console.error('unable to delete file %s of tour %d %s',fileName, tourId, error);
+        ajaxUtil.del(url, tourFormData)
+            .then((tourFormFilesTableHtml) => {
+                $('#uploadedFilesTable').html(tourFormFilesTableHtml);
+                tourFormFilesFragmentSubject.notifyObservers();
+            }).catch((error) => {
+                console.error('unable to delete file %s %s',fileName, error);
                 Swal.fire({
                     icon: 'error',
                     title: 'unable to delete tour file'
                 });
-            })
-            .finally(btn.prop('disabled', false));
+            }).finally(btn.prop('disabled', false));
     });
 
     $('#resetTourFormBtn').on('click', function (e) {
@@ -175,6 +179,10 @@ function initTourFormButtons () {
                 });
             })
             .finally(btn.prop('disabled', false));
+    });
+
+    $(function () {
+        $('[data-toggle="popover"]').popover();
     });
 }
 

@@ -11,7 +11,7 @@ import org.novinomad.picasso.commons.utils.CommonDateUtils;
 import org.novinomad.picasso.entities.AppSettings;
 import org.novinomad.picasso.entities.domain.impl.*;
 import org.novinomad.picasso.exceptions.BindException;
-import org.novinomad.picasso.exceptions.base.PicassoException;
+import org.novinomad.picasso.exceptions.base.BaseException;
 import org.novinomad.picasso.repositories.jpa.AppSettingsRepository;
 import org.novinomad.picasso.repositories.jpa.DriverRepository;
 import org.novinomad.picasso.repositories.jpa.GuideRepository;
@@ -97,7 +97,7 @@ public class DevEnvInitializer implements IDevEnvInitializer {
             LocalDateTime finalStartDate = dateToLocalDateTime(startDate);
             LocalDateTime finalEndDate = dateToLocalDateTime(endDate);
 
-            Set<String> files = new HashSet<>();
+            List<String> files = new ArrayList<>();
 
             int rndFilesCount = RandomUtils.nextInt(0, 3);
 
@@ -163,7 +163,7 @@ public class DevEnvInitializer implements IDevEnvInitializer {
     }
 
     @Override
-    public List<TourBind> createTourBindings(List<Tour> tours, List<Employee> employees) throws PicassoException {
+    public List<TourBind> createTourBindings(List<Tour> tours, List<Employee> employees) throws BaseException {
         log.info("start create bindings");
         List<TourBind> bindings = new ArrayList<>();
 

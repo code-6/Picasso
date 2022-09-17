@@ -8,13 +8,14 @@ import org.apache.commons.lang3.StringUtils;
 import org.novinomad.picasso.dto.filters.TourFilter;
 import org.novinomad.picasso.entities.domain.impl.Tour;
 import org.novinomad.picasso.exceptions.StorageException;
-import org.novinomad.picasso.exceptions.base.PicassoException;
+import org.novinomad.picasso.exceptions.base.BaseException;
 import org.novinomad.picasso.repositories.jpa.TourRepository;
 import org.novinomad.picasso.services.ITourService;
 import org.novinomad.picasso.services.StorageService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.PostConstruct;
@@ -27,6 +28,8 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
+import static org.novinomad.picasso.services.StorageService.*;
+
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -36,8 +39,6 @@ public class TourService implements ITourService {
     final TourRepository tourRepository;
 
     final StorageService storageService;
-
-    private static final String PATH_SEPARATOR = FileSystems.getDefault().getSeparator();
     private static final String DEFAULT_ROOT_DIR = "." + PATH_SEPARATOR + "toursFiles";
 
     private Path rootLocation;
@@ -59,12 +60,12 @@ public class TourService implements ITourService {
         // make sure that path to rot directory is provided, if not then use default value
         if (StringUtils.isBlank(filesRootDir)) filesRootDir = DEFAULT_ROOT_DIR;
 
-        if (storageService.isValidPath(filesRootDir)){
-            if (!storageService.existsFolder(filesRootDir)) {
+        if (storageService.isValid(filesRootDir)){
+            if (!storageService.exist(filesRootDir)) {
                 try {
-                    rootLocation = storageService.createDir(filesRootDir);
+                    rootLocation = storageService.createFolder(filesRootDir);
                     log.info("root directory {} for tour files created successfully", rootLocation.getFileName());
-                } catch (IOException | StorageException e) {
+                } catch (StorageException e) {
                     log.error("root directory {} for tour files not created because {}", filesRootDir, e.getMessage(), e);
                     throw new RuntimeException(e);
                 }
@@ -75,14 +76,14 @@ public class TourService implements ITourService {
     }
 
     @Override
-    public Tour save(Tour tour) throws PicassoException {
+    public Tour save(Tour tour) throws BaseException {
         try {
             Tour savedTour = tourRepository.save(tour);
             log.debug("saved {}", tour);
             return savedTour;
         } catch (Exception e) {
             log.error("unable to create: {} because: {}", tour, e.getMessage(), e);
-            throw new PicassoException(e, "unable to create: {} because: {}", tour, e.getMessage());
+            throw new BaseException(e, "unable to create: {} because: {}", tour, e.getMessage());
         }
     }
 
@@ -92,7 +93,7 @@ public class TourService implements ITourService {
         tours.forEach(tour -> {
             try {
                 savedTours.add(save(tour));
-            } catch (PicassoException ignored) {
+            } catch (BaseException ignored) {
                 // ignored because save contains logging.
             }
         });
@@ -103,12 +104,12 @@ public class TourService implements ITourService {
     }
 
     @Override
-    public void delete(Long id) throws PicassoException {
+    public void delete(Long id) throws BaseException {
         try {
             tourRepository.deleteById(id);
         } catch (Exception e) {
             log.error("unable to delete Tour with id: {} because: {}", id, e.getMessage(), e);
-            throw new PicassoException(e, "unable to delete Tour with id: {} because: {}", id, e.getMessage());
+            throw new BaseException(e, "unable to delete Tour with id: {} because: {}", id, e.getMessage());
         }
     }
 
@@ -120,7 +121,7 @@ public class TourService implements ITourService {
             try {
                 delete(id);
                 deletedTours.add(id);
-            } catch (PicassoException ignored) {
+            } catch (BaseException ignored) {
                 // ignored because save contains logging.
             }
         });
@@ -162,35 +163,36 @@ public class TourService implements ITourService {
     }
 
     @Override
-    public Tour save(Tour tour, List<MultipartFile> files) throws PicassoException {
-        tour.addFile(files);
-        tour = tourRepository.save(tour);
-        String newDir = rootLocation.toString() + PATH_SEPARATOR + tour.getId();
-        try {
-            if(!storageService.existsFolder(newDir))
-                storageService.createDir(newDir);
+    public Tour save(Tour tour, List<MultipartFile> newFiles) throws BaseException {
+        if(!CollectionUtils.isEmpty(newFiles))
+            tour.addFile(newFiles);
 
-            for (MultipartFile file : files)
-                storageService.store(file, newDir);
-        } catch (IOException e) {
+        tour = tourRepository.save(tour);
+
+        try {
+            String tourFilesFolder = rootLocation.toString() + PATH_SEPARATOR + tour.getId() + PATH_SEPARATOR;
+
+            if(!storageService.exist(tourFilesFolder))
+                storageService.createFolder(tourFilesFolder);
+
+            storageService.clearFolder(tourFilesFolder, tour.getFileNames().toArray(String[]::new));
+
+            storageService.store(tourFilesFolder, newFiles);
+
+        } catch (StorageException e) {
             log.error(e.getMessage(), e);
         }
         return tour;
     }
 
     @Override
-    public void deleteTourFile(Long tourId, String fileName) throws IOException {
+    public void deleteTourFile(Long tourId, String fileName) throws StorageException {
         String filePath = rootLocation.toString() + PATH_SEPARATOR + tourId + PATH_SEPARATOR + fileName;
-        try {
-            storageService.delete(filePath);
-        } catch (Exception e) {
-            log.error("unable to delete tour file {} because {}", filePath, e.getMessage(), e);
-            throw e;
-        }
+        storageService.delete(filePath);
     }
 
     @Override
-    public Resource getTourFile(Long tourId, String fileName) throws FileNotFoundException, StorageException {
+    public Resource getTourFile(Long tourId, String fileName) throws StorageException {
         String filePath = rootLocation.toString() + PATH_SEPARATOR + tourId + PATH_SEPARATOR + fileName;
         return storageService.loadAsResource(filePath);
     }

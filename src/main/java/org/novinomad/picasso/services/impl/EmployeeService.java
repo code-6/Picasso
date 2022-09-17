@@ -5,7 +5,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.novinomad.picasso.entities.domain.impl.Employee;
-import org.novinomad.picasso.exceptions.base.PicassoException;
+import org.novinomad.picasso.exceptions.base.BaseException;
 import org.novinomad.picasso.repositories.jpa.EmployeeRepository;
 import org.novinomad.picasso.services.IEmployeeService;
 import org.springframework.stereotype.Service;
@@ -22,14 +22,14 @@ public class EmployeeService implements IEmployeeService {
     final EmployeeRepository employeeRepository;
 
     @Override
-    public Employee save(Employee employee) throws PicassoException {
+    public Employee save(Employee employee) throws BaseException {
         try {
             Employee savedEmployee = employeeRepository.save(employee);
             log.debug("saved {}", employee);
             return savedEmployee;
         } catch (Exception e) {
             log.error("unable to create: {} because: {}", employee, e.getMessage(), e);
-            throw new PicassoException(e, "unable to create: {} because: {}", employee, e.getMessage());
+            throw new BaseException(e, "unable to create: {} because: {}", employee, e.getMessage());
         }
     }
 
@@ -39,7 +39,7 @@ public class EmployeeService implements IEmployeeService {
         employees.forEach(employee -> {
             try {
                 savedEmployees.add(save(employee));
-            } catch (PicassoException ignored) {
+            } catch (BaseException ignored) {
                 // ignored because save contains logging.
             }
         });
@@ -50,12 +50,12 @@ public class EmployeeService implements IEmployeeService {
     }
 
     @Override
-    public void delete(Long id) throws PicassoException {
+    public void delete(Long id) throws BaseException {
         try {
             employeeRepository.deleteById(id);
         } catch (Exception e) {
             log.error("unable to delete Employee with id: {} because: {}", id, e.getMessage(), e);
-            throw new PicassoException(e, "unable to delete Employee with id: {} because: {}", id, e.getMessage());
+            throw new BaseException(e, "unable to delete Employee with id: {} because: {}", id, e.getMessage());
         }
     }
 
@@ -67,7 +67,7 @@ public class EmployeeService implements IEmployeeService {
             try {
                 delete(id);
                 deletedEmployees.add(id);
-            } catch (PicassoException ignored) {
+            } catch (BaseException ignored) {
                 // ignored because save contains logging.
             }
         });

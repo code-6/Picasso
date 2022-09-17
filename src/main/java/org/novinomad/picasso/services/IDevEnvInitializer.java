@@ -1,7 +1,7 @@
 package org.novinomad.picasso.services;
 
 import org.novinomad.picasso.entities.domain.impl.*;
-import org.novinomad.picasso.exceptions.base.PicassoException;
+import org.novinomad.picasso.exceptions.base.BaseException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -14,9 +14,9 @@ public interface IDevEnvInitializer {
 
     List<Guide> createGuides();
 
-    List<TourBind> createTourBindings(List<Tour> tours, List<Employee> employees) throws PicassoException;
+    List<TourBind> createTourBindings(List<Tour> tours, List<Employee> employees) throws BaseException;
 
-    default List<TourBind> createTourBindings() throws PicassoException {
+    default List<TourBind> createTourBindings() throws BaseException {
         return createTourBindings(createTours(), createEmployees());
     }
 

@@ -1,15 +1,14 @@
 package org.novinomad.picasso.exceptions;
 
 import org.novinomad.picasso.commons.IRange;
-import org.novinomad.picasso.commons.LocalDateTimeRange;
 import org.novinomad.picasso.commons.utils.CommonMessageFormat;
 import org.novinomad.picasso.entities.domain.impl.Employee;
 import org.novinomad.picasso.entities.domain.impl.Tour;
-import org.novinomad.picasso.exceptions.base.PicassoException;
+import org.novinomad.picasso.exceptions.base.BaseException;
 
 import java.util.Map;
 
-public class BindException extends PicassoException {
+public class BindException extends BaseException {
     
     private static final String MSG_PATTERN = "Unable to bind: {} to the: {} for dates {} because: {}";
     

@@ -6,8 +6,7 @@ import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.novinomad.picasso.entities.domain.impl.Tour;
 import org.novinomad.picasso.dto.filters.TourFilter;
-import org.novinomad.picasso.exceptions.StorageException;
-import org.novinomad.picasso.exceptions.base.PicassoException;
+import org.novinomad.picasso.exceptions.base.BaseException;
 import org.novinomad.picasso.services.ITourService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
@@ -20,10 +19,8 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Locale;
 import java.util.Optional;
 
 @Slf4j
@@ -55,7 +52,7 @@ public class TourController {
     }
 
     @DeleteMapping
-    public String deleteTour(Long tourId) throws PicassoException {
+    public String deleteTour(Long tourId) throws BaseException {
         tourService.delete(tourId);
         return "tour/toursTable :: toursTable";
     }
@@ -79,7 +76,7 @@ public class TourController {
 
         try {
             tourService.save(tour, Arrays.asList(tourFiles));
-        } catch (PicassoException e) {
+        } catch (BaseException e) {
             model.addAttribute("exception", e.getMessage());
         }
 
@@ -87,7 +84,8 @@ public class TourController {
     }
 
     @GetMapping("/{tourId}/file/{fileName}")
-    public @ResponseBody ResponseEntity<Resource> downloadTourFile(@PathVariable("tourId") Long tourId, @PathVariable("fileName") String fileName) {
+    public @ResponseBody ResponseEntity<Resource> downloadTourFile(@PathVariable("tourId") Long tourId,
+                                                                   @PathVariable("fileName") String fileName) {
         try {
             Resource tourFile = tourService.getTourFile(tourId, fileName);
             HttpHeaders httpHeaders = new HttpHeaders();
@@ -105,24 +103,13 @@ public class TourController {
         }
     }
 
-    @DeleteMapping("/{tourId}/file/{fileName}")
-    public String deleteTourFile(@PathVariable("tourId") Long tourId, @PathVariable("fileName") String fileName, Model model) {
+    @DeleteMapping("/file/{fileName}")
+    public String deleteTourFile(Tour tour,
+                                 @PathVariable("fileName") String fileName,
+                                 Model model) {
+        tour.deleteFile(fileName);
+        model.addAttribute(tour);
 
-        try {
-            tourService.deleteTourFile(tourId, fileName);
-            tourService.get(tourId).ifPresent(tour -> {
-                tour.removeFile(fileName);
-                try {
-                    tourService.save(tour);
-                } catch (PicassoException e) {
-                    log.error(e.getMessage(), e);
-                    throw new RuntimeException(e);
-                }
-                model.addAttribute("tour", tour);
-            });
-        } catch (IOException e) {
-            model.addAttribute("exception", e.getMessage());
-        }
         return "tour/tourFilesFragment :: tourFilesFragment";
     }
 }

@@ -4,13 +4,10 @@ import org.apache.commons.lang3.StringUtils;
 import org.novinomad.picasso.commons.IRange;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 public interface ITour extends IRange {
-    Set<String> getFileNames();
+    List<String> getFileNames();
 
     default void addFileName(String ... files) {
         getFileNames().addAll(Arrays.asList(files));
@@ -24,22 +21,42 @@ public interface ITour extends IRange {
         getFileNames().addAll(files);
     }
     default void addFile(Collection<MultipartFile> files) {
-        files.forEach(f -> {
-            String originalFilename = f.getOriginalFilename();
-            if(StringUtils.isNotBlank(originalFilename))
-                addFileName(originalFilename);
-        });
+        for (MultipartFile f : files) {
+            if(f != null && !f.isEmpty()) {
+                String originalFilename = f.getOriginalFilename();
+                if (StringUtils.isNotBlank(originalFilename))
+                    addFileName(originalFilename);
+            }
+        }
     }
 
-    default void removeFile(String file) {
-        getFileNames().removeIf(lang -> lang.equals(file));
+    default void deleteFile(String file) {
+        Iterator<String> iterator = getFileNames().iterator();
+        while (iterator.hasNext()) {
+            if(StringUtils.isNotBlank(file) && file.equals(iterator.next())) {
+                iterator.remove();
+            }
+        }
     }
 
-    default void removeFile(String ... file) {
-        getFileNames().removeAll(Arrays.asList(file));
+    default void deleteFile(String ... file) {
+        List<String> fileNames = getFileNames();
+        Iterator<String> iterator = fileNames.iterator();
+        while (iterator.hasNext()) {
+            for (String f : file) {
+                if(StringUtils.isNotBlank(f) && f.equals(iterator.next())) {
+                    iterator.remove();
+                }
+            }
+        }
     }
 
-    default void removeFile(Collection<String> files) {
-        getFileNames().removeAll(files);
+    default void deleteFile(Collection<String> files) {
+        Iterator<String> iterator = getFileNames().iterator();
+        while (iterator.hasNext()) {
+            if(files.contains(iterator.next())) {
+                iterator.remove();
+            }
+        }
     }
 }

@@ -11,7 +11,7 @@ import org.novinomad.picasso.entities.domain.impl.Employee;
 import org.novinomad.picasso.entities.domain.impl.Tour;
 import org.novinomad.picasso.entities.domain.impl.TourBind;
 import org.novinomad.picasso.exceptions.BindException;
-import org.novinomad.picasso.exceptions.base.PicassoException;
+import org.novinomad.picasso.exceptions.base.BaseException;
 import org.novinomad.picasso.repositories.jpa.TourBindRepository;
 import org.novinomad.picasso.services.IEmployeeService;
 import org.novinomad.picasso.services.ITourBindService;
@@ -48,26 +48,26 @@ public class TourBindService implements ITourBindService {
      * 2. Intersects with dates of other allTours.
      * */
     @Override
-    public TourBind bind(Employee employee, Tour tour, IRange dateRange) throws PicassoException {
+    public TourBind bind(Employee employee, Tour tour, IRange dateRange) throws BaseException {
         try {
             TourBind tourBind = new TourBind(employee, tour, dateRange);
 
             validateBind(tourBind);
 
             return save(tourBind);
-        } catch (PicassoException e) {
+        } catch (BaseException e) {
             log.error(e.getMessage(), e);
             throw e;
         }
     }
 
     @Override
-    public TourBind bind(Long employeeID, Long tourId, IRange dateRange) throws PicassoException {
+    public TourBind bind(Long employeeID, Long tourId, IRange dateRange) throws BaseException {
         Employee employee = employeeService.get(employeeID)
-                .orElseThrow(() -> new PicassoException("Employee with id: {} not found in DB", employeeID));
+                .orElseThrow(() -> new BaseException("Employee with id: {} not found in DB", employeeID));
 
         Tour tour = tourService.get(tourId)
-                .orElseThrow(() -> new PicassoException("Tour with id: {} not found in DB", tourId));
+                .orElseThrow(() -> new BaseException("Tour with id: {} not found in DB", tourId));
 
         return bind(employee, tour, dateRange);
     }
@@ -90,7 +90,7 @@ public class TourBindService implements ITourBindService {
     }
 
     @Override
-    public void validateBind(Long tourId, Long employeeId, IRange bindRange) throws PicassoException {
+    public void validateBind(Long tourId, Long employeeId, IRange bindRange) throws BaseException {
         List<TourBind> overlapsBinds = tourBindRepository.findOverlappedBinds(tourId, employeeId, bindRange.getStartDate(), bindRange.getEndDate());
 
         if (!overlapsBinds.isEmpty()) {
@@ -98,24 +98,24 @@ public class TourBindService implements ITourBindService {
                     .collect(Collectors.toMap(TourBind::getTour, tb -> findOverlappedRange(bindRange, tb.getDateRange())));
 
             Employee employee = employeeService.get(employeeId)
-                    .orElseThrow(() -> new PicassoException("Employee with id: {} not found in DB", employeeId));
+                    .orElseThrow(() -> new BaseException("Employee with id: {} not found in DB", employeeId));
 
             Tour tour = tourService.get(tourId)
-                    .orElseThrow(() -> new PicassoException("Tour with id: {} not found in DB", tourId));
+                    .orElseThrow(() -> new BaseException("Tour with id: {} not found in DB", tourId));
 
             throw new BindException(employee, tour, bindRange, overlapsToursAndRanges);
         }
     }
 
     @Override
-    public TourBind save(TourBind tourBind) throws PicassoException {
+    public TourBind save(TourBind tourBind) throws BaseException {
         try {
             TourBind savedTourBind = tourBindRepository.save(tourBind);
             log.debug("saved {}", tourBind);
             return savedTourBind;
         } catch (Exception e) {
             log.error("unable to save: {} because: {}", tourBind, e.getMessage(), e);
-            throw new PicassoException(e, "unable to save: {} because: {}", tourBind, e.getMessage());
+            throw new BaseException(e, "unable to save: {} because: {}", tourBind, e.getMessage());
         }
     }
 
@@ -129,7 +129,7 @@ public class TourBindService implements ITourBindService {
         tourBinds.forEach(tourBind -> {
             try {
                 savedTourBinds.add(save(tourBind));
-            } catch (PicassoException ignored) {
+            } catch (BaseException ignored) {
                 // ignored because save contains logging.
             }
         });
@@ -140,12 +140,12 @@ public class TourBindService implements ITourBindService {
     }
 
     @Override
-    public void delete(Long id) throws PicassoException {
+    public void delete(Long id) throws BaseException {
         try {
             tourBindRepository.deleteById(id);
         } catch (Exception e) {
             log.error("unable to delete TourBind with id: {} because: {}", id, e.getMessage(), e);
-            throw new PicassoException(e, "unable to delete TourBind with id: {} because: {}", id, e.getMessage());
+            throw new BaseException(e, "unable to delete TourBind with id: {} because: {}", id, e.getMessage());
         }
     }
 
@@ -157,7 +157,7 @@ public class TourBindService implements ITourBindService {
             try {
                 delete(id);
                 deletedTourBindIds.add(id);
-            } catch (PicassoException ignored) {
+            } catch (BaseException ignored) {
                 // ignored because save contains logging.
             }
         });

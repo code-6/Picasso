@@ -39,10 +39,10 @@ public class Tour extends AbstractEntity implements ITour {
     LocalDateTime endDate;
 
     @ElementCollection
-    Set<String> fileNames = new HashSet<>();
+    List<String> fileNames = new ArrayList<>();
 
     @Override
-    public Set<String> getFileNames() {
+    public List<String> getFileNames() {
         return fileNames;
     }
 

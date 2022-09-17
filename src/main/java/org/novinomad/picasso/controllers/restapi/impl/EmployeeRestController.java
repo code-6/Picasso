@@ -6,7 +6,7 @@ import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.novinomad.picasso.commons.ICrud;
 import org.novinomad.picasso.entities.domain.impl.Employee;
-import org.novinomad.picasso.exceptions.base.PicassoException;
+import org.novinomad.picasso.exceptions.base.BaseException;
 import org.novinomad.picasso.services.impl.EmployeeService;
 import org.springframework.web.bind.annotation.*;
 
@@ -24,13 +24,13 @@ public class EmployeeRestController implements ICrud<Employee> {
 
     @Override
     @PostMapping
-    public Employee save(Employee employee) throws PicassoException {
+    public Employee save(Employee employee) throws BaseException {
         return employeeService.save(employee);
     }
 
     @Override
     @DeleteMapping("/{id}")
-    public void delete(@PathVariable("id") Long id) throws PicassoException {
+    public void delete(@PathVariable("id") Long id) throws BaseException {
         employeeService.delete(id);
     }
 

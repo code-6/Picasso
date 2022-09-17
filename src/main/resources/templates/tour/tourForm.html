@@ -38,49 +38,59 @@
         </div>
         <div class="row form-group">
             <div class="col-sm-2">
-                <label for="tourFilesInput" class="form-label" th:title="#{file.upload}"></label>
+                <label for="tourFilesInput" class="form-label" th:text="#{file.upload}"></label>
             </div>
             <div class="col">
-                <input id="tourFilesInput" class="form-control" type="file" multiple name="tourFiles">
+                <div class="input-group mb-3">
+                    <div class="input-group-prepend">
+                        <button type="button" class="btn btn-sm btn-outline-secondary"
+                                data-toggle="popover" th:title="#{file.uploaded.help.title}"
+                                th:data-content="#{file.upload.help}">
+                            <i class="fas fa-question-circle"></i>
+                        </button>
+                    </div>
+                    <div class="custom-file">
+                        <input id="tourFilesInput" class="form-control" type="file" multiple name="tourFiles">
+                    </div>
+                </div>
                 <small id="tourFilesInputHelp" class="form-text text-muted"
                        th:text="#{tourFilesInputHelp} + ${@environment.getProperty('spring.servlet.multipart.max-file-size')}"></small>
             </div>
         </div>
         <div class="row form-group">
             <div class="col-sm-2">
-                <label class="form-label" th:title="#{file.uploaded}"></label>
+                <label class="form-label" th:text="#{file.uploaded}"></label>
             </div>
-            <div class="col">
-                <table th:include="tour/tourFilesFragment :: tourFilesFragment" id="uploadedFilesTable"
-                       class="table table-sm table-borderless"></table>
+            <div class="col" th:if="${tour.fileNames != null and !tour.fileNames.isEmpty()}">
+                <div th:include="tour/tourFilesFragment :: tourFilesFragment" id="uploadedFilesTable">
+                </div>
             </div>
-        </div>
-        <div class="row form-group">
-            <div class="col-sm-2"></div>
-            <div class="col">
+            <div class="row form-group">
+                <div class="col-sm-2"></div>
+                <div class="col">
 
-                <button type="submit" class="btn btn-outline-success btn-block">
-                    <i class="fas fa-check-square"></i>
-                    <span th:text="#{submit.cap}"></span>
-                </button>
+                    <button type="submit" class="btn btn-outline-success btn-block">
+                        <i class="fas fa-check-square"></i>
+                        <span th:text="#{submit.cap}"></span>
+                    </button>
+                </div>
+                <div class="col">
+                    <button type="button" class="btn btn-outline-secondary btn-block" data-toggle="collapse"
+                            href="#tourFormContainer"
+                            aria-expanded="true" aria-controls="tourFormContainer">
+                        <i class="fas fa-window-close"></i>
+                        <span th:text="#{close.cap}"></span>
+                    </button>
+                </div>
+                <div class="col">
+                    <button class="btn btn-outline-warning btn-block" id="resetTourFormBtn"
+                            type="button"
+                            th:title="#{clear.title}">
+                        <i class="fas fa-eraser"></i>
+                        <span th:text="#{clear.cap} + #{form}"></span>
+                    </button>
+                </div>
             </div>
-            <div class="col">
-                <button type="button" class="btn btn-outline-secondary btn-block" data-toggle="collapse"
-                        href="#tourFormContainer"
-                        aria-expanded="true" aria-controls="tourFormContainer">
-                    <i class="fas fa-window-close"></i>
-                    <span th:text="#{close.cap}"></span>
-                </button>
-            </div>
-            <div class="col">
-                <button class="btn btn-outline-warning btn-block" id="resetTourFormBtn"
-                        type="button"
-                        th:title="#{clear.title}">
-                    <i class="fas fa-eraser"></i>
-                    <span th:text="#{clear.cap} + #{form}"></span>
-                </button>
-            </div>
+            <input type="hidden" name="id" th:value="${tour.id}">
         </div>
-        <input type="hidden" name="id" th:value="${tour.id}">
-    </div>
 </form>

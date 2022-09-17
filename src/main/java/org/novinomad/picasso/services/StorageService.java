@@ -6,26 +6,49 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.nio.file.Path;
+import java.nio.file.*;
+import java.util.Collection;
+import java.util.List;
 import java.util.stream.Stream;
 
 public interface StorageService {
+    String PATH_SEPARATOR = FileSystems.getDefault().getSeparator();
 
-    boolean existsFolder(String pathToFolder);
+    default boolean exist(String pathToFolder) {
+        try {
+            return Files.exists(Paths.get(pathToFolder));
+        } catch (InvalidPathException ignored) {
+            return false;
+        }
+    }
 
-    boolean isValidPath(String pathToFolder);
+    default boolean isValid(String pathToFolder) {
+        try {
+            Paths.get(pathToFolder);
+            return true;
+        } catch (InvalidPathException ignored) {
+            return false;
+        }
+    }
 
-    void store(MultipartFile file, String pathToFolder) throws StorageException, IOException;
+    void store(MultipartFile file, String pathToFolder) throws StorageException;
 
-    Stream<Path> loadAll(String pathToFolder) throws StorageException;
+    default void store(String pathToFolder, Collection<MultipartFile> files) throws StorageException {
+        for (MultipartFile file : files) {
+            if(file != null && !file.isEmpty())
+                store(file, pathToFolder);
+        }
+    }
 
-    Path load(String filename);
+    List<Path> loadAll(String pathToFolder) throws StorageException;
 
-    Resource loadAsResource(String filename) throws FileNotFoundException, StorageException;
+    Path load(String filename) throws StorageException;
 
-    void deleteAll(String pathToFolder);
-    void delete(String pathToFolder) throws IOException;
+    Resource loadAsResource(String filename) throws StorageException;
+    void delete(String pathToFolder) throws StorageException;
 
-    Path createDir(String path) throws IOException, StorageException;
+    void clearFolder(String pathToFolder, String... exceptionFileNames) throws StorageException;
+
+    Path createFolder(String path) throws StorageException;
 
 }

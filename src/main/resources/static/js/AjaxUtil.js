@@ -15,12 +15,12 @@ export function postSync(endpointUrl, payloadData) {
     return exchangeSync('post', endpointUrl, payloadData);
 }
 
-export function del(endpointUrl) {
-    return exchange('delete', endpointUrl);
+export function del(endpointUrl, payloadData) {
+    return exchange('delete', endpointUrl, payloadData);
 }
 
-export function delSync(endpointUrl) {
-    return exchangeSync('delete', endpointUrl);
+export function delSync(endpointUrl, payloadData) {
+    return exchangeSync('delete', endpointUrl, payloadData);
 }
 
 export function exchange(httpRequestType, endpointUrl, payloadData) {

@@ -1,8 +1,8 @@
 package org.novinomad.picasso.exceptions;
 
-import org.novinomad.picasso.exceptions.base.PicassoException;
+import org.novinomad.picasso.exceptions.base.BaseException;
 
-public class StorageException extends PicassoException {
+public class StorageException extends BaseException {
 
     public StorageException() {
     }

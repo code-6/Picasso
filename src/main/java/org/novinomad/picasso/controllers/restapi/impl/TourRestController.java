@@ -6,7 +6,7 @@ import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.novinomad.picasso.commons.ICrud;
 import org.novinomad.picasso.entities.domain.impl.Tour;
-import org.novinomad.picasso.exceptions.base.PicassoException;
+import org.novinomad.picasso.exceptions.base.BaseException;
 import org.novinomad.picasso.services.impl.TourService;
 import org.springframework.web.bind.annotation.*;
 
@@ -23,13 +23,13 @@ public class TourRestController implements ICrud<Tour> {
 
     @Override
     @PostMapping
-    public Tour save(Tour tour) throws PicassoException {
+    public Tour save(Tour tour) throws BaseException {
         return tourService.save(tour);
     }
 
     @Override
     @DeleteMapping("/{id}")
-    public void delete(@PathVariable("id") Long id) throws PicassoException {
+    public void delete(@PathVariable("id") Long id) throws BaseException {
         tourService.delete(id);
     }
 
