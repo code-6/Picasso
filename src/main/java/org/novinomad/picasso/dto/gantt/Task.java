@@ -31,16 +31,16 @@ public class Task implements ITask, Comparable<Task> {
     @JsonProperty("pName")
     String name;
     @JsonProperty("pStart")
-    
+
     LocalDateTime startDate;
     @JsonProperty("pEnd")
-    
+
     LocalDateTime endDate;
     @JsonProperty("pPlanStart")
-    
+
     LocalDateTime plannedStartDate;
     @JsonProperty("pPlanEnd")
-    
+
     LocalDateTime plannedEndDate;
     @JsonProperty("pClass")
     String cssClass = CssClass.BLUE.cssName;
@@ -130,28 +130,31 @@ public class Task implements ITask, Comparable<Task> {
     private static Task build(Tour tour, List<TourBind> binds) {
         Task ganttTourTask = buildTourTask(tour);
 
-        binds.stream().collect(Collectors.groupingBy(TourBind::getEmployee)).forEach((employee, employeeBinds) -> {
-
-            if(!CollectionUtils.isEmpty(employeeBinds) && employeeBinds.get(0) != null) {
-                TourBind firstBind = employeeBinds.get(0);
-                if(employeeBinds.size() > 1) {
-                    Task employeeCombinedTask = buildEmployeeTask(ganttTourTask, employee, Long.parseLong("838466" + firstBind.getId()), tour.getDateRange(), Type.COMBINED);
-                    Task employeeTask = null;
-                    for (TourBind bind : employeeBinds) {
-                        employeeTask = buildEmployeeTask(employeeCombinedTask, employee, Long.parseLong("66" + bind.getId()), bind.getDateRange(), Type.SINGLE, employeeTask);
+        binds.stream().filter(tb -> tb.getEmployee() != null).collect(Collectors.groupingBy(TourBind::getEmployee))
+                .forEach((employee, employeeBinds) -> {
+                    if (!CollectionUtils.isEmpty(employeeBinds) && employeeBinds.get(0) != null) {
+                        TourBind firstBind = employeeBinds.get(0);
+                        if (employeeBinds.size() > 1) {
+                            long combinedTaskId = Long.parseLong("838466" + firstBind.getId());
+                            Task employeeCombinedTask = buildEmployeeTask(ganttTourTask, employee, combinedTaskId, tour.getDateRange(), Type.COMBINED);
+                            Task employeeTask = null;
+                            for (TourBind bind : employeeBinds) {
+                                long employeeTaskId = Long.parseLong("66" + bind.getId());
+                                employeeTask = buildEmployeeTask(employeeCombinedTask, employee, employeeTaskId, bind.getDateRange(), Type.SINGLE, employeeTask);
+                            }
+                        } else {
+                            long employeeTaskId = Long.parseLong("66" + firstBind.getId());
+                            buildEmployeeTask(ganttTourTask, employee, employeeTaskId, firstBind.getDateRange(), Type.SINGLE);
+                        }
                     }
-                } else {
-                    buildEmployeeTask(ganttTourTask, employee, Long.parseLong("66" + firstBind.getId()), firstBind.getDateRange(), Type.SINGLE);
-                }
-            }
-        });
+                });
         return ganttTourTask;
     }
 
     private static Task buildTourTask(Tour tour) {
         Long ganttTourTaskId = Long.parseLong("84" + tour.getId()); // 84 - ASCII symbol code (T)
 
-        Task ganttTourTask = new Task(ganttTourTaskId,tour.getId() + ". " + tour.getName(), tour.getDateRange())
+        Task ganttTourTask = new Task(ganttTourTaskId, tour.getId() + ". " + tour.getName(), tour.getDateRange())
                 .notes(tour.getDescription())
                 .completionPercent(tour.getCompletenessPercent())
                 .type(Task.Type.PARENT);
@@ -166,7 +169,7 @@ public class Task implements ITask, Comparable<Task> {
         return ganttTourTask;
     }
 
-    private static Task buildEmployeeTask(Task parentTask, Employee employee, Long taskId, IRange taskDates, Task.Type type, Task ... dependencies) {
+    private static Task buildEmployeeTask(Task parentTask, Employee employee, Long taskId, IRange taskDates, Task.Type type, Task... dependencies) {
 
         Long employeeId = employee.getId();
         Employee.Type employeeType = employee.getType();
@@ -175,10 +178,10 @@ public class Task implements ITask, Comparable<Task> {
         Task ganttEmployeeTask = new Task(taskId, employeeType + " " + employeeId + ". " + employeeName, taskDates)
                 .parent(parentTask).type(type);
 
-        if(dependencies != null && dependencies.length > 0) {
+        if (dependencies != null && dependencies.length > 0) {
             ArrayList<Task> dependencyTasks = new ArrayList<>();
             for (Task dependency : dependencies) {
-                if(dependency != null)
+                if (dependency != null)
                     dependencyTasks.add(dependency);
             }
             ganttEmployeeTask.dependencies(dependencyTasks);
@@ -304,7 +307,7 @@ public class Task implements ITask, Comparable<Task> {
 
     @Override
     public int compareTo(Task o) {
-        if(startDate.equals(o.getStartDate()))
+        if (startDate.equals(o.getStartDate()))
             return endDate.compareTo(o.getEndDate());
 
         return startDate.compareTo(o.getStartDate());

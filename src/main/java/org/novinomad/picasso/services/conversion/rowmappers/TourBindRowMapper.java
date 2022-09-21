@@ -28,7 +28,7 @@ public class TourBindRowMapper implements RowMapper<TourBind> {
         tourBind.setEndDate(CommonDateUtils.dateToLocalDateTime(rs.getTimestamp("end_date")));
         tourBind.setStartDate(CommonDateUtils.dateToLocalDateTime(rs.getTimestamp("start_date")));
         tourBind.setTour(tourService.get(rs.getLong("tour_id")).orElseThrow(NoSuchElementException::new));
-        tourBind.setEmployee(employeeService.get(rs.getLong("employee_id")).orElseThrow(NoSuchElementException::new));
+        tourBind.setEmployee(employeeService.get(rs.getLong("employee_id")).orElse(null));
 
         return tourBind;
     }

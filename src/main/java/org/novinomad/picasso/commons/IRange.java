@@ -37,9 +37,9 @@ public interface IRange {
         return getStartDateAsString(null, CommonDateUtils.DEFAULT_LOCALE);
     }
     default String getStartDateAsString(String format, Locale locale) {
-        if(getStartDate() == null) return "";
+        if (getStartDate() == null) return "";
 
-        if(StringUtils.isBlank(format)) format = UI_DATE_TIME_NO_SEC;
+        if (StringUtils.isBlank(format)) format = UI_DATE_TIME_NO_SEC;
 
         return getStartDate().format(DateTimeFormatter.ofPattern(format, locale));
     }
