@@ -58,5 +58,10 @@ tasks.named('test') {
 }
 
 jar {
+    manifest {
+        attributes(
+                'Main-Class': 'org.novinomad.picasso.PicassoApplication'
+        )
+    }
     archiveName('picasso.jar')
 }
