@@ -1,1 +1,1 @@
-web: java -Dserver.port=$PORT -jar picasso.jar
+web: java -Dserver.port=$PORT -jar build/libs/picasso.jar
