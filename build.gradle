@@ -57,6 +57,10 @@ tasks.named('test') {
     useJUnitPlatform()
 }
 
+task stage(dependsOn: ['build', 'clean', 'bootJar'])
+build.mustRunAfter clean
+bootJar.mustRunAfter build
+
 jar {
     manifest {
         attributes(
@@ -64,4 +68,8 @@ jar {
         )
     }
     archiveName('picasso.jar')
+}
+
+bootJar {
+    archiveFileName = 'picasso.jar'
 }
