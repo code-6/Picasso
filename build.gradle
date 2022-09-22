@@ -57,9 +57,8 @@ tasks.named('test') {
     useJUnitPlatform()
 }
 
-task stage(dependsOn: ['build', 'clean', 'bootJar'])
-build.mustRunAfter clean
-bootJar.mustRunAfter build
+task stage(dependsOn: ['clean', 'bootJar'])
+bootJar.mustRunAfter clean
 
 jar {
     manifest {
