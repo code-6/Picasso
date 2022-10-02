@@ -10,7 +10,8 @@
         <div class="row justify-content-end">
             <div class="col-4">
                 <div class="btn-group-sm">
-                    <button th:data-ctx="${ctx}" th:data-entity-id="${entityId}" th:text="#{edit.cap}" onclick="onEditEntity($(this).attr('data-entity-id'), $(this).attr('data-ctx'))"
+                    <button th:data-ctx="${ctx}" th:data-entity-id="${entityId}" th:text="#{edit.cap}"
+                            onclick="onEditEntityButton($(this).attr('data-ctx'), $(this).attr('data-entity-id'))"
                             class="btn btn-sm btn-outline-primary btn-edit-entity">
                         <i class="fa-thin fa-pen-to-square"></i>
                     </button>
