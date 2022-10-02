@@ -24,3 +24,33 @@ window.addEventListener('DOMContentLoaded', event => {
     }
 
 });
+
+/**
+ * @param element any HTML element eg. button
+ * */
+function toggleSpinner(element) {
+
+    if($(element).is('span') && $(element).hasClass('spinner-border')) {
+        if($(element).css('display') === 'none') {
+            $(element).show();
+        } else {
+            $(element).hide();
+        }
+    } else {
+        // if element has icon child replace icon with running spinner.
+        $(element).children('svg.svg-inline--fa').each(function(){
+            if($(this).css('display') === 'none') {
+                $(this).show();
+            } else {
+                $(this).hide();
+            }
+        });
+        $(element).children('span.spinner-border').each(function(){
+            if($(this).css('display') === 'none') {
+                $(this).show();
+            } else {
+                $(this).hide();
+            }
+        });
+    }
+}

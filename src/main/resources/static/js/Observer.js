@@ -19,9 +19,11 @@ FragmentSubject.prototype = {
     },
 
     notifyObservers: function (o, thisObj) {
+        console.debug('notify observers');
         let scope = thisObj || window;
         this.observers.forEach(function (item) {
             item.call(scope, o);
+            console.debug('notify observer %s', item.name);
         });
     }
 };

@@ -45,7 +45,7 @@ public interface IRange {
     }
 
     @JsonIgnore // fix StackOverflowError because of infinity recursion
-    default IRange getDateRange() {
+    default LocalDateTimeRange getDateRange() {
         return getStartDate() != null && getEndDate() != null
                 ? new LocalDateTimeRange(getStartDate(), getEndDate())
                 : null;

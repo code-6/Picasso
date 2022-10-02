@@ -30,11 +30,11 @@ export function exchange(httpRequestType, endpointUrl, payloadData) {
             url: endpointUrl,
             data: payloadData,
             success: function (response) {
-                console.debug('HTTP %s %s response %s' , httpRequestType , endpointUrl , response);
+                console.debug('HTTP %s %s data %s response %s' , httpRequestType , endpointUrl, payloadData, response);
                 resolve(response);
             },
             error: function (error) {
-                console.error('HTTP %s %s error %s' , httpRequestType , endpointUrl , error);
+                console.error('HTTP %s %s data %s error %s' , httpRequestType , endpointUrl, payloadData, error);
                 reject(error);
             }
         });
@@ -43,19 +43,25 @@ export function exchange(httpRequestType, endpointUrl, payloadData) {
 
 export function exchangeSync(httpRequestType, endpointUrl, payloadData) {
     let payload;
+    let failed = false;
+    let exception;
     $.ajax({
         type: httpRequestType,
         url: endpointUrl,
         async: false,
         data: payloadData,
         success: function (response) {
-            console.debug('HTTP %s (sync) %s response %s' , httpRequestType , endpointUrl , response);
+            console.debug('HTTP %s (sync) %s data %s response %s' , httpRequestType , endpointUrl, payloadData, response);
             payload = response;
         },
         error: function (error) {
-            console.error('HTTP %s (sync) %s error %s' , httpRequestType , endpointUrl , error);
+            console.error('HTTP %s (sync) %s data %s error %s' , httpRequestType , endpointUrl, payloadData, error);
+            failed = true;
+            exception = error;
             throw error;
         }
     });
+    if(failed) throw exception;
+
     return payload;
 }
