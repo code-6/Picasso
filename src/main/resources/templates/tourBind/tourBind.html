@@ -686,6 +686,7 @@
                 .then((bindFormFragment) => {
                     $('#tourBindForm').html(bindFormFragment);
                     $('#tourBind').collapse('show');
+                    // window.scrollTo({ top: 0, behavior: 'smooth' });
                     changeEmployeeBindFormCollapseElementsVisibility('show');
                     bindFormFragmentSubject.notifyObservers();
                     bindFormEmployeesFragmentSubject.notifyObservers();

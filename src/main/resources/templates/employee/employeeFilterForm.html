@@ -1,0 +1,47 @@
+<form th:object="${employeeFilter}" id="employeeFilterForm" th:fragment="employeeFilterForm">
+    <div>
+        <div class="row align-items-end">
+            <div class="col">
+                <label for="filterStartDate" th:text="#{start.cap} + #{date}"></label>
+                <input type="text"
+                       class="form-control date-picker date-picker-single date-picker-single-employee-filter-form"
+                       id="filterStartDate"
+                       th:field="*{startDate}" name="startDate">
+            </div>
+            <div class="col">
+                <label for="filterEndDate" th:text="#{end.cap} + #{date}"></label>
+                <input type="text"
+                       class="form-control date-picker date-picker-single date-picker-single-employee-filter-form"
+                       id="filterEndDate"
+                       th:field="*{endDate}" name="endDate">
+            </div>
+            <div class="col">
+                <label for="filteremployeeSelect" th:text="#{employee.cap}"></label>
+                <select id="filteremployeeSelect" class="form-control selectpicker employeeSelect"
+                        th:field="*{employeeIds}" multiple
+                        data-live-search="true" data-selected-text-format="count > 1"
+                        name="employeeIds">
+                    <option th:each="employee : ${allemployees}"
+                            th:value="${employee.id}"
+                            th:text="${employee.id + '. ' + employee.name}"
+                            th:selected="${employeeFilter.employeeIds.contains(employee.id)}">
+                    </option>
+                </select>
+            </div>
+            <div class="col">
+                <!--
+                When submit employee filter then:
+                1. request employees table fragment
+                2. replace fragment with returned HTML
+                3. initialize datatables
+                4. initialize management buttons (edit employee, delete employee)
+                -->
+                <button id="submitFilterBtn" type="button" class="btn btn-outline-success btn-block"
+                        th:text="#{show.cap} + #{employee.pl}"></button>
+
+                <input type="hidden" name="fragment" th:value="${true}">
+            </div>
+        </div>
+    </div>
+</form>
+

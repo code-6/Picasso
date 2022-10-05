@@ -1,53 +1,96 @@
-<div th:fragment="employeeFormContent">
-    <div class="row">
-        <div class="col-sm-2">
-            <label for="tourNameForm" class="form-label">Name</label>
-        </div>
-        <div class="col">
-            <input type="text" class="form-control" id="tourNameForm" placeholder="enter tour name" name="name">
-        </div>
-    </div>
-    <div class="row">
-        <div class="col-sm-2">
-            <label for="datepickerForm" class="form-label">Date range</label>
-        </div>
-        <div class="col">
-            <div class="input-daterange input-group" id="datepickerForm" data-provide="datepicker">
-                <input type="text" class="input-sm form-control" name="startDate"/>
-                <span class="input-group-addon">to</span>
-                <input type="text" class="input-sm form-control" name="endDate"/>
+<form th:object="${employee}" th:action="@{/employee}" th:method="post" id="employeeForm" th:fragment="employeeForm"
+      enctype="multipart/form-data">
+    <div>
+        <div class="row form-group">
+            <div class="col-sm-2">
+                <label for="employeeNameForm" class="form-label" th:text="#{name.cap}"></label>
+            </div>
+            <div class="col">
+                <input type="text" class="form-control" id="employeeNameForm" placeholder="enter employee name" name="name"
+                       th:value="${employee.name}">
             </div>
         </div>
-    </div>
-    <div class="row">
-        <div class="col-sm-2">
-            <label for="tourDescription" class="form-label">Description</label>
+        <div class="row form-group">
+            <div class="col-sm-2">
+                <label for="datepickerForm" th:text="#{date.cap.pl}"></label>
+            </div>
+            <div class="col">
+                <div class="input-daterange input-group" id="datepickerForm" data-provide="datepicker">
+                    <input type="text" class="form-control date-picker date-picker-single date-picker-single-employee-form"
+                           id="filterStartDate"
+                           th:field="${employee.startDate}" name="startDate">
+                    <span class="input-group-addon from-to-date-fields-divider">to</span>
+                    <input type="text" class="form-control date-picker date-picker-single date-picker-single-employee-form"
+                           id="filterEndDate"
+                           th:field="${employee.endDate}" name="endDate">
+                </div>
+            </div>
         </div>
-        <div class="col">
+        <div class="row form-group">
+            <div class="col-sm-2">
+                <label for="employeeDescription" class="form-label" th:text="#{description.cap}"></label>
+            </div>
+            <div class="col">
 
-            <textarea class="form-control" id="tourDescription" rows="3" name="description"></textarea>
+            <textarea class="form-control" id="employeeDescription" rows="3" name="description"
+                      th:text="${employee.description}"></textarea>
+            </div>
         </div>
-    </div>
-    <div class="row">
-        <div class="col-sm-2">
-            <label for="formFileMultiple" class="form-label">Files</label>
+        <div class="row form-group">
+            <div class="col-sm-2">
+                <label for="employeeFilesInput" class="form-label" th:text="#{file.upload}"></label>
+            </div>
+            <div class="col">
+                <div class="input-group mb-3">
+                    <div class="input-group-prepend">
+                        <button type="button" class="btn btn-sm btn-outline-secondary"
+                                data-toggle="popover" th:title="#{file.uploaded.help.title}"
+                                th:data-content="#{file.upload.help}">
+                            <i class="fas fa-question-circle"></i>
+                        </button>
+                    </div>
+                    <div class="custom-file">
+                        <input id="employeeFilesInput" class="form-control" type="file" multiple name="employeeFiles">
+                    </div>
+                </div>
+                <small id="employeeFilesInputHelp" class="form-text text-muted"
+                       th:text="#{employeeFilesInputHelp} + ${@environment.getProperty('spring.servlet.multipart.max-file-size')}"></small>
+            </div>
+        </div>
+        <div class="row form-group">
+            <div class="col-sm-2">
+                <label class="form-label" th:text="#{file.uploaded}"></label>
+            </div>
+            <div class="col" th:if="${employee.fileNames != null and !employee.fileNames.isEmpty()}">
+                <div th:include="employee/employeeFilesFragment :: employeeFilesFragment" id="uploadedFilesTable">
+                </div>
+            </div>
+            <div class="row form-group">
+                <div class="col-sm-2"></div>
+                <div class="col">
 
+                    <button type="submit" class="btn btn-outline-success btn-block">
+                        <i class="fas fa-check-square"></i>
+                        <span th:text="#{submit.cap}"></span>
+                    </button>
+                </div>
+                <div class="col">
+                    <button type="button" class="btn btn-outline-secondary btn-block" data-toggle="collapse"
+                            href="#employeeFormContainer"
+                            aria-expanded="true" aria-controls="employeeFormContainer">
+                        <i class="fas fa-window-close"></i>
+                        <span th:text="#{close.cap}"></span>
+                    </button>
+                </div>
+                <div class="col">
+                    <button class="btn btn-outline-warning btn-block" id="resetemployeeFormBtn"
+                            type="button"
+                            th:title="#{clear.title}">
+                        <i class="fas fa-eraser"></i>
+                        <span th:text="#{clear.cap} + #{form}"></span>
+                    </button>
+                </div>
+            </div>
+            <input type="hidden" name="id" th:value="${employee.id}">
         </div>
-        <div class="col">
-            <input class="form-control" type="file" id="formFileMultiple" multiple name="files">
-
-        </div>
-    </div>
-    <div class="row">
-        <div class="col">
-
-            <button type="submit" class="btn-sm btn-outline-success btn-block">Submit</button>
-        </div>
-        <div class="col">
-            <button type="button" class="btn-sm btn-outline-secondary btn-block" data-toggle="collapse"
-                    href="#tourFormContainer"
-                    aria-expanded="true" aria-controls="tourFormContainer">Close
-            </button>
-        </div>
-    </div>
-</div>
+</form>

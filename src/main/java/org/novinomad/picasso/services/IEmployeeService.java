@@ -28,4 +28,6 @@ public interface IEmployeeService extends ICrud<Employee> {
     }
 
     List<Employee> get(List<Employee.Type> types);
+
+    List<Employee.Type> getEmployeeTypes();
 }

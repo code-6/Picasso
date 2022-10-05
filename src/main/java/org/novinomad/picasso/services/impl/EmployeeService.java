@@ -107,4 +107,9 @@ public class EmployeeService implements IEmployeeService {
     public List<Employee> get(List<Employee.Type> types) {
         return employeeRepository.findAllByTypeIn(types);
     }
+
+    @Override
+    public List<Employee.Type> getEmployeeTypes() {
+        return Arrays.asList(Employee.Type.values());
+    }
 }

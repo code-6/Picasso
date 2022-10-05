@@ -9,7 +9,6 @@ import lombok.*;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.novinomad.picasso.commons.IRange;
-import org.novinomad.picasso.commons.LocalDateTimeRange;
 import org.novinomad.picasso.commons.serializers.ListOfEntitiesToCommaSeparatedString;
 import org.novinomad.picasso.entities.domain.impl.Employee;
 import org.novinomad.picasso.entities.domain.impl.Tour;
@@ -187,7 +186,7 @@ public class Task implements ITask, Comparable<Task> {
             ganttEmployeeTask.dependencies(dependencyTasks);
         }
 
-        ganttEmployeeTask.cssClass(employeeType.getCOLOR().getCssName());
+        ganttEmployeeTask.cssClass(employeeType.getGANT_TASK_COLOR().getCssName());
 
         parentTask.addChild(ganttEmployeeTask);
 
