@@ -9,7 +9,7 @@ import org.novinomad.picasso.entities.domain.impl.TourBind;
 import org.novinomad.picasso.dto.gantt.Task;
 import org.novinomad.picasso.exceptions.BindException;
 import org.novinomad.picasso.exceptions.base.BaseException;
-import org.novinomad.picasso.services.IEmployeeService;
+import org.novinomad.picasso.services.ITourParticipantService;
 import org.novinomad.picasso.services.ITourBindService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -25,16 +25,16 @@ import java.util.Optional;
 @RequestMapping("/api/bind")
 public class TourBindRestController implements ICrud<TourBind> {
 
-    final IEmployeeService employeeService;
+    final ITourParticipantService tourParticipantService;
 
     final ITourBindService tourBindService;
 
-    @GetMapping("/validate/{tourId}/{employeeId}/{localDateTimeRange}")
+    @GetMapping("/validate/{tourId}/{tourParticipantId}/{localDateTimeRange}")
     public ResponseEntity<String> validate(@PathVariable Long tourId,
-                                   @PathVariable Long employeeId,
+                                   @PathVariable Long tourParticipantId,
                                    @PathVariable IRange localDateTimeRange) throws BaseException {
         try {
-            tourBindService.validateBind(tourId, employeeId, localDateTimeRange);
+            tourBindService.validateBind(tourId, tourParticipantId, localDateTimeRange);
             return new ResponseEntity<>("OK", HttpStatus.OK);
         } catch (BindException e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.CONFLICT);

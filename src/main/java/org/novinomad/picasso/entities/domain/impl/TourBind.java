@@ -24,11 +24,11 @@ import static org.novinomad.picasso.commons.utils.CommonDateUtils.UI_DATE_TIME_N
 @Setter
 @NoArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
-@Table(indexes = @Index(columnList = "tour_id,employee_id,startDate,endDate", unique = true))
+@Table(indexes = @Index(columnList = "tour_id,tour_participant_id,startDate,endDate", unique = true))
 public class TourBind extends AbstractEntity implements IRange {
 
     @OneToOne
-    Employee employee;
+    TourParticipant tourParticipant;
 
     @OneToOne
     Tour tour;
@@ -40,34 +40,34 @@ public class TourBind extends AbstractEntity implements IRange {
     @Column(nullable = false)
     LocalDateTime endDate;
 
-    public TourBind(@NotNull Employee employee,
+    public TourBind(@NotNull TourParticipant tourParticipant,
                     @NotNull Tour tour,
                     @NotNull IRange dateTimeRange) throws BindException {
-        this.employee = employee;
+        this.tourParticipant = tourParticipant;
         this.tour = tour;
         this.startDate = dateTimeRange.getStartDate();
         this.endDate = dateTimeRange.getEndDate();
 
         if (isOutOfTourDateRange())
-            throw new BindException(employee, tour, new LocalDateTimeRange(startDate, endDate), "out of tour date range");
+            throw new BindException(tourParticipant, tour, new LocalDateTimeRange(startDate, endDate), "out of tour date range");
     }
 
     public TourBind(Long id,
-                    @NotNull Employee employee,
+                    @NotNull TourParticipant tourParticipant,
                     @NotNull Tour tour,
                     @NotNull IRange dateTimeRange) throws BindException {
-        this(employee, tour, dateTimeRange);
+        this(tourParticipant, tour, dateTimeRange);
         this.id = id;
 
         if (isOutOfTourDateRange())
-            throw new BindException(employee, tour, new LocalDateTimeRange(startDate, endDate), "out of tour date range");
+            throw new BindException(tourParticipant, tour, new LocalDateTimeRange(startDate, endDate), "out of tour date range");
     }
 
-    public TourBind(@NotNull Employee employee,
+    public TourBind(@NotNull TourParticipant tourParticipant,
                     @NotNull Tour tour,
                     @NotNull LocalDateTime startDate,
                     @NotNull LocalDateTime endDate) throws BindException {
-        this(employee, tour, new LocalDateTimeRange(startDate, endDate));
+        this(tourParticipant, tour, new LocalDateTimeRange(startDate, endDate));
     }
 
     public TourBind withId(Long id) {
@@ -90,12 +90,12 @@ public class TourBind extends AbstractEntity implements IRange {
         if (o == null || getClass() != o.getClass()) return false;
         if (!super.equals(o)) return false;
         TourBind tourBind = (TourBind) o;
-        return tour.equals(tourBind.tour) && employee.equals(tourBind.employee) && startDate.equals(tourBind.startDate) && endDate.equals(tourBind.endDate);
+        return tour.equals(tourBind.tour) && tourParticipant.equals(tourBind.tourParticipant) && startDate.equals(tourBind.startDate) && endDate.equals(tourBind.endDate);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(super.hashCode(), tour, employee, startDate, endDate);
+        return Objects.hash(super.hashCode(), tour, tourParticipant, startDate, endDate);
     }
 
     @Override
@@ -103,7 +103,7 @@ public class TourBind extends AbstractEntity implements IRange {
         DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern(UI_DATE_TIME_NO_SEC, Locale.ENGLISH);
         return super.toString().replace("}", "") +
                 ", tour=" + tour +
-                ", employee=" + employee +
+                ", tourParticipant=" + tourParticipant +
                 ", startDate=" + startDate.format(dateTimeFormatter) +
                 ", endDate=" + endDate.format(dateTimeFormatter) +
                 '}';

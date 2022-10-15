@@ -29,30 +29,30 @@
   </div>
 
   <div class="col-md align-items-end">
-    <label for="filterEmployeeTypeSelect" th:text="#{employee-type}"></label>
-    <select id="filterEmployeeTypeSelect"
-            class="form-control selectpicker employeeTypeSelect"
-            th:field="*{employeeTypes}" name="employeeTypes"
+    <label for="filterTourParticipantTypeSelect" th:text="#{tour.participant.type}"></label>
+    <select id="filterTourParticipantTypeSelect"
+            class="form-control selectpicker tourParticipantTypeSelect"
+            th:field="*{tourParticipantTypes}" name="tourParticipantTypes"
             multiple data-live-search="true" data-selected-text-format="count > 3"
-            data-employee-select-id="filterEmployeeSelect">
-      <option th:each="employeeType : ${allEmployeeTypes}"
-              th:value="${employeeType}" th:text="${employeeType.name()}"
-              th:selected="${tourBindFilter.employeeTypes.contains(employeeType)}">
+            data-tourParticipant-select-id="filterTourParticipantSelect">
+      <option th:each="tourParticipantType : ${allTourParticipantTypes}"
+              th:value="${tourParticipantType}" th:text="${tourParticipantType.name()}"
+              th:selected="${tourBindFilter.tourParticipantTypes.contains(tourParticipantType)}">
       </option>
     </select>
   </div>
 
   <div class="col-md align-items-end">
-    <label for="filterEmployeeSelect">Employee</label>
-    <select id="filterEmployeeSelect" class="form-control selectpicker employeeSelect"
-            th:field="*{employeeIds}" name="employeeIds"
+    <label for="filterTourParticipantSelect" th:text="#{tour.participant.cap}"></label>
+    <select id="filterTourParticipantSelect" class="form-control selectpicker tourParticipantSelect"
+            th:field="*{tourParticipantIds}" name="tourParticipantIds"
             multiple data-live-search="true" data-selected-text-format="count > 2">
     </select>
   </div>
 
   <div class="col-md align-items-end">
     <button id="submitFilterBtn" type="button"
-            title="Press to see filtered tours and employees"
+            title="Press to see filtered tours and tourParticipants"
             class="btn btn-outline-success btn-block form-control"
             th:text="#{show.cap} + #{tour.pl}">
     </button>

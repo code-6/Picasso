@@ -36,7 +36,7 @@ import static org.novinomad.picasso.commons.utils.CommonDateUtils.localDateTimeT
 public class DevEnvInitializer implements IDevEnvInitializer {
     static final LocalDate CURRENT_DATE = LocalDate.now();
     static final int NEXT_MONTH_MAX_DAY = CURRENT_DATE.plusMonths(1).lengthOfMonth();
-    static final int EMPLOYEES_COUNT_TO_CREATE = 10;
+    static final int TOUR_PARTICIPANTS_COUNT_TO_CREATE = 10;
     static final int TOURS_COUNT_TO_CREATE = 100;
     static final int BINDINGS_COUNT_TO_CREATE = 60;
     static final int MAX_TOUR_DAYS_COUNT = 20;
@@ -69,9 +69,9 @@ public class DevEnvInitializer implements IDevEnvInitializer {
                 shouldInitialize = !Boolean.parseBoolean(setting.get().getSettingValue());
             }
             if(shouldInitialize) {
-                List<Employee> employees = createEmployees();
+                List<TourParticipant> tourParticipants = createTourParticipants();
                 List<Tour> tours = createTours();
-                createTourBindings(tours, employees);
+                createTourBindings(tours, tourParticipants);
 
                 appSettingsRepository.save(AppSettings.TEST_DATA_INITIALIZED.value("true"));
             }
@@ -125,7 +125,7 @@ public class DevEnvInitializer implements IDevEnvInitializer {
         final int maxCarsCount = 3;
         final int minCarsCount = 1;
 
-        for (int i = 0; i < EMPLOYEES_COUNT_TO_CREATE; i++) {
+        for (int i = 0; i < TOUR_PARTICIPANTS_COUNT_TO_CREATE; i++) {
             final String driverName = faker.name().fullName();
             Driver driver = new Driver(driverName);
             driver.addCar(CarUtils.randomSet(minCarsCount, maxCarsCount));
@@ -147,7 +147,7 @@ public class DevEnvInitializer implements IDevEnvInitializer {
         final int maxLanguagesCount = 3;
         final int minLanguagesCount = 1;
 
-        for (int i = 0; i < EMPLOYEES_COUNT_TO_CREATE; i++) {
+        for (int i = 0; i < TOUR_PARTICIPANTS_COUNT_TO_CREATE; i++) {
             final String guideName = faker.name().fullName();
             Guide guide = new Guide(guideName);
             guide.addLanguage(Guide.Language.randomSet(minLanguagesCount, maxLanguagesCount));
@@ -163,17 +163,17 @@ public class DevEnvInitializer implements IDevEnvInitializer {
     }
 
     @Override
-    public List<TourBind> createTourBindings(List<Tour> tours, List<Employee> employees) throws BaseException {
+    public List<TourBind> createTourBindings(List<Tour> tours, List<TourParticipant> tourParticipants) throws BaseException {
         log.info("start create bindings");
         List<TourBind> bindings = new ArrayList<>();
 
-        List<Driver> drivers = employees.stream()
-                .filter(e -> Employee.Type.DRIVER.equals(e.getType()))
+        List<Driver> drivers = tourParticipants.stream()
+                .filter(e -> TourParticipant.Type.DRIVER.equals(e.getType()))
                 .map(Driver.class::cast)
                 .toList();
 
-        List<Guide> guides = employees.stream()
-                .filter(e -> Employee.Type.GUIDE.equals(e.getType()))
+        List<Guide> guides = tourParticipants.stream()
+                .filter(e -> TourParticipant.Type.GUIDE.equals(e.getType()))
                 .map(Guide.class::cast)
                 .toList();
 
@@ -183,8 +183,8 @@ public class DevEnvInitializer implements IDevEnvInitializer {
 
         for (int i = 0; i < BINDINGS_COUNT_TO_CREATE; i++) {
             Tour tour = tours.get(RandomUtils.nextInt(0, totalTours - 1));
-            Employee driver = drivers.get(RandomUtils.nextInt(0, totalDrivers - 1));
-            Employee guide = guides.get(RandomUtils.nextInt(0, totalGuides - 1));
+            TourParticipant driver = drivers.get(RandomUtils.nextInt(0, totalDrivers - 1));
+            TourParticipant guide = guides.get(RandomUtils.nextInt(0, totalGuides - 1));
 
             try {
                 int daysCount = tour.getDaysCount();

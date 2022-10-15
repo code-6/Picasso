@@ -3,8 +3,8 @@ package org.novinomad.picasso.repositories;
 import com.github.javafaker.Faker;
 import org.junit.jupiter.api.*;
 import org.novinomad.picasso.entities.domain.impl.Driver;
-import org.novinomad.picasso.entities.domain.impl.Employee;
-import org.novinomad.picasso.repositories.jpa.EmployeeRepository;
+import org.novinomad.picasso.entities.domain.impl.TourParticipant;
+import org.novinomad.picasso.repositories.jpa.TourParticipantRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
@@ -19,15 +19,15 @@ import static org.junit.jupiter.api.Assertions.*;
 @TestPropertySource(locations = "classpath:application-test.yml")
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class EmployeeRepositoryTest {
+class TourParticipantRepositoryTest {
 
     @Autowired
-    EmployeeRepository employeeRepository;
+    TourParticipantRepository tourParticipantRepository;
 
     @Autowired
     Faker faker;
 
-    Employee savedEmployee;
+    TourParticipant savedTourParticipant;
 
     @Test
     @Order(1)
@@ -37,13 +37,13 @@ class EmployeeRepositoryTest {
         Driver driver = new Driver(name);
 
         assertDoesNotThrow(() -> {
-            savedEmployee = employeeRepository.save(driver);
+            savedTourParticipant = tourParticipantRepository.save(driver);
 
-            System.out.println(savedEmployee);
+            System.out.println(savedTourParticipant);
 
-            assertNotNull(savedEmployee.getId());
-            assertNotNull(savedEmployee.getName());
-            assertEquals(name, savedEmployee.getName());
+            assertNotNull(savedTourParticipant.getId());
+            assertNotNull(savedTourParticipant.getName());
+            assertEquals(name, savedTourParticipant.getName());
         });
     }
 
@@ -58,13 +58,13 @@ class EmployeeRepositoryTest {
         driver.addCar("Mazda", "RX-7", String.valueOf(faker.number().numberBetween(1000, 9999)));
 
         assertDoesNotThrow(() -> {
-            savedEmployee = employeeRepository.save(driver);
+            savedTourParticipant = tourParticipantRepository.save(driver);
 
-            System.out.println(savedEmployee);
+            System.out.println(savedTourParticipant);
 
-            assertNotNull(savedEmployee.getId());
-            assertNotNull(savedEmployee.getName());
-            assertEquals(name, savedEmployee.getName());
+            assertNotNull(savedTourParticipant.getId());
+            assertNotNull(savedTourParticipant.getName());
+            assertEquals(name, savedTourParticipant.getName());
         });
     }
 
@@ -72,7 +72,7 @@ class EmployeeRepositoryTest {
     @Order(3)
     void shouldReturnAllDrivers() {
         assertDoesNotThrow(() -> {
-            List<Employee> drivers = employeeRepository.findAll();
+            List<TourParticipant> drivers = tourParticipantRepository.findAll();
 
             assertFalse(drivers.isEmpty());
         });

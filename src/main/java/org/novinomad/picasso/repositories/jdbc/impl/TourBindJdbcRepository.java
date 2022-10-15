@@ -35,29 +35,29 @@ public class TourBindJdbcRepository implements TourBindRepository {
 
 
     @Override
-    public List<TourBind> findOverlappedBinds(Long tourId, Long employeeId, LocalDateTime newBindStartDate, LocalDateTime newBindEndDate) {
+    public List<TourBind> findOverlappedBinds(Long tourId, Long tourParticipantId, LocalDateTime newBindStartDate, LocalDateTime newBindEndDate) {
 
         String sql = """
                 select tb.* from TOUR_BIND tb
                 where (tb.START_DATE <= :newBindEndDate and tb.END_DATE >= :newBindStartDate) and tb.TOUR_ID <> :tourId
-                and tb.EMPLOYEE_ID = :employeeId               
+                and tb.TOUR_PARTICIPANT_ID = :tourParticipantId               
                 """;
         SqlParameterSource params = new MapSqlParameterSource()
                 .addValue("newBindEndDate", localDateTimeToDate(newBindEndDate))
                 .addValue("newBindStartDate", localDateTimeToDate(newBindStartDate))
                 .addValue("tourId", tourId)
-                .addValue("employeeId", employeeId);
+                .addValue("tourParticipantId", tourParticipantId);
 
         return jdbcTemplate.query(sql, params, tourBindRowMapper);
     }
 
     @Override
-    public List<TourBind> findByFilter(LocalDateTime startDate, LocalDateTime endDate, List<Long> tourIds, List<Long> employeeIds) {
+    public List<TourBind> findByFilter(LocalDateTime startDate, LocalDateTime endDate, List<Long> tourIds, List<Long> tourParticipantIds) {
         StringBuilder sql = new StringBuilder("""
-                select tb.id, tb.tour_id, tb.employee_id, tb.start_date, tb.end_date
+                select tb.id, tb.tour_id, tb.tour_participant_id, tb.start_date, tb.end_date
                 from TOUR_BIND tb
                 join TOUR t on tb.tour_id = t.id
-                left join EMPLOYEE e on tb.EMPLOYEE_ID = e.ID
+                left join TOUR_PARTICIPANT e on tb.TOUR_PARTICIPANT_ID = e.ID
                 where (:endDate is null or t.start_date <= :endDate)
                 and (:startDate is null or t.end_date >= :startDate)
                 """);
@@ -66,12 +66,12 @@ public class TourBindJdbcRepository implements TourBindRepository {
             sql.append(" and (t.id in (:tourIds)) ");
         }
 
-        if (!CollectionUtils.isEmpty(employeeIds)) {
-            sql.append(" and (e.id in (:employeeIds)) ");
+        if (!CollectionUtils.isEmpty(tourParticipantIds)) {
+            sql.append(" and (e.id in (:tourParticipantIds)) ");
         }
 
         sql.append("""                                            
-                group by tb.id, tb.tour_id, tb.employee_id, tb.start_date, tb.end_date
+                group by tb.id, tb.tour_id, tb.tour_participant_id, tb.start_date, tb.end_date
                 order by t.START_DATE, tb.START_DATE, t.END_DATE, tb.END_DATE   
                 """);
 
@@ -79,7 +79,7 @@ public class TourBindJdbcRepository implements TourBindRepository {
                 .addValue("startDate", localDateTimeToDate(startDate))
                 .addValue("endDate", localDateTimeToDate(endDate))
                 .addValue("tourIds", tourIds)
-                .addValue("employeeIds", employeeIds);
+                .addValue("tourParticipantIds", tourParticipantIds);
 
         return jdbcTemplate.query(sql.toString(), params, tourBindRowMapper);
     }

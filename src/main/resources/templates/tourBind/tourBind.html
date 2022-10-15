@@ -124,77 +124,77 @@
 
                             </div>
 
-                            <div id="bindResultEmployees" th:fragment="bindResultEmployees">
-                                <div class="employee-bind-row" th:each="employeeBind, employeeBindRow : ${tourBind.employees}">
+                            <div id="bindResultTourParticipants" th:fragment="bindResultTourParticipants">
+                                <div class="tourParticipant-bind-row" th:each="tourParticipantBind, tourParticipantBindRow : ${tourBind.tourParticipants}">
                                     <div class="row form-group">
                                         <div class="col-sm-2">
-                                            <select th:id="${'employeeTypeSelect_' + employeeBindRow.index}"
-                                                    class="form-control selectpicker employeeTypeSelect employeeTypeSelect-bindForm"
+                                            <select th:id="${'tourParticipantTypeSelect_' + tourParticipantBindRow.index}"
+                                                    class="form-control selectpicker tourParticipantTypeSelect tourParticipantTypeSelect-bindForm"
                                                     data-live-search="true" required
-                                                    th:field="${tourBind.employees[__${employeeBindRow.index}__].employee.type}"
-                                                    th:data-employee-select-id="${'employeeSelect_' + employeeBindRow.index}">
+                                                    th:field="${tourBind.tourParticipants[__${tourParticipantBindRow.index}__].tourParticipant.type}"
+                                                    th:data-tourParticipant-select-id="${'tourParticipantSelect_' + tourParticipantBindRow.index}">
                                                 <option th:value="${null}"></option>
-                                                <option th:each="employeeType : ${allEmployeeTypes}"
-                                                        th:value="${employeeType}"
-                                                        th:text="${employeeType.name()}"
-                                                        th:selected="${employeeBind.employee != null and employeeBind.employee.type != null and employeeBind.employee.type.equals(employeeType)}">
+                                                <option th:each="tourParticipantType : ${allTourParticipantTypes}"
+                                                        th:value="${tourParticipantType}"
+                                                        th:text="${tourParticipantType.name()}"
+                                                        th:selected="${tourParticipantBind.tourParticipant != null and tourParticipantBind.tourParticipant.type != null and tourParticipantBind.tourParticipant.type.equals(tourParticipantType)}">
                                                 </option>
                                             </select>
                                         </div>
                                         <div class="col">
-                                            <select th:id="${'employeeSelect_' + employeeBindRow.index}"
-                                                    class="form-control selectpicker employeeSelect employeeSelect-bindForm"
+                                            <select th:id="${'tourParticipantSelect_' + tourParticipantBindRow.index}"
+                                                    class="form-control selectpicker tourParticipantSelect tourParticipantSelect-bindForm"
                                                     required
                                                     data-live-search="true"
-                                                    th:field="${tourBind.employees[__${employeeBindRow.index}__].employee}">
+                                                    th:field="${tourBind.tourParticipants[__${tourParticipantBindRow.index}__].tourParticipant}">
                                                 <option th:value="${null}"></option>
-                                                <option th:each="employee : ${@employeeService.getOrEmpty(employeeBind.employee?.type)}"
-                                                        th:value="${employee.id}"
-                                                        th:text="${employee.id + '. ' + employee.name}"
-                                                        th:data-subtext="${employee.type.name()}"
-                                                        th:selected="${employeeBind.employee != null and employeeBind.employee.equals(employee)}">
+                                                <option th:each="tourParticipant : ${@tourParticipantService.getOrEmpty(tourParticipantBind.tourParticipant?.type)}"
+                                                        th:value="${tourParticipant.id}"
+                                                        th:text="${tourParticipant.id + '. ' + tourParticipant.name}"
+                                                        th:data-subtext="${tourParticipant.type.name()}"
+                                                        th:selected="${tourParticipantBind.tourParticipant != null and tourParticipantBind.tourParticipant.equals(tourParticipant)}">
                                             </select>
                                         </div>
                                         <div class="col-sm-1">
-                                            <!--                                            TODO 2022-08-15 enabled only if employee type and employee selected. Also allow to add more only if previously added date-range filled. Disallow to submit if any of date-ranges is empty.-->
-                                            <button class="btn btn-outline-success bindEmployeeDateRangeBtn" type="button"
-                                                    th:data-employee-row-id="${employeeBindRow.index}"
-                                                    data-ctx="bindEmployeeDateRange"
-                                                    title="Add custom date range. Optional action, if not chosen, employee will be utilized to full tour date range">
+                                            <!--                                            TODO 2022-08-15 enabled only if tourParticipant type and tourParticipant selected. Also allow to add more only if previously added date-range filled. Disallow to submit if any of date-ranges is empty.-->
+                                            <button class="btn btn-outline-success bindTourParticipantDateRangeBtn" type="button"
+                                                    th:data-tourParticipant-row-id="${tourParticipantBindRow.index}"
+                                                    data-ctx="bindTourParticipantDateRange"
+                                                    title="Add custom date range. Optional action, if not chosen, tourParticipant will be utilized to full tour date range">
                                                 <i class="fa-solid fa-calendar-plus"></i>
                                             </button>
                                         </div>
                                         <div class="col-sm-1">
-                                            <button class="btn btn-outline-primary unbindEmployeeBtn" type="button"
-                                                    title="Unbind employee"
-                                                    th:data-employee-row-id="${employeeBindRow.index}">
+                                            <button class="btn btn-outline-primary unbindTourParticipantBtn" type="button"
+                                                    title="Unbind tourParticipant"
+                                                    th:data-tourParticipant-row-id="${tourParticipantBindRow.index}">
                                                 <i class="fa-solid fa-user-xmark"></i>
                                                 <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" style="display: none"></span>
                                             </button>
                                         </div>
                                         <div class="col-sm-1"></div>
                                     </div>
-                                    <div th:each="employeeDateRange, employeeDateRangeRow : ${employeeBind.getBindIdsToDateRanges}">
+                                    <div th:each="tourParticipantDateRange, tourParticipantDateRangeRow : ${tourParticipantBind.getBindIdsToDateRanges}">
                                         <div class="row form-group">
                                             <div class="col-sm-2"></div>
                                             <div class="col">
                                                 <input type="hidden" name="bindId"
-                                                       th:field="${tourBind.employees[__${employeeBindRow.index}__].bindIdsToDateRanges[__${employeeDateRangeRow.index}__]?.bindId}">
+                                                       th:field="${tourBind.tourParticipants[__${tourParticipantBindRow.index}__].bindIdsToDateRanges[__${tourParticipantDateRangeRow.index}__]?.bindId}">
 
                                                 <input type="text" required
-                                                       class="form-control date-picker date-picker-employee-tour-bind"
-                                                       th:id="${'employeeTourDateRange_'+employeeBindRow.index+'-'+employeeDateRangeRow.index}"
-                                                       th:data-employee-id="${employeeBind?.employee?.id}"
+                                                       class="form-control date-picker date-picker-tourParticipant-tour-bind"
+                                                       th:id="${'tourParticipantTourDateRange_'+tourParticipantBindRow.index+'-'+tourParticipantDateRangeRow.index}"
+                                                       th:data-tourParticipant-id="${tourParticipantBind?.tourParticipant?.id}"
                                                        th:data-tour-id="${tourBind.tour.id}" name="dateRange"
-                                                       th:field="${tourBind.employees[__${employeeBindRow.index}__].bindIdsToDateRanges[__${employeeDateRangeRow.index}__]?.dateRange}"
-                                                       th:value="${tourBind.employees[__${employeeBindRow.index}__].bindIdsToDateRanges[__${employeeDateRangeRow.index}__]?.dateRange.toString()}">
+                                                       th:field="${tourBind.tourParticipants[__${tourParticipantBindRow.index}__].bindIdsToDateRanges[__${tourParticipantDateRangeRow.index}__]?.dateRange}"
+                                                       th:value="${tourBind.tourParticipants[__${tourParticipantBindRow.index}__].bindIdsToDateRanges[__${tourParticipantDateRangeRow.index}__]?.dateRange.toString()}">
                                             </div>
                                             <div class="col-sm-1">
-                                                <button class="btn btn-outline-primary unbindEmployeeDateRangeBtn" type="button"
-                                                        th:data-employee-date-range-row-id="${employeeDateRangeRow.index}"
-                                                        th:data-employee-row-id="${employeeBindRow.index}"
+                                                <button class="btn btn-outline-primary unbindTourParticipantDateRangeBtn" type="button"
+                                                        th:data-tourParticipant-date-range-row-id="${tourParticipantDateRangeRow.index}"
+                                                        th:data-tourParticipant-row-id="${tourParticipantBindRow.index}"
                                                         title="Remove custom date range"
-                                                        data-ctx="unbindEmployeeDateRange">
+                                                        data-ctx="unbindTourParticipantDateRange">
                                                     <i class="fa-solid fa-calendar-xmark"></i>
                                                 </button>
                                             </div>
@@ -205,18 +205,18 @@
                                 </div>
                             </div>
 
-                            <div class="collapse" id="bindResultEmployeesControls">
+                            <div class="collapse" id="bindResultTourParticipantsControls">
                                 <div class="row form-group">
                                     <div class="col-sm-2"></div>
                                     <div class="col">
                                         <button class="btn btn-outline-success btn-block" type="button"
-                                                id="bindEmployeeBtn"
-                                                th:text="#{bind-employee-to-the} + ${tourBind.tour?.name}">
+                                                id="bindTourParticipantBtn"
+                                                th:text="#{bind-tourParticipant-to-the} + ${tourBind.tour?.name}">
                                         </button>
                                     </div>
                                     <div class="col-sm-1">
                                         <!--                                        <button class="btn btn-outline-success" type="button"-->
-                                        <!--                                                title="These aren't the employees you're looking for ? Create new one. ">-->
+                                        <!--                                                title="These aren't the tourParticipants you're looking for ? Create new one. ">-->
                                         <!--                                            <i class="fa-solid fa-plus"></i>-->
                                         <!--                                        </button>-->
                                     </div>
@@ -228,7 +228,7 @@
                                 <div class="col">
                                     <!--                                    TODO 2022-08-15 : allow to submit only if: -->
                                     <!--                                    1) Tour is chosen-->
-                                    <!--                                    2) At least one employee chosen-->
+                                    <!--                                    2) At least one tourParticipant chosen-->
                                     <!--                                    3) There is no overlaps with other tours-->
                                     <button class="btn btn-outline-success btn-block" type="submit" id="submitBindBtn"
                                             th:text="#{submit.cap}">
@@ -307,19 +307,19 @@
         const ganttMajorDateFormat = $("meta[name='ganttMajorDateFormat']").attr('content');
 
         /**
-         * When bind form employees fragment updated notify related observers.
+         * When bind form tourParticipants fragment updated notify related observers.
          * */
-        const bindFormEmployeesFragmentSubject = new FragmentSubject()
-            .subscribe(initEmployeeTypeSelectChangeListener)
+        const bindFormTourParticipantsFragmentSubject = new FragmentSubject()
+            .subscribe(initTourParticipantTypeSelectChangeListener)
             .subscribe(initBindFormDatePickers)
             .subscribe(refreshBootstrapSelects)
-            .subscribe(initUnbindEmployeeButtons)
-            .subscribe(initBindEmployeeDateRangeButtons)
-            .subscribe(initEmployeeSelectChangeListener)
-            .subscribe(initUnbindEmployeeDateRangeButtons);
+            .subscribe(initUnbindTourParticipantButtons)
+            .subscribe(initBindTourParticipantDateRangeButtons)
+            .subscribe(initTourParticipantSelectChangeListener)
+            .subscribe(initUnbindTourParticipantDateRangeButtons);
 
         const bindFormFragmentSubject = new FragmentSubject()
-            .subscribe(initBindEmployeeButton)
+            .subscribe(initBindTourParticipantButton)
             .subscribe(initBindFormTourSelect)
             .subscribe(initBindFormResetButton)
             .subscribe(initBindFormSubmitButton);
@@ -334,7 +334,7 @@
 
             initFilterSubmitButton();
 
-            bindFormEmployeesFragmentSubject.notifyObservers();
+            bindFormTourParticipantsFragmentSubject.notifyObservers();
 
             bindFormFragmentSubject.notifyObservers();
 
@@ -346,7 +346,7 @@
                 const selectedTourId = $('#bindFormTourSelect').find(":selected").map((_, e) => e.value).get();
 
                 if (selectedTourId == null || selectedTourId[0] === '') {
-                    changeEmployeeBindFormCollapseElementsVisibility();
+                    changeTourParticipantBindFormCollapseElementsVisibility();
                     initBindFormTourDetails();
                     $('#resetBindFormBtn').prop('disabled', true)
                 } else {
@@ -424,7 +424,7 @@
             } catch (e) {
                 console.error(e);
             }
-            $('.date-picker-employee-tour-bind').daterangepicker({
+            $('.date-picker-tourParticipant-tour-bind').daterangepicker({
                 showDropdowns: true,
                 timePicker: true,
                 timePicker24Hour: true,
@@ -438,31 +438,31 @@
                     format: dateRangePickerDateFormat,
                 }
             }).on('apply.daterangepicker hideCalendar.daterangepicker hide.daterangepicker', function (e, clickedIndex, isSelected, previousValue) {
-                // validate bind when employee dates changed
+                // validate bind when tourParticipant dates changed
                 let datePickerInputField = $(this);
-                let employeeId = $(this).attr('data-employee-id');
-                // in case if date-picker doesn't contains attribute data-employee-id try to search for value different way
-                if (!employeeId) {
-                    // search for employee select related to this date-picker by id
-                    // each date picker id has following format employeeTourDateRange_{employeeRowId}-{datePickerRowId} example employeeTourDateRange_0-0
-                    // first number after employeeTourDateRange_ indicates to wich employee select its related.
+                let tourParticipantId = $(this).attr('data-tourParticipant-id');
+                // in case if date-picker doesn't contains attribute data-tourParticipant-id try to search for value different way
+                if (!tourParticipantId) {
+                    // search for tourParticipant select related to this date-picker by id
+                    // each date picker id has following format tourParticipantTourDateRange_{tourParticipantRowId}-{datePickerRowId} example tourParticipantTourDateRange_0-0
+                    // first number after tourParticipantTourDateRange_ indicates to wich tourParticipant select its related.
                     let datePickerId = $(this).attr('id');
 
                     // extract first number after _
-                    let employeeSelectRowIndex = datePickerId.match(/_\d/)[0].substring(1);
+                    let tourParticipantSelectRowIndex = datePickerId.match(/_\d/)[0].substring(1);
 
-                    // find required employeeSelect and extract selected option value which contains employee id
-                    let employeeSelect = $('#' + 'employeeSelect_' + employeeSelectRowIndex).find(":selected").map((_, e) => e.value).get();
+                    // find required tourParticipantSelect and extract selected option value which contains tourParticipant id
+                    let tourParticipantSelect = $('#' + 'tourParticipantSelect_' + tourParticipantSelectRowIndex).find(":selected").map((_, e) => e.value).get();
 
-                    if (employeeSelect && employeeSelect[0] && employeeSelect[0] !== '') {
-                        employeeId = employeeSelect[0];
+                    if (tourParticipantSelect && tourParticipantSelect[0] && tourParticipantSelect[0] !== '') {
+                        tourParticipantId = tourParticipantSelect[0];
                     }
                 }
-                if (employeeId) {
+                if (tourParticipantId) {
 
                     let tourId = $(this).attr('data-tour-id');
                     let dateRange = $(this).val();
-                    ajaxUtil.get(mainUrl + '/api/bind/validate/' + tourId + '/' + employeeId + '/' + dateRange)
+                    ajaxUtil.get(mainUrl + '/api/bind/validate/' + tourId + '/' + tourParticipantId + '/' + dateRange)
                         .then(() => {
                             if ($(datePickerInputField).hasClass('is-invalid'))
                                 $(datePickerInputField).removeClass('is-invalid')
@@ -483,56 +483,56 @@
         }
 
         /**
-         * When employee type select value is chosen then load employees from backend and initialize employee selects.
+         * When tourParticipant type select value is chosen then load tourParticipants from backend and initialize tourParticipant selects.
          * */
-        function initEmployeeTypeSelectChangeListener() {
-            $('.employeeTypeSelect').each(function () {
+        function initTourParticipantTypeSelectChangeListener() {
+            $('.tourParticipantTypeSelect').each(function () {
                 $(this).on('changed.bs.select', function () {
-                    loadEmployeesForSelect($(this));
+                    loadTourParticipantsForSelect($(this));
                 });
             });
         }
 
         /**
-         * Get list of employees from backend and initialize employee selects.
+         * Get list of tourParticipants from backend and initialize tourParticipant selects.
          * */
-        function loadEmployeesForSelect($employeeTypeSelect) {
+        function loadTourParticipantsForSelect($tourParticipantTypeSelect) {
 
-            const chosenEmployeeTypes = $employeeTypeSelect.find(":selected").map((_, e) => e.value).get();
+            const chosenTourParticipantTypes = $tourParticipantTypeSelect.find(":selected").map((_, e) => e.value).get();
 
-            const employeeSelectId = '#' + $employeeTypeSelect.attr('data-employee-select-id');
+            const tourParticipantSelectId = '#' + $tourParticipantTypeSelect.attr('data-tourParticipant-select-id');
 
-            let $employeeSelect = $(employeeSelectId);
+            let $tourParticipantSelect = $(tourParticipantSelectId);
 
-            $employeeSelect.empty();
+            $tourParticipantSelect.empty();
 
-            let getEmployeesByTypesApiUrl = mainUrl + "/api/employee";
+            let getTourParticipantsByTypesApiUrl = mainUrl + "/api/tourParticipant";
 
             let payloadData = {
-                "types": chosenEmployeeTypes.toString().replace('[', '').replace(']', '')
+                "types": chosenTourParticipantTypes.toString().replace('[', '').replace(']', '')
             };
 
-            ajaxUtil.get(getEmployeesByTypesApiUrl, payloadData)
-                .then((employees) => {
+            ajaxUtil.get(getTourParticipantsByTypesApiUrl, payloadData)
+                .then((tourParticipants) => {
                     let emptyOption = new Option('', null);
-                    $employeeSelect.append(emptyOption);
-                    $.each(employees, function (index, employee) {
+                    $tourParticipantSelect.append(emptyOption);
+                    $.each(tourParticipants, function (index, tourParticipant) {
                         // add options to select
-                        let option = new Option(employee.id + '. ' + employee.name, employee.id);
-                        option.setAttribute('data-subtext', employee.type);
-                        $employeeSelect.append(option);
+                        let option = new Option(tourParticipant.id + '. ' + tourParticipant.name, tourParticipant.id);
+                        option.setAttribute('data-subtext', tourParticipant.type);
+                        $tourParticipantSelect.append(option);
                     });
-                    $employeeSelect.prop("disabled", false);
-                    $employeeSelect.selectpicker('refresh')
-                    // automatically open related employee select when employee type select value chosen
-                    $employeeSelect.selectpicker('toggle');
+                    $tourParticipantSelect.prop("disabled", false);
+                    $tourParticipantSelect.selectpicker('refresh')
+                    // automatically open related tourParticipant select when tourParticipant type select value chosen
+                    $tourParticipantSelect.selectpicker('toggle');
                 })
                 .catch((error) => {
-                    console.error('unable to get employees of type %s from backend %s', chosenEmployeeTypes, error.responseJSON.message)
-                    $employeeSelect.prop("disabled", true);
+                    console.error('unable to get tourParticipants of type %s from backend %s', chosenTourParticipantTypes, error.responseJSON.message)
+                    $tourParticipantSelect.prop("disabled", true);
                     Swal.fire({
                         icon: 'error',
-                        title: 'unable to load employees'
+                        title: 'unable to load tourParticipants'
                     });
                 });
         }
@@ -540,10 +540,10 @@
         /**
          * @param {'show' | 'hide'} visibility - The action to perform. Default value = 'hide'
          */
-        function changeEmployeeBindFormCollapseElementsVisibility(visibility = 'hide') {
+        function changeTourParticipantBindFormCollapseElementsVisibility(visibility = 'hide') {
             $('#bindResultTourDetails').collapse(visibility);
-            $('#bindResultEmployees').collapse(visibility);
-            $('#bindResultEmployeesControls').collapse(visibility);
+            $('#bindResultTourParticipants').collapse(visibility);
+            $('#bindResultTourParticipantsControls').collapse(visibility);
             $('#submitBindBtnRow').collapse(visibility);
         }
 
@@ -579,7 +579,7 @@
                 const selectedTourId = $(this).find(":selected").map((_, e) => e.value).get();
                 let $resetBindFormBtn = $('#resetBindFormBtn');
                 if (selectedTourId == null || selectedTourId[0] === '') {
-                    changeEmployeeBindFormCollapseElementsVisibility();
+                    changeTourParticipantBindFormCollapseElementsVisibility();
                     initBindFormTourDetails();
                     $resetBindFormBtn.prop('disabled', true);
                 } else {
@@ -588,13 +588,13 @@
                         .then((tour) => {
                             initBindFormTourDetails(tour);
                             $resetBindFormBtn.prop('disabled', false);
-                            $('#bindEmployeeBtn').text('Add employee to the ' + tour.name);
-                            changeEmployeeBindFormCollapseElementsVisibility('show');
+                            $('#bindTourParticipantBtn').text('Add tourParticipant to the ' + tour.name);
+                            changeTourParticipantBindFormCollapseElementsVisibility('show');
                         })
                         .catch((error) => {
                             console.error('unable to load tour with id %d %s', selectedTourId, error.responseJSON.message);
                             initBindFormTourDetails();
-                            changeEmployeeBindFormCollapseElementsVisibility();
+                            changeTourParticipantBindFormCollapseElementsVisibility();
                             Swal.fire({
                                 icon: 'error',
                                 title: 'unable to get tour by id: ' + selectedTourId
@@ -605,20 +605,20 @@
         }
 
         /**
-         * When user selected first time employee A and selected date ranges then changed employee validate bind for new employee should be called again.
+         * When user selected first time tourParticipant A and selected date ranges then changed tourParticipant validate bind for new tourParticipant should be called again.
          * */
-        function initEmployeeSelectChangeListener() {
-            $('.employeeSelect-bindForm').on('changed.bs.select', function (e, clickedIndex, isSelected, previousValue) {
+        function initTourParticipantSelectChangeListener() {
+            $('.tourParticipantSelect-bindForm').on('changed.bs.select', function (e, clickedIndex, isSelected, previousValue) {
                 let selectedTourId = $('#bindFormTourSelect').find(":selected").map((_, e) => e.value).get();
 
                 if (selectedTourId && selectedTourId[0] && selectedTourId[0] !== '') {
                     selectedTourId = selectedTourId[0];
 
-                    let employeeId = $(this).find(":selected").map((_, e) => e.value).get();
+                    let tourParticipantId = $(this).find(":selected").map((_, e) => e.value).get();
 
-                    $(this).closest('div.employee-bind-row').find('.date-picker-employee-tour-bind').each(function (index, dateRangeInput) {
+                    $(this).closest('div.tourParticipant-bind-row').find('.date-picker-tourParticipant-tour-bind').each(function (index, dateRangeInput) {
                         let dateRange = $(dateRangeInput).val();
-                        ajaxUtil.get(mainUrl + '/api/bind/validate/' + selectedTourId + '/' + employeeId + '/' + dateRange)
+                        ajaxUtil.get(mainUrl + '/api/bind/validate/' + selectedTourId + '/' + tourParticipantId + '/' + dateRange)
                             .then(() => {
                                 if ($(dateRangeInput).hasClass('is-invalid'))
                                     $(dateRangeInput).removeClass('is-invalid')
@@ -654,7 +654,7 @@
                     $('#tourBindForm').html(bindFormFragment);
                     $('#tourBind').collapse('show');
                     bindFormFragmentSubject.notifyObservers();
-                    bindFormEmployeesFragmentSubject.notifyObservers();
+                    bindFormTourParticipantsFragmentSubject.notifyObservers();
                 }).catch((error) => {
                     console.error('initBindFormResetButton unable to load bind form fragment %s', error.responseJSON.message);
                     Swal.fire({
@@ -677,7 +677,7 @@
             $('.btn-edit-entity').addEventListener('click', onEditEntityButton)
         }
 
-        // event handler when bind, tour or employee edit button pressed.
+        // event handler when bind, tour or tourParticipant edit button pressed.
         window.onEditEntityButton=(ctx, entityId) => {
 
             if (ctx === '/') ctx = "";
@@ -687,9 +687,9 @@
                     $('#tourBindForm').html(bindFormFragment);
                     $('#tourBind').collapse('show');
                     // window.scrollTo({ top: 0, behavior: 'smooth' });
-                    changeEmployeeBindFormCollapseElementsVisibility('show');
+                    changeTourParticipantBindFormCollapseElementsVisibility('show');
                     bindFormFragmentSubject.notifyObservers();
-                    bindFormEmployeesFragmentSubject.notifyObservers();
+                    bindFormTourParticipantsFragmentSubject.notifyObservers();
                 })
                 .catch((error) => {
                     console.error('initEditEntityButton unable to load bind form fragment for edit bind %s', error.responseJSON.message);
@@ -704,42 +704,42 @@
                 });
         }
 
-        function initBindEmployeeButton() {
-            $('#bindEmployeeBtn').on('click', function(e) {
+        function initBindTourParticipantButton() {
+            $('#bindTourParticipantBtn').on('click', function(e) {
                 e.preventDefault();
                 $(this).prop('disabled', true);
-                updateBindResultEmployeesFragment(mainUrl + '/bindEmployee')
+                updateBindResultTourParticipantsFragment(mainUrl + '/bindTourParticipant')
                     .finally($(this).prop('disabled', false));
             });
         }
 
-        function initUnbindEmployeeButtons() {
-            $('.unbindEmployeeBtn').on('click', function(e){
+        function initUnbindTourParticipantButtons() {
+            $('.unbindTourParticipantBtn').on('click', function(e){
                 toggleSpinner($(this));
-                let employeeRowId = $(this).attr('data-employee-row-id');
-                let url = mainUrl + '/unbindEmployee/' + employeeRowId;
-                updateBindResultEmployeesFragment(url).finally(() => toggleSpinner($(this)));
+                let tourParticipantRowId = $(this).attr('data-tourParticipant-row-id');
+                let url = mainUrl + '/unbindTourParticipant/' + tourParticipantRowId;
+                updateBindResultTourParticipantsFragment(url).finally(() => toggleSpinner($(this)));
             });
         }
 
-        function initBindEmployeeDateRangeButtons() {
-            $('.bindEmployeeDateRangeBtn').on('click', function(e){
+        function initBindTourParticipantDateRangeButtons() {
+            $('.bindTourParticipantDateRangeBtn').on('click', function(e){
                 e.preventDefault();
-                let employeeRowId = $(this).attr('data-employee-row-id');
+                let tourParticipantRowId = $(this).attr('data-tourParticipant-row-id');
 
-                let url = mainUrl + '/bindEmployeeDateRange/' + employeeRowId;
-                updateBindResultEmployeesFragment(url);
+                let url = mainUrl + '/bindTourParticipantDateRange/' + tourParticipantRowId;
+                updateBindResultTourParticipantsFragment(url);
             });
         }
 
-        function initUnbindEmployeeDateRangeButtons() {
+        function initUnbindTourParticipantDateRangeButtons() {
 
-            $('.unbindEmployeeDateRangeBtn').on('click', function(e){
+            $('.unbindTourParticipantDateRangeBtn').on('click', function(e){
                 e.preventDefault();
-                let employeeRowId = $(this).attr('data-employee-row-id');
-                let dateRangeRowId = $(this).attr('data-employee-date-range-row-id');
-                let url = mainUrl + '/unbindEmployeeDateRange/' + employeeRowId + '/' + dateRangeRowId;
-                updateBindResultEmployeesFragment(url);
+                let tourParticipantRowId = $(this).attr('data-tourParticipant-row-id');
+                let dateRangeRowId = $(this).attr('data-tourParticipant-date-range-row-id');
+                let url = mainUrl + '/unbindTourParticipantDateRange/' + tourParticipantRowId + '/' + dateRangeRowId;
+                updateBindResultTourParticipantsFragment(url);
             });
         }
 
@@ -752,8 +752,8 @@
         }
 
         function refreshBootstrapSelects() {
-            $('.employeeTypeSelect').selectpicker('refresh');
-            $('.employeeSelect').selectpicker('refresh');
+            $('.tourParticipantTypeSelect').selectpicker('refresh');
+            $('.tourParticipantSelect').selectpicker('refresh');
             $('.tourSelect').selectpicker('refresh');
         }
 
@@ -829,17 +829,17 @@
             ganttChart.Draw();
         }
 
-        function updateBindResultEmployeesFragment(url) {
+        function updateBindResultTourParticipantsFragment(url) {
             return ajaxUtil.post(url, $('#tourBindForm').serialize())
-                .then((bindResultEmployeesFragment) => {
-                    $('#bindResultEmployees').html(bindResultEmployeesFragment);
-                    bindFormEmployeesFragmentSubject.notifyObservers();
+                .then((bindResultTourParticipantsFragment) => {
+                    $('#bindResultTourParticipants').html(bindResultTourParticipantsFragment);
+                    bindFormTourParticipantsFragmentSubject.notifyObservers();
                 })
                 .catch((error) => {
-                    console.error('updateBindResultEmployeesFragment unable to load tourBind/tourBind :: bindResultEmployees fragment %s', error.responseJSON.message);
+                    console.error('updateBindResultTourParticipantsFragment unable to load tourBind/tourBind :: bindResultTourParticipants fragment %s', error.responseJSON.message);
                     Swal.fire({
                         icon: 'error',
-                        title: 'Unable add new row for bind employee date range.'
+                        title: 'Unable add new row for bind tourParticipant date range.'
                     });
                 });
         }

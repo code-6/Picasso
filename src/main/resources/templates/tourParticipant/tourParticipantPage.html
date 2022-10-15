@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{fragments/layout}">
+<head>
+    <title>PCS - tourParticipants</title>
+
+    <link rel="stylesheet" type="text/css" th:href="@{/webjars/datatables/css/jquery.dataTables.css}">
+
+    <link rel="stylesheet" type="text/css"
+          th:href="@{/webjars/bootstrap-daterangepicker/css/bootstrap-daterangepicker.css}"/>
+
+    <link rel="stylesheet" type="text/css"
+          th:href="@{/webjars/bootstrap-select/dist/css/bootstrap-select.min.css}"/>
+
+    <style>
+        .from-to-date-fields-divider {
+            padding-right: 1rem;
+            padding-left: 1rem;
+            text-align: center;
+        }
+    </style>
+</head>
+<body class="sb-nav-fixed">
+
+<!-- Page management components -->
+<div th:fragment="pageManageComponents" class="mx-auto order-0">
+    <div class="btn-toolbar" role="toolbar" aria-label="Toolbar with button groups">
+        <div class="btn-group mr-2" role="group" aria-label="Second group">
+            <a class="nav-link" id="tourParticipantFormToggleBtn" data-toggle="collapse"
+               data-target="#tourParticipantFormContainer"
+               aria-expanded="false" aria-controls="tourParticipantFormContainer" href="#tourParticipantFormContainer">
+                <i id="tourParticipantFormToggleBtnIcon" class="fas fa-eye"></i>
+                <span th:text="#{show.cap} + ${tourParticipantType} + ' ' + #{form}"></span>
+            </a>
+        </div>
+    </div>
+</div>
+
+<div layout:fragment="content">
+    <!--    tourParticipant form-->
+    <div class="collapse" id="tourParticipantFormContainer">
+        <div class="card">
+            <div class="card-header"><span th:text="${tourParticipantType + ' '} + #{form}"></span></div>
+            <div id="tourParticipantFormDiv" class="card-body">
+                <form th:object="${tourParticipant}" th:action="@{/tourParticipant}" th:method="post" id="tourParticipantForm"
+                      th:replace="tourParticipant/tourParticipantForm :: tourParticipantForm"></form>
+            </div>
+        </div>
+    </div>
+
+    <!--    tourParticipants table -->
+    <div class="collapse show">
+        <div class="card">
+            <div class="card-header"><span th:text="${tourParticipantType + ' '} + #{table}"></span></div>
+            <div id="tourParticipantsTableDiv" class="card-body">
+                <table id="tourParticipantsTable" class="display compact cell-border hover stripe"
+                       th:replace="tourParticipant/tourParticipantsTable :: tourParticipantsTable"></table>
+            </div>
+        </div>
+    </div>
+</div>
+<div th:fragment="scripts">
+
+    <script th:src="@{/webjars/momentjs/moment.js}"></script>
+
+    <script th:src="@{/webjars/datatables/js/jquery.dataTables.js}"></script>
+
+    <script th:src="@{/js/datetime-moment.js}"></script>
+
+    <script th:src="@{/webjars/bootstrap-daterangepicker/js/bootstrap-daterangepicker.js}"></script>
+
+    <script th:src="@{/webjars/bootstrap-select/dist/js/bootstrap-select.js}"></script>
+
+    <!--<script type="module" th:src="@{/js/AjaxUtil.js}"></script>
+    <script type="module" th:src="@{/js/Observer.js}"></script>-->
+
+    <script type="module" th:inline="javascript">
+        // main url stored in head tag of layout.html
+        import {FragmentSubject} from "../js/Observer.js";
+        import * as ajaxUtil from "../js/AjaxUtil.js";
+
+        const mainUrl = $("meta[name='mainUrl']").attr("content");
+        const userLocale = $("meta[name='userLocale']").attr('content');
+        const dateRangePickerDateFormat = $("meta[name='dateRangePickerDateFormat']").attr('content');
+
+        const tourParticipantsTableFragmentSubject = new FragmentSubject()
+            .subscribe(initTableParticipantEditTourButtons)
+            .subscribe(refreshBootstrapSelects)
+        ;
+
+        $(document).ready(function() {
+            // page load initialization
+            moment.locale(userLocale); // to fix different locale issue in date-range picker
+
+            $.fn.dataTable.moment(dateRangePickerDateFormat, userLocale); // to fix sort by date columns
+
+            $('#tourParticipantsTable').DataTable({
+                "drawCallback": function( settings ) {
+                    console.debug('datatables draw callback fired');
+                    tourParticipantsTableFragmentSubject.notifyObservers(); // to fix edit/delete tour buttons when search in tours table
+                },
+                paging: true,
+                searching: true,
+                ordering: true,
+                fixedHeader: true
+            });
+
+            // initSubmitFormButton();
+        });
+
+        function refreshBootstrapSelects() {
+            $('.selectpicker').selectpicker('refresh');
+        }
+
+        // function initSubmitFormButton() {
+        //     $('#submitTourParticipantFormBtn').on('click', function(e) {
+        //         e.preventDefault();
+        //
+        //         $(this).prop('disabled', true);
+        //         let formData = $("#tourParticipantForm").serialize();
+        //         ajaxUtil.post(mainUrl + '/tour-participant', formData).catch((error) => {
+        //             console.error('unable to save %s %s', formData, error.responseJSON.message);
+        //             Swal.fire({
+        //                 icon: 'error',
+        //                 title: 'unable to save tour participant ' + formData
+        //             });
+        //         })
+        //     })
+        // }
+
+        function initTableParticipantEditTourButtons() {
+            $('.tourParticipantEditBtn').on('click', function (e) {
+                e.preventDefault();
+                let btn = $(this);
+                btn.prop('disabled', true);
+
+                let tourParticipantId = btn.attr('data-tour-participant-id');
+                let tourParticipantType = btn.attr('data-tour-participant-type');
+
+                let url = mainUrl + '/tour-participant/' + tourParticipantType + '/' + tourParticipantId;
+
+                ajaxUtil.get(url)
+                    .then((tourParticipantFormHTML) => {
+                        $('#tourParticipantForm').html(tourParticipantFormHTML);
+                        tourParticipantsTableFragmentSubject.notifyObservers();
+                        $('#tourParticipantFormContainer').collapse('show');
+                    })
+                    .catch((error) => {
+                        console.error('unable to load tour participant form HTML for participant %s %d %s',tourParticipantType, tourParticipantId, error);
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'unable to open tour form'
+                        });
+                    })
+                    .finally(btn.prop('disabled', false));
+            });
+        }
+    </script>
+</div>
+</body>
+</html>

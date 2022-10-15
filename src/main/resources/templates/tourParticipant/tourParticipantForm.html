@@ -1,0 +1,51 @@
+<form th:object="${tourParticipant}" th:action="@{${'/tour-participant/' + tourParticipantType}}" th:method="post" id="tourParticipantForm"
+      th:fragment="tourParticipantForm">
+    <div>
+        <input type="hidden" name="id" th:value="${tourParticipant.id}">
+        <input type="hidden" name="type" th:value="${tourParticipantType}">
+
+        <div class="row form-group">
+            <div class="col-sm-2">
+                <label for="tourParticipantName" class="form-label" th:text="#{name.cap}"></label>
+            </div>
+            <div class="col">
+                <input type="text" class="form-control" id="tourParticipantName" th:value="${tourParticipant.name}"
+                       th:placeholder="#{tourParticipantName.placeholder}" name="name">
+            </div>
+        </div>
+
+        <div class="row form-group" th:replace="~{'fragments/' + ${participantFragment} + '/tourParticipantAdditionalFormFields' :: tourParticipantAdditionalFormFields}"></div>
+
+        <div class="row form-group">
+            <div class="row form-group">
+
+                <div class="col-sm-2"></div>
+
+                <div class="col">
+                    <button id="submitTourParticipantFormBtn" type="submit" class="btn btn-outline-success btn-block">
+                        <i class="fas fa-check-square"></i>
+                        <span th:text="#{submit.cap}"></span>
+                    </button>
+                </div>
+
+                <div class="col">
+                    <button type="button" class="btn btn-outline-secondary btn-block" data-toggle="collapse"
+                            href="#tourParticipantFormContainer"
+                            aria-expanded="true" aria-controls="tourParticipantFormContainer">
+                        <i class="fas fa-window-close"></i>
+                        <span th:text="#{close.cap}"></span>
+                    </button>
+                </div>
+
+                <div class="col">
+                    <button class="btn btn-outline-warning btn-block" id="resetTourParticipantFormBtn"
+                            type="button"
+                            th:title="#{clear.title}">
+                        <i class="fas fa-eraser"></i>
+                        <span th:text="#{clear.cap} + #{form}"></span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>

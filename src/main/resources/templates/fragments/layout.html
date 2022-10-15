@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <meta name="description" content="">
     <meta name="author" content="Stanislav Wong">
+    <meta name="ctxPath" th:content="${#httpServletRequest.getContextPath()}" />
     <meta name="mainUrl" th:content="${#httpServletRequest.getScheme()} + '://' + ${#httpServletRequest.getServerName()} + ':' + ${#httpServletRequest.getServerPort()} + ${#httpServletRequest.getContextPath()}" />
     <meta name="userLocale" th:content="${@userService.getCurrentUserLocale()}" />
     <meta name="userLanguage" th:content="${@userService.getCurrentUserLocale().getLanguage()}" />
