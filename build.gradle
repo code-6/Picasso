@@ -40,10 +40,12 @@ dependencies {
     implementation group: 'org.webjars', name: 'jquery-easing', version: '1.4.1'
     implementation group: 'org.webjars.npm', name: 'sweetalert2', version: '11.4.14'
     implementation group: 'org.webjars', name: 'bootstrap-daterangepicker', version: '3.1'
-    runtimeOnly group: 'org.webjars.bower', name: 'bootstrap-select', version: '1.13.11'
-//    implementation group: 'org.webjars', name: 'bootstrap-select', version: '1.13.18'
-    implementation group: 'org.webjars', name: 'select2', version: '4.0.13'
-
+    implementation('org.webjars.bower:bootstrap-select:1.13.11') {
+        exclude group: 'org.webjars.bower', module: 'bootstrap'
+    }
+    implementation('org.webjars:select2:4.0.13') {
+        exclude group: 'org.webjars.bower', module: 'jquery'
+    }
 
     compileOnly 'org.projectlombok:lombok'
 
