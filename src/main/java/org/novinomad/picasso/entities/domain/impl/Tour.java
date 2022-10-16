@@ -2,8 +2,10 @@ package org.novinomad.picasso.entities.domain.impl;
 
 import lombok.*;
 import lombok.experimental.FieldDefaults;
+import org.apache.commons.lang3.NotImplementedException;
 import org.hibernate.annotations.Nationalized;
 import org.novinomad.picasso.commons.IRange;
+import org.novinomad.picasso.dto.base.AbstractModel;
 import org.novinomad.picasso.entities.domain.ITour;
 import org.novinomad.picasso.entities.base.AbstractEntity;
 

@@ -3,6 +3,9 @@ package org.novinomad.picasso.entities.domain.impl;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 import org.novinomad.picasso.commons.utils.CommonCollections;
+import org.novinomad.picasso.dto.DriverModel;
+import org.novinomad.picasso.dto.base.AbstractModel;
+import org.novinomad.picasso.entities.base.ModelConvertable;
 import org.novinomad.picasso.entities.domain.IDriver;
 
 import javax.persistence.*;
@@ -17,7 +20,7 @@ public class Driver extends TourParticipant implements IDriver {
 
     @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(indexes = @Index(columnList = "brandName, modelName"))
-    List<Car> cars = new ArrayList<>();
+    Set<Car> cars = new HashSet<>();
 
     public Driver(String name) {
         super(name, Type.DRIVER);
@@ -28,8 +31,17 @@ public class Driver extends TourParticipant implements IDriver {
         this.id = id;
     }
 
-    //region equals, hashCode, toString
+    @Override
+    public DriverModel toModel() {
+        DriverModel driverModel = new DriverModel();
+        driverModel.setId(id);
+        driverModel.setName(name);
+        driverModel.setType(type);
+        driverModel.setCars(new ArrayList<>(cars));
+        return driverModel;
+    }
 
+    //region equals, hashCode, toString
 
     @Override
     public String toString() {

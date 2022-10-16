@@ -5,6 +5,7 @@ import org.novinomad.picasso.entities.domain.impl.Driver;
 import org.novinomad.picasso.entities.domain.impl.Guide;
 import org.novinomad.picasso.entities.domain.impl.TourParticipant;
 import org.novinomad.picasso.services.IDriverService;
+import org.novinomad.picasso.services.IGuideService;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ModelAttribute;
 
@@ -17,14 +18,16 @@ public class GlobalModelAttributes {
 
     private final IDriverService driverService;
 
+    private final IGuideService guideService;
+
     @ModelAttribute("allTourParticipantTypes")
     public List<TourParticipant.Type> getTourParticipantTypes() {
         return Arrays.asList(TourParticipant.Type.values());
     }
 
     @ModelAttribute("allLanguages")
-    public List<Guide.Language> getLanguages(){
-        return Arrays.asList(Guide.Language.values());
+    public List<String> getLanguages(){
+        return guideService.getAllLanguages();
     }
 
     @ModelAttribute("allCars")

@@ -5,7 +5,7 @@ import org.novinomad.picasso.entities.domain.impl.Driver;
 import java.util.*;
 
 public interface IDriver {
-    List<Driver.Car> getCars();
+    Collection<Driver.Car> getCars();
 
     default void addCar(Driver.Car ... cars) {
         getCars().addAll(Arrays.asList(cars));

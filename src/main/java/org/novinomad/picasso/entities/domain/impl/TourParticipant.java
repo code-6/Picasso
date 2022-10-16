@@ -5,8 +5,10 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 import org.hibernate.annotations.Nationalized;
+import org.novinomad.picasso.dto.base.AbstractModel;
 import org.novinomad.picasso.dto.gantt.Task;
 import org.novinomad.picasso.entities.base.AbstractEntity;
+import org.novinomad.picasso.entities.base.ModelConvertable;
 
 import javax.persistence.*;
 import java.util.Objects;

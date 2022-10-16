@@ -4,6 +4,10 @@ import lombok.*;
 import lombok.experimental.FieldDefaults;
 import org.apache.commons.lang3.RandomUtils;
 import org.novinomad.picasso.commons.utils.CommonCollections;
+import org.novinomad.picasso.dto.DriverModel;
+import org.novinomad.picasso.dto.GuideModel;
+import org.novinomad.picasso.dto.base.AbstractModel;
+import org.novinomad.picasso.entities.base.ModelConvertable;
 import org.novinomad.picasso.entities.domain.IGuide;
 
 import javax.persistence.*;
@@ -17,10 +21,9 @@ import java.util.stream.Collectors;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class Guide extends TourParticipant implements IGuide {
 
-    @Enumerated(EnumType.STRING)
     @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(indexes = @Index(columnList = "languages"))
-    Set<Language> languages = new HashSet<>();
+    Set<String> languages = new HashSet<>();
 
     public Guide(String name) {
         super(name, Type.GUIDE);
@@ -31,9 +34,17 @@ public class Guide extends TourParticipant implements IGuide {
         this.id = id;
     }
 
+    @Override
+    public GuideModel toModel() {
+        GuideModel guideModel = new GuideModel();
+        guideModel.setId(id);
+        guideModel.setType(type);
+        guideModel.setName(name);
+        guideModel.setLanguages(new ArrayList<>(languages));
+        return guideModel;
+    }
+
     //region equals, hashCode, toString
-
-
     @Override
     public String toString() {
         return super.toString();
@@ -92,16 +103,16 @@ public class Guide extends TourParticipant implements IGuide {
                     });
         }
 
-        public static Language random() {
+        public static String random() {
             Language[] languages = values();
             int langIndex = RandomUtils.nextInt(0, languages.length - 1);
-            return languages[langIndex];
+            return languages[langIndex].NAME;
         }
-        public static Set<Language> randomSet() {
+        public static Set<String> randomSet() {
             return randomSet(1, 0);
         }
 
-        public static Set<Language> randomSet(int minCount, int maxCount) {
+        public static Set<String> randomSet(int minCount, int maxCount) {
 
             maxCount = Math.abs(maxCount);
 
@@ -113,7 +124,7 @@ public class Guide extends TourParticipant implements IGuide {
 
             int langCountToReturn = RandomUtils.nextInt(minCount, maxCount);
 
-            Set<Language> languages = new HashSet<>();
+            Set<String> languages = new HashSet<>();
 
             while(languages.size() < langCountToReturn) languages.add(Language.random());
 
