@@ -40,11 +40,16 @@ dependencies {
     implementation group: 'org.webjars', name: 'jquery-easing', version: '1.4.1'
     implementation group: 'org.webjars.npm', name: 'sweetalert2', version: '11.4.14'
     implementation group: 'org.webjars', name: 'bootstrap-daterangepicker', version: '3.1'
+
     implementation('org.webjars.bower:bootstrap-select:1.13.11') {
         exclude group: 'org.webjars.bower', module: 'bootstrap'
+        exclude group: 'org.webjars.bower', module: 'jquery'
+        exclude group: 'org.webjars', module: 'jquery'
     }
+
     implementation('org.webjars:select2:4.0.13') {
         exclude group: 'org.webjars.bower', module: 'jquery'
+        exclude group: 'org.webjars', module: 'jquery'
     }
 
     compileOnly 'org.projectlombok:lombok'
@@ -72,6 +77,7 @@ jar {
         )
     }
     archiveName('picasso.jar')
+    duplicatesStrategy(DuplicatesStrategy.EXCLUDE)
 }
 
 bootJar {
