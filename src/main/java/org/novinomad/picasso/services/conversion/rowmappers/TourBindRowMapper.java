@@ -2,7 +2,7 @@ package org.novinomad.picasso.services.conversion.rowmappers;
 
 import org.novinomad.picasso.commons.utils.CommonDateUtils;
 import org.novinomad.picasso.entities.domain.impl.TourBind;
-import org.novinomad.picasso.services.IEmployeeService;
+import org.novinomad.picasso.services.ITourParticipantService;
 import org.novinomad.picasso.services.ITourService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.RowMapper;
@@ -16,7 +16,7 @@ import java.util.NoSuchElementException;
 public class TourBindRowMapper implements RowMapper<TourBind> {
 
     @Autowired
-    private IEmployeeService employeeService;
+    private ITourParticipantService tourParticipantService;
 
     @Autowired
     private ITourService tourService;
@@ -28,7 +28,7 @@ public class TourBindRowMapper implements RowMapper<TourBind> {
         tourBind.setEndDate(CommonDateUtils.dateToLocalDateTime(rs.getTimestamp("end_date")));
         tourBind.setStartDate(CommonDateUtils.dateToLocalDateTime(rs.getTimestamp("start_date")));
         tourBind.setTour(tourService.get(rs.getLong("tour_id")).orElseThrow(NoSuchElementException::new));
-        tourBind.setEmployee(employeeService.get(rs.getLong("employee_id")).orElse(null));
+        tourBind.setTourParticipant(tourParticipantService.get(rs.getLong("tour_participant_id")).orElse(null));
 
         return tourBind;
     }

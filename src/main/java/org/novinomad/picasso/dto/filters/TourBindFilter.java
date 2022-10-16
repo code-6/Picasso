@@ -2,7 +2,7 @@ package org.novinomad.picasso.dto.filters;
 
 import lombok.*;
 import lombok.experimental.FieldDefaults;
-import org.novinomad.picasso.entities.domain.impl.Employee;
+import org.novinomad.picasso.entities.domain.impl.TourParticipant;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -13,9 +13,9 @@ import java.util.List;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class TourBindFilter extends TourFilter {
 
-    private List<Employee.Type> employeeTypes = new ArrayList<>();
+    private List<TourParticipant.Type> tourParticipantTypes = new ArrayList<>();
 
-    private List<Long> employeeIds = new ArrayList<>();
+    private List<Long> tourParticipantIds = new ArrayList<>();
 
     public TourBindFilter() {
         super();

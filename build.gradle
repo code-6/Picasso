@@ -27,7 +27,7 @@ dependencies {
     implementation 'com.h2database:h2'
     implementation group: 'org.apache.commons', name: 'commons-lang3', version: '3.12.0'
     implementation group: 'com.github.javafaker', name: 'javafaker', version: '1.0.2'
-    implementation group: 'org.yaml', name: 'snakeyaml', version: '1.29'
+    implementation group: 'org.yaml', name: 'snakeyaml', version: '1.32'
     implementation group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310', version: '2.13.3'
 
     // frontend
@@ -36,11 +36,14 @@ dependencies {
     implementation group: 'org.webjars', name: 'font-awesome', version: '6.1.2'
     implementation group: 'org.webjars', name: 'bootstrap', version: '4.6.2'
     implementation group: 'org.webjars.npm', name: 'chart.js', version: '3.8.0'
-    implementation group: 'org.webjars', name: 'jquery', version: '3.6.0'
+    implementation group: 'org.webjars', name: 'jquery', version: '3.6.1'
     implementation group: 'org.webjars', name: 'jquery-easing', version: '1.4.1'
     implementation group: 'org.webjars.npm', name: 'sweetalert2', version: '11.4.14'
     implementation group: 'org.webjars', name: 'bootstrap-daterangepicker', version: '3.1'
     runtimeOnly group: 'org.webjars.bower', name: 'bootstrap-select', version: '1.13.11'
+//    implementation group: 'org.webjars', name: 'bootstrap-select', version: '1.13.18'
+    implementation group: 'org.webjars', name: 'select2', version: '4.0.13'
+
 
     compileOnly 'org.projectlombok:lombok'
 

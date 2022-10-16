@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <meta name="description" content="">
     <meta name="author" content="Stanislav Wong">
+    <meta name="ctxPath" th:content="${#httpServletRequest.getContextPath()}" />
     <meta name="mainUrl" th:content="${#httpServletRequest.getScheme()} + '://' + ${#httpServletRequest.getServerName()} + ':' + ${#httpServletRequest.getServerPort()} + ${#httpServletRequest.getContextPath()}" />
     <meta name="userLocale" th:content="${@userService.getCurrentUserLocale()}" />
     <meta name="userLanguage" th:content="${@userService.getCurrentUserLocale().getLanguage()}" />
@@ -15,7 +16,7 @@
 
     <title>Picasso</title>
 <!--    common dependencies-->
-    <link th:href="@{/webjars/bootstrap/css/bootstrap.css}" rel="stylesheet" />
+    <link th:href="@{/webjars/bootstrap/4.6.2/css/bootstrap.css}" rel="stylesheet" />
 
     <link th:href="@{/css/styles.css}" rel="stylesheet" />
 
@@ -45,7 +46,7 @@
 <body class="sb-nav-fixed">
 
 <div layout:fragment="header">
-    <nav th:insert="fragments/header :: header"></nav>
+    <nav th:replace="fragments/header :: header"></nav>
 </div>
 
 <div id="layoutSidenav">
@@ -56,13 +57,13 @@
                 <h1>You are welcome!</h1>
             </div>
         </main>
-        <div th:insert="fragments/footer :: footer"></div>
+        <div th:replace="fragments/footer :: footer"></div>
     </div>
 </div>
 <!--    common dependencies-->
 <script th:src="@{/webjars/jquery/jquery.js}" ></script>
 <script th:src="@{/webjars/popper.js/umd/popper.min.js}" ></script>
-<script th:src="@{/webjars/bootstrap/js/bootstrap.js}" ></script>
+<script th:src="@{/webjars/bootstrap/4.6.2/js/bootstrap.js}" ></script>
 
 <script th:src="@{/js/scripts.js}"></script>
 

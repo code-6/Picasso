@@ -2,23 +2,22 @@ package org.novinomad.picasso.entities.domain.impl;
 
 import lombok.*;
 import lombok.experimental.FieldDefaults;
+import org.novinomad.picasso.commons.utils.CommonCollections;
 import org.novinomad.picasso.entities.domain.IDriver;
 
 import javax.persistence.*;
-import java.util.HashSet;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 
 @Entity
 @Getter
 @Setter
 @NoArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class Driver extends Employee implements IDriver {
+public class Driver extends TourParticipant implements IDriver {
 
     @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(indexes = @Index(columnList = "brandName, modelName"))
-    Set<Car> cars = new HashSet<>();
+    List<Car> cars = new ArrayList<>();
 
     public Driver(String name) {
         super(name, Type.DRIVER);
@@ -42,6 +41,10 @@ public class Driver extends Employee implements IDriver {
         return super.toString().replace("}","") +
                 ", cars=" + cars +
                 '}';
+    }
+
+    public String getCarsAsString() {
+        return CommonCollections.toString(",", cars);
     }
 
     @Override
@@ -68,8 +71,6 @@ public class Driver extends Employee implements IDriver {
     @Embeddable
     public static class Car {
 
-        private static final Class<Car> clazz = Car.class;
-
         String brandName;
         String modelName;
 
@@ -91,32 +92,8 @@ public class Driver extends Employee implements IDriver {
 
         @Override
         public String toString() {
-            return "Car{" +
-                    "brandName='" + brandName + '\'' +
-                    ", modelName='" + modelName + '\'' +
-                    ", number='" + number + '\'' +
-                    '}';
+            return String.format("%s %s %s", brandName, modelName, number);
         }
     }
-
-    /*public static class CarsToStringConverter implements AttributeConverter<Collection<Car>, String> {
-
-        private static final String delimiter = ",";
-
-        @Override
-        public String convertToDatabaseColumn(Collection<Car> attribute) {
-            return attribute.stream()
-                    .map(Car::toString)
-                    .sorted()
-                    .collect(Collectors.joining(delimiter));
-        }
-
-        @Override
-        public Collection<Car> convertToEntityAttribute(String dbData) {
-            return Arrays.stream(dbData.split(dbData))
-                    .map(Car::fromString)
-                    .collect(Collectors.toSet());
-        }
-    }*/
     //endregion
 }

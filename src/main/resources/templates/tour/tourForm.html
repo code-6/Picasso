@@ -62,8 +62,7 @@
                 <label class="form-label" th:text="#{file.uploaded}"></label>
             </div>
             <div class="col" th:if="${tour.fileNames != null and !tour.fileNames.isEmpty()}">
-                <div th:include="tour/tourFilesFragment :: tourFilesFragment" id="uploadedFilesTable">
-                </div>
+                <div th:include="tour/tourFilesFragment :: tourFilesFragment" id="uploadedFilesTable"></div>
             </div>
             <div class="row form-group">
                 <div class="col-sm-2"></div>

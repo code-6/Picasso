@@ -1,10 +1,12 @@
 package org.novinomad.picasso.entities.domain.impl;
 
+import com.fasterxml.jackson.annotation.JsonSubTypes;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 import org.hibernate.annotations.Nationalized;
-import org.novinomad.picasso.entities.base.AbstractEntity;
 import org.novinomad.picasso.dto.gantt.Task;
+import org.novinomad.picasso.entities.base.AbstractEntity;
 
 import javax.persistence.*;
 import java.util.Objects;
@@ -18,7 +20,14 @@ import java.util.Objects;
 @Inheritance(strategy = InheritanceType.JOINED)
 @NoArgsConstructor(access = AccessLevel.PUBLIC)
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
-public class Employee extends AbstractEntity {
+@JsonTypeInfo(
+        use = JsonTypeInfo.Id.NAME,
+        property = "type")
+@JsonSubTypes({
+        @JsonSubTypes.Type(value = Guide.class, name = "GUIDE"),
+        @JsonSubTypes.Type(value = Driver.class, name = "DRIVER")
+})
+public class TourParticipant extends AbstractEntity {
 
     @Nationalized
     @Column(nullable = false)
@@ -39,8 +48,8 @@ public class Employee extends AbstractEntity {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         if (!super.equals(o)) return false;
-        Employee employee = (Employee) o;
-        return Objects.equals(name, employee.name);
+        TourParticipant tourParticipant = (TourParticipant) o;
+        return Objects.equals(name, tourParticipant.name);
     }
 
     @Override
@@ -58,13 +67,30 @@ public class Employee extends AbstractEntity {
 
     @RequiredArgsConstructor
     public enum Type {
-        DRIVER("<i class=\"driver-icon\"></i>", Task.CssClass.PINK),
-        GUIDE("<i class=\"fa-thin fa-person-hiking\"></i>", Task.CssClass.YELLOW);
+        DRIVER("fas fa-user-tie", Task.CssClass.PINK, Driver.class, "driver"),
+        GUIDE("fas fa-hiking", Task.CssClass.YELLOW, Guide.class, "guide");
 
-        @Getter
-        private final String ICON;
+        private final String ICON_CSS_CLASS;
 
-        @Getter
-        private final Task.CssClass COLOR;
+        private final Task.CssClass GANT_TASK_COLOR;
+        private final Class<? extends TourParticipant> TOUR_PARTICIPANT_CLASS;
+
+        private final String THYMELEAF_FRAGMENT;
+
+        public Class<? extends TourParticipant> getTourParticipantClass() {
+            return TOUR_PARTICIPANT_CLASS;
+        }
+
+        public String getIconCssClass() {
+            return this.ICON_CSS_CLASS;
+        }
+
+        public Task.CssClass getGanttTaskColor() {
+            return this.GANT_TASK_COLOR;
+        }
+
+        public String getThymeleafFragment() {
+            return THYMELEAF_FRAGMENT;
+        }
     }
 }

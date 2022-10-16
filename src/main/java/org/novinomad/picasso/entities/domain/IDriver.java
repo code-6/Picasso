@@ -2,12 +2,10 @@ package org.novinomad.picasso.entities.domain;
 
 import org.novinomad.picasso.entities.domain.impl.Driver;
 
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Set;
+import java.util.*;
 
 public interface IDriver {
-    Set<Driver.Car> getCars();
+    List<Driver.Car> getCars();
 
     default void addCar(Driver.Car ... cars) {
         getCars().addAll(Arrays.asList(cars));
@@ -42,10 +40,10 @@ public interface IDriver {
     }
 
     default boolean hasCar(Driver.Car ... car) {
-        return getCars().containsAll(Arrays.asList(car));
+        return new HashSet<>(getCars()).containsAll(Arrays.asList(car));
     }
 
     default boolean hasCar(Collection<Driver.Car> cars) {
-        return getCars().containsAll(cars);
+        return new HashSet<>(getCars()).containsAll(cars);
     }
 }

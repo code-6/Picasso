@@ -16,7 +16,7 @@ public class CarUtils {
         brandsAndModels.put("Mercedes-Benz", List.of("SPRINTER", "CITAN", "EQB", "GLS-CLASS", "E-CLASS", "C-CLASS", "A-CLASS", "AMG GT", "AMG ONE", "AMG SL", "G-CLASS"));
     }
 
-    public static  Driver.Car random() {
+    public static Driver.Car random() {
         Driver.Car rndCar = null;
         int totalBrandsCount = brandsAndModels.keySet().size();
         int randomBrandIdx = RandomUtils.nextInt(0, totalBrandsCount - 1);
@@ -34,11 +34,11 @@ public class CarUtils {
         return rndCar;
     }
 
-    public static  Set<Driver.Car> randomSet() {
+    public static Set<Driver.Car> randomSet() {
         return randomSet(1, 0);
     }
 
-    public static  Set<Driver.Car> randomSet(int minCount, int maxCount) {
+    public static Set<Driver.Car> randomSet(int minCount, int maxCount) {
         maxCount = Math.abs(maxCount);
 
         int maxAvailableModelsCount = getTotalModelsCount();
@@ -56,7 +56,7 @@ public class CarUtils {
         return cars;
     }
 
-    public static  int getTotalModelsCount() {
+    public static int getTotalModelsCount() {
         int count = 0;
 
         for (Map.Entry<String, List<String>> brandAndModels : brandsAndModels.entrySet()) {

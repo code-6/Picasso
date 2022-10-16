@@ -3,6 +3,7 @@ package org.novinomad.picasso.entities.domain.impl;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 import org.apache.commons.lang3.RandomUtils;
+import org.novinomad.picasso.commons.utils.CommonCollections;
 import org.novinomad.picasso.entities.domain.IGuide;
 
 import javax.persistence.*;
@@ -14,7 +15,7 @@ import java.util.stream.Collectors;
 @Setter
 @NoArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class Guide extends Employee implements IGuide {
+public class Guide extends TourParticipant implements IGuide {
 
     @Enumerated(EnumType.STRING)
     @ElementCollection(fetch = FetchType.EAGER)
@@ -52,6 +53,10 @@ public class Guide extends Employee implements IGuide {
         if (!super.equals(o)) return false;
         Guide guide = (Guide) o;
         return Objects.equals(languages, guide.languages);
+    }
+
+    public String getLanguagesAsString() {
+        return CommonCollections.toString(",", languages);
     }
 
     @Override

@@ -7,13 +7,13 @@ import lombok.extern.slf4j.Slf4j;
 import org.novinomad.picasso.commons.IRange;
 import org.novinomad.picasso.dto.filters.TourBindFilter;
 import org.novinomad.picasso.dto.gantt.Task;
-import org.novinomad.picasso.entities.domain.impl.Employee;
+import org.novinomad.picasso.entities.domain.impl.TourParticipant;
 import org.novinomad.picasso.entities.domain.impl.Tour;
 import org.novinomad.picasso.entities.domain.impl.TourBind;
 import org.novinomad.picasso.exceptions.BindException;
 import org.novinomad.picasso.exceptions.base.BaseException;
 import org.novinomad.picasso.repositories.jpa.TourBindRepository;
-import org.novinomad.picasso.services.IEmployeeService;
+import org.novinomad.picasso.services.ITourParticipantService;
 import org.novinomad.picasso.services.ITourBindService;
 import org.novinomad.picasso.services.ITourService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,7 +36,7 @@ public class TourBindService implements ITourBindService {
 
     final ITourService tourService;
 
-    final IEmployeeService employeeService;
+    final ITourParticipantService tourParticipantService;
 
     @Autowired
     @Qualifier("tourBindJdbcRepository")
@@ -48,9 +48,9 @@ public class TourBindService implements ITourBindService {
      * 2. Intersects with dates of other allTours.
      * */
     @Override
-    public TourBind bind(Employee employee, Tour tour, IRange dateRange) throws BaseException {
+    public TourBind bind(TourParticipant tourParticipant, Tour tour, IRange dateRange) throws BaseException {
         try {
-            TourBind tourBind = new TourBind(employee, tour, dateRange);
+            TourBind tourBind = new TourBind(tourParticipant, tour, dateRange);
 
             validateBind(tourBind);
 
@@ -62,21 +62,21 @@ public class TourBindService implements ITourBindService {
     }
 
     @Override
-    public TourBind bind(Long employeeID, Long tourId, IRange dateRange) throws BaseException {
-        Employee employee = employeeService.get(employeeID)
-                .orElseThrow(() -> new BaseException("Employee with id: {} not found in DB", employeeID));
+    public TourBind bind(Long tourParticipantID, Long tourId, IRange dateRange) throws BaseException {
+        TourParticipant tourParticipant = tourParticipantService.get(tourParticipantID)
+                .orElseThrow(() -> new BaseException("TourParticipant with id: {} not found in DB", tourParticipantID));
 
         Tour tour = tourService.get(tourId)
                 .orElseThrow(() -> new BaseException("Tour with id: {} not found in DB", tourId));
 
-        return bind(employee, tour, dateRange);
+        return bind(tourParticipant, tour, dateRange);
     }
 
     @Override
     public void validateBind(TourBind tourBind) throws BindException {
-        Employee employee = tourBind.getEmployee();
+        TourParticipant tourParticipant = tourBind.getTourParticipant();
 
-        List<TourBind> overlapsBinds = tourBindRepository.findOverlappedBinds(tourBind.getTour().getId(), employee.getId(),
+        List<TourBind> overlapsBinds = tourBindRepository.findOverlappedBinds(tourBind.getTour().getId(), tourParticipant.getId(),
                 tourBind.getStartDate(), tourBind.getEndDate());
 
         if (!overlapsBinds.isEmpty()) {
@@ -85,25 +85,25 @@ public class TourBindService implements ITourBindService {
                             Collectors.toMap(TourBind::getTour,
                                     tb -> findOverlappedRange(tourBind.getDateRange(), tb.getDateRange()))
                     );
-            throw new BindException(employee, tourBind.getTour(), tourBind.getDateRange(), overlapsToursAndRanges);
+            throw new BindException(tourParticipant, tourBind.getTour(), tourBind.getDateRange(), overlapsToursAndRanges);
         }
     }
 
     @Override
-    public void validateBind(Long tourId, Long employeeId, IRange bindRange) throws BaseException {
-        List<TourBind> overlapsBinds = tourBindRepository.findOverlappedBinds(tourId, employeeId, bindRange.getStartDate(), bindRange.getEndDate());
+    public void validateBind(Long tourId, Long tourParticipantId, IRange bindRange) throws BaseException {
+        List<TourBind> overlapsBinds = tourBindRepository.findOverlappedBinds(tourId, tourParticipantId, bindRange.getStartDate(), bindRange.getEndDate());
 
         if (!overlapsBinds.isEmpty()) {
             Map<Tour, IRange> overlapsToursAndRanges = overlapsBinds.stream()
                     .collect(Collectors.toMap(TourBind::getTour, tb -> findOverlappedRange(bindRange, tb.getDateRange())));
 
-            Employee employee = employeeService.get(employeeId)
-                    .orElseThrow(() -> new BaseException("Employee with id: {} not found in DB", employeeId));
+            TourParticipant tourParticipant = tourParticipantService.get(tourParticipantId)
+                    .orElseThrow(() -> new BaseException("TourParticipant with id: {} not found in DB", tourParticipantId));
 
             Tour tour = tourService.get(tourId)
                     .orElseThrow(() -> new BaseException("Tour with id: {} not found in DB", tourId));
 
-            throw new BindException(employee, tour, bindRange, overlapsToursAndRanges);
+            throw new BindException(tourParticipant, tour, bindRange, overlapsToursAndRanges);
         }
     }
 
@@ -191,9 +191,9 @@ public class TourBindService implements ITourBindService {
     @Override
     public List<TourBind> get(TourBindFilter tourBindFilter) {
         List<Long> tourIds = tourBindFilter.getTourIds().isEmpty() ? null : tourBindFilter.getTourIds();
-        List<Long> employeeIds = tourBindFilter.getEmployeeIds().isEmpty() ? null : tourBindFilter.getEmployeeIds();
+        List<Long> tourParticipantIds = tourBindFilter.getTourParticipantIds().isEmpty() ? null : tourBindFilter.getTourParticipantIds();
 
-        return tourBindJdbcRepository.findByFilter(tourBindFilter.getStartDate(), tourBindFilter.getEndDate(), tourIds, employeeIds);
+        return tourBindJdbcRepository.findByFilter(tourBindFilter.getStartDate(), tourBindFilter.getEndDate(), tourIds, tourParticipantIds);
     }
 
     @Override

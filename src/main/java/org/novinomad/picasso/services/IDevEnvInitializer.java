@@ -14,18 +14,18 @@ public interface IDevEnvInitializer {
 
     List<Guide> createGuides();
 
-    List<TourBind> createTourBindings(List<Tour> tours, List<Employee> employees) throws BaseException;
+    List<TourBind> createTourBindings(List<Tour> tours, List<TourParticipant> tourParticipants) throws BaseException;
 
     default List<TourBind> createTourBindings() throws BaseException {
-        return createTourBindings(createTours(), createEmployees());
+        return createTourBindings(createTours(), createTourParticipants());
     }
 
-    default List<Employee> createEmployees(){
-        List<Employee> employees = new ArrayList<>();
+    default List<TourParticipant> createTourParticipants(){
+        List<TourParticipant> tourParticipants = new ArrayList<>();
 
-        employees.addAll(createDrivers());
-        employees.addAll(createGuides());
+        tourParticipants.addAll(createDrivers());
+        tourParticipants.addAll(createGuides());
 
-        return employees;
+        return tourParticipants;
     }
 }

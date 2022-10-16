@@ -9,9 +9,8 @@ import lombok.*;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.novinomad.picasso.commons.IRange;
-import org.novinomad.picasso.commons.LocalDateTimeRange;
 import org.novinomad.picasso.commons.serializers.ListOfEntitiesToCommaSeparatedString;
-import org.novinomad.picasso.entities.domain.impl.Employee;
+import org.novinomad.picasso.entities.domain.impl.TourParticipant;
 import org.novinomad.picasso.entities.domain.impl.Tour;
 import org.novinomad.picasso.entities.domain.impl.TourBind;
 import org.springframework.util.CollectionUtils;
@@ -130,21 +129,21 @@ public class Task implements ITask, Comparable<Task> {
     private static Task build(Tour tour, List<TourBind> binds) {
         Task ganttTourTask = buildTourTask(tour);
 
-        binds.stream().filter(tb -> tb.getEmployee() != null).collect(Collectors.groupingBy(TourBind::getEmployee))
-                .forEach((employee, employeeBinds) -> {
-                    if (!CollectionUtils.isEmpty(employeeBinds) && employeeBinds.get(0) != null) {
-                        TourBind firstBind = employeeBinds.get(0);
-                        if (employeeBinds.size() > 1) {
+        binds.stream().filter(tb -> tb.getTourParticipant() != null).collect(Collectors.groupingBy(TourBind::getTourParticipant))
+                .forEach((tourParticipant, tourParticipantBinds) -> {
+                    if (!CollectionUtils.isEmpty(tourParticipantBinds) && tourParticipantBinds.get(0) != null) {
+                        TourBind firstBind = tourParticipantBinds.get(0);
+                        if (tourParticipantBinds.size() > 1) {
                             long combinedTaskId = Long.parseLong("838466" + firstBind.getId());
-                            Task employeeCombinedTask = buildEmployeeTask(ganttTourTask, employee, combinedTaskId, tour.getDateRange(), Type.COMBINED);
-                            Task employeeTask = null;
-                            for (TourBind bind : employeeBinds) {
-                                long employeeTaskId = Long.parseLong("66" + bind.getId());
-                                employeeTask = buildEmployeeTask(employeeCombinedTask, employee, employeeTaskId, bind.getDateRange(), Type.SINGLE, employeeTask);
+                            Task tourParticipantCombinedTask = buildTourParticipantTask(ganttTourTask, tourParticipant, combinedTaskId, tour.getDateRange(), Type.COMBINED);
+                            Task tourParticipantTask = null;
+                            for (TourBind bind : tourParticipantBinds) {
+                                long tourParticipantTaskId = Long.parseLong("66" + bind.getId());
+                                tourParticipantTask = buildTourParticipantTask(tourParticipantCombinedTask, tourParticipant, tourParticipantTaskId, bind.getDateRange(), Type.SINGLE, tourParticipantTask);
                             }
                         } else {
-                            long employeeTaskId = Long.parseLong("66" + firstBind.getId());
-                            buildEmployeeTask(ganttTourTask, employee, employeeTaskId, firstBind.getDateRange(), Type.SINGLE);
+                            long tourParticipantTaskId = Long.parseLong("66" + firstBind.getId());
+                            buildTourParticipantTask(ganttTourTask, tourParticipant, tourParticipantTaskId, firstBind.getDateRange(), Type.SINGLE);
                         }
                     }
                 });
@@ -169,13 +168,13 @@ public class Task implements ITask, Comparable<Task> {
         return ganttTourTask;
     }
 
-    private static Task buildEmployeeTask(Task parentTask, Employee employee, Long taskId, IRange taskDates, Task.Type type, Task... dependencies) {
+    private static Task buildTourParticipantTask(Task parentTask, TourParticipant tourParticipant, Long taskId, IRange taskDates, Task.Type type, Task... dependencies) {
 
-        Long employeeId = employee.getId();
-        Employee.Type employeeType = employee.getType();
-        String employeeName = employee.getName();
+        Long tourParticipantId = tourParticipant.getId();
+        TourParticipant.Type tourParticipantType = tourParticipant.getType();
+        String tourParticipantName = tourParticipant.getName();
 
-        Task ganttEmployeeTask = new Task(taskId, employeeType + " " + employeeId + ". " + employeeName, taskDates)
+        Task ganttTourParticipantTask = new Task(taskId, tourParticipantType + " " + tourParticipantId + ". " + tourParticipantName, taskDates)
                 .parent(parentTask).type(type);
 
         if (dependencies != null && dependencies.length > 0) {
@@ -184,14 +183,14 @@ public class Task implements ITask, Comparable<Task> {
                 if (dependency != null)
                     dependencyTasks.add(dependency);
             }
-            ganttEmployeeTask.dependencies(dependencyTasks);
+            ganttTourParticipantTask.dependencies(dependencyTasks);
         }
 
-        ganttEmployeeTask.cssClass(employeeType.getCOLOR().getCssName());
+        ganttTourParticipantTask.cssClass(tourParticipantType.getGanttTaskColor().getCssName());
 
-        parentTask.addChild(ganttEmployeeTask);
+        parentTask.addChild(ganttTourParticipantTask);
 
-        return ganttEmployeeTask;
+        return ganttTourParticipantTask;
     }
 
     public Task id(Long id) {

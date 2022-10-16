@@ -3,7 +3,7 @@ package org.novinomad.picasso.dto.bind;
 import lombok.Data;
 import org.novinomad.picasso.commons.IRange;
 import org.novinomad.picasso.commons.LocalDateTimeRange;
-import org.novinomad.picasso.entities.domain.impl.Employee;
+import org.novinomad.picasso.entities.domain.impl.TourParticipant;
 import org.novinomad.picasso.entities.domain.impl.Tour;
 import org.novinomad.picasso.entities.domain.impl.TourBind;
 import org.novinomad.picasso.exceptions.BindException;
@@ -16,43 +16,43 @@ public class TourBindModel{
 
     private Tour tour = new Tour();
 
-    private List<EmployeeBindModel> employees = new ArrayList<>();
+    private List<TourParticipantBindModel> tourParticipants = new ArrayList<>();
 
-    public void bindEmployee(Employee employee) {
+    public void bindTourParticipant(TourParticipant tourParticipant) {
         if (tour != null) {
-            bindEmployee(null, employee, tour.getDateRange());
+            bindTourParticipant(null, tourParticipant, tour.getDateRange());
         }
     }
 
-    public void bindEmployee(Long bindId, Employee employee, IRange dateRange) {
-        getBoundEmployee(employee).ifPresentOrElse(employeeBindModel -> {
-            List<BindDateRange> dateRanges = employeeBindModel.getBindIdsToDateRanges();
+    public void bindTourParticipant(Long bindId, TourParticipant tourParticipant, IRange dateRange) {
+        getBoundTourParticipant(tourParticipant).ifPresentOrElse(tourParticipantBindModel -> {
+            List<BindDateRange> dateRanges = tourParticipantBindModel.getBindIdsToDateRanges();
             if (dateRanges.stream().noneMatch(bindDateRange -> bindDateRange.getDateRange().equals(dateRange)))
                 dateRanges.add(new BindDateRange(bindId, dateRange));
         }, () -> {
-            EmployeeBindModel employeeBindModel = new EmployeeBindModel();
-            employeeBindModel.getBindIdsToDateRanges().add(new BindDateRange(bindId, dateRange));
-            employeeBindModel.setEmployee(employee);
-            employees.add(employeeBindModel);
+            TourParticipantBindModel tourParticipantBindModel = new TourParticipantBindModel();
+            tourParticipantBindModel.getBindIdsToDateRanges().add(new BindDateRange(bindId, dateRange));
+            tourParticipantBindModel.setTourParticipant(tourParticipant);
+            tourParticipants.add(tourParticipantBindModel);
         });
     }
 
-    public Optional<EmployeeBindModel> getBoundEmployee(Employee employee) {
-        return employees.isEmpty()
+    public Optional<TourParticipantBindModel> getBoundTourParticipant(TourParticipant tourParticipant) {
+        return tourParticipants.isEmpty()
                 ? Optional.empty()
-                : employees.stream()
-                .filter(e -> e != null && e.getEmployee() != null && e.getEmployee().equals(employee))
+                : tourParticipants.stream()
+                .filter(e -> e != null && e.getTourParticipant() != null && e.getTourParticipant().equals(tourParticipant))
                 .findAny();
     }
 
     public List<TourBind> toEntities() throws BindException {
         List<TourBind> tourBinds = new ArrayList<>();
 
-        if (employees.isEmpty()) tourBinds.add(new TourBind(null, tour, tour.getDateRange()));
+        if (tourParticipants.isEmpty()) tourBinds.add(new TourBind(null, tour, tour.getDateRange()));
         else
-            for (EmployeeBindModel employeeBindModel : employees)
-                for (BindDateRange bindDateRange : employeeBindModel.getBindIdsToDateRanges())
-                    tourBinds.add(new TourBind(bindDateRange.getBindId(), employeeBindModel.getEmployee(), tour, bindDateRange.getDateRange()));
+            for (TourParticipantBindModel tourParticipantBindModel : tourParticipants)
+                for (BindDateRange bindDateRange : tourParticipantBindModel.getBindIdsToDateRanges())
+                    tourBinds.add(new TourBind(bindDateRange.getBindId(), tourParticipantBindModel.getTourParticipant(), tour, bindDateRange.getDateRange()));
 
         return tourBinds;
     }
@@ -67,7 +67,7 @@ public class TourBindModel{
         collect.forEach((tour, binds) -> {
             tourBindModel.setTour(tour);
 
-            binds.forEach(bind -> tourBindModel.bindEmployee(bind.getId(), bind.getEmployee(), bind.getDateRange()));
+            binds.forEach(bind -> tourBindModel.bindTourParticipant(bind.getId(), bind.getTourParticipant(), bind.getDateRange()));
         });
         return tourBindModel;
     }
@@ -75,8 +75,8 @@ public class TourBindModel{
     public boolean canSubmit() {
         return tour != null
                 && tour.getId() != null
-                && !employees.isEmpty()
-                && employees.get(0).getEmployee() != null
-                && employees.get(0).getEmployee().getId() != null;
+                && !tourParticipants.isEmpty()
+                && tourParticipants.get(0).getTourParticipant() != null
+                && tourParticipants.get(0).getTourParticipant().getId() != null;
     }
 }

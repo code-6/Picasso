@@ -1,0 +1,44 @@
+<table id="tourParticipantsTable" class="display compact cell-border hover stripe" th:fragment="tourParticipantsTable">
+  <thead>
+  <tr>
+    <th>ID</th>
+    <th th:text="#{name.cap}"></th>
+    <th:block th:replace="~{'fragments/' + ${participantFragment} + '/tourParticipantAdditionalTableColumnHeaders' :: tourParticipantAdditionalTableColumnHeaders}"></th:block>
+    <th></th>
+  </tr>
+  </thead>
+  <tfoot>
+  <tr>
+    <th>ID</th>
+    <th th:text="#{name.cap}"></th>
+    <th:block th:replace="~{'fragments/' + ${participantFragment} + '/tourParticipantAdditionalTableColumnHeaders' :: tourParticipantAdditionalTableColumnHeaders}"></th:block>
+    <th></th>
+  </tr>
+  </tfoot>
+  <tbody>
+
+  <tr th:each="tourParticipant, row : ${tourParticipants}">
+    <td><span th:text="${tourParticipant.id}"></span></td>
+    <td><span th:text="${tourParticipant.name}"></span></td>
+    <th:block th:replace="~{'fragments/' + ${participantFragment} + '/tourParticipantAdditionalTableColumns' :: tourParticipantAdditionalTableColumns}"></th:block>
+    <td>
+
+      <div class="btn-group" role="group" aria-label="tourParticipant entries management buttons">
+        <button type="button" class="btn btn-sm btn-outline-primary tourParticipantEditBtn"
+                th:data-tour-participant-id="${tourParticipant.id}"
+                th:data-tour-participant-type="${tourParticipant.type}"
+                th:title="#{edit.title}">
+            <i class="fas fa-edit"></i>
+        </button>
+
+        <button type="button" class="btn btn-sm btn-outline-danger tourParticipantDeleteBtn"
+                th:data-tourParticipant-id="${tourParticipant.id}" th:title="#{delete.title}">
+            <i class="fas fa-trash-alt"></i>
+        </button>
+      </div>
+    </td>
+  </tr>
+
+  </tbody>
+</table>
+

@@ -6,6 +6,7 @@ import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.novinomad.picasso.entities.domain.impl.Tour;
 import org.novinomad.picasso.dto.filters.TourFilter;
+import org.novinomad.picasso.entities.domain.impl.TourParticipant;
 import org.novinomad.picasso.exceptions.base.BaseException;
 import org.novinomad.picasso.services.ITourService;
 import org.springframework.beans.factory.annotation.Value;

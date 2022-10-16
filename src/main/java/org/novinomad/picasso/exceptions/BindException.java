@@ -2,7 +2,7 @@ package org.novinomad.picasso.exceptions;
 
 import org.novinomad.picasso.commons.IRange;
 import org.novinomad.picasso.commons.utils.CommonMessageFormat;
-import org.novinomad.picasso.entities.domain.impl.Employee;
+import org.novinomad.picasso.entities.domain.impl.TourParticipant;
 import org.novinomad.picasso.entities.domain.impl.Tour;
 import org.novinomad.picasso.exceptions.base.BaseException;
 
@@ -11,19 +11,20 @@ import java.util.Map;
 public class BindException extends BaseException {
     
     private static final String MSG_PATTERN = "Unable to bind: {} to the: {} for dates {} because: {}";
-    
-    public BindException(Employee employee,
+    private static final String MSG_PATTERN_RU = "Не удалось связать: {} с: {} на даты {} причина: {}";
+
+    public BindException(TourParticipant tourParticipant,
                          Tour tour,
                          IRange dateTimeRange,
                          String reason) {
-        this(MSG_PATTERN, employee, tour, dateTimeRange, reason);
+        this(MSG_PATTERN, tourParticipant, tour, dateTimeRange, reason);
     }
 
-    public BindException(Employee employee,
+    public BindException(TourParticipant tourParticipant,
                          Tour tour,
                          IRange dateTimeRange,
                          Map<Tour, IRange> overlapsToursAndRanges) {
-        super(buildOverlapsCauseMessage(employee, tour, dateTimeRange, overlapsToursAndRanges));
+        super(buildOverlapsCauseMessage(tourParticipant, tour, dateTimeRange, overlapsToursAndRanges));
     }
 
     public BindException(String message, Object... args) {
@@ -46,11 +47,11 @@ public class BindException extends BaseException {
         super(message, cause, enableSuppression, writableStackTrace, args);
     }
 
-    private static String buildOverlapsCauseMessage(Employee employee,
+    private static String buildOverlapsCauseMessage(TourParticipant tourParticipant,
                                                     Tour newBindTour,
                                                     IRange newBindDateTimeRange,
                                                     Map<Tour, IRange> overlappedToursAndRanges) {
-        String baseMessage = CommonMessageFormat.format(MSG_PATTERN, employee, newBindTour, newBindDateTimeRange, "overlaps with: \n");
+        String baseMessage = CommonMessageFormat.format(MSG_PATTERN, tourParticipant, newBindTour, newBindDateTimeRange, "overlaps with: \n");
 
         StringBuilder overlapsCauseBuilder = new StringBuilder(baseMessage);
 
