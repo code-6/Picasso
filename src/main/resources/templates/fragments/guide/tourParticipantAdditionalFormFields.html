@@ -1,16 +1,18 @@
-<div class="row form-group" th:fragment="tourParticipantAdditionalFormFields">
-    <div class="col-sm-2">
-        <label for="guideLanguagesSelect" class="form-label" th:text="#{language.pl.cap}"></label>
+<th:block th:fragment="tourParticipantAdditionalFormFields">
+    <div class="row form-group">
+        <div class="col-sm-2">
+            <label for="guideLanguagesSelect" class="form-label" th:text="#{language.pl.cap}"></label>
+        </div>
+        <div class="col">
+            <select id="guideLanguagesSelect"
+                    class="form-control guideLanguagesSelect select2 select2-multiple select2-multiple-auto-create"
+                    th:field="${tourParticipant.languages}" multiple>
+                <option th:each="lang : ${allLanguages}"
+                        th:value="${lang}"
+                        th:text="${lang}"
+                        th:selected="${tourParticipant.languages.contains(lang)}">
+                </option>
+            </select>
+        </div>
     </div>
-    <div class="col">
-        <select id="guideLanguagesSelect" class="form-control selectpicker guideLanguagesSelect"
-                th:field="${tourParticipant.languages}" multiple
-                data-live-search="true">
-            <option th:each="lang : ${allLanguages}"
-                    th:value="${lang}"
-                    th:text="${lang}"
-                    th:selected="${tourParticipant.languages.contains(lang)}">
-            </option>
-        </select>
-    </div>
-</div>
+</th:block>

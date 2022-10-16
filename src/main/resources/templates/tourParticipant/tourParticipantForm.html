@@ -14,7 +14,7 @@
             </div>
         </div>
 
-        <div class="row form-group" th:replace="~{'fragments/' + ${participantFragment} + '/tourParticipantAdditionalFormFields' :: tourParticipantAdditionalFormFields}"></div>
+        <th:block th:replace="~{'fragments/' + ${participantFragment} + '/tourParticipantAdditionalFormFields' :: tourParticipantAdditionalFormFields}"></th:block>
 
         <div class="row form-group">
             <div class="row form-group">

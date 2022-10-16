@@ -41,6 +41,9 @@ dependencies {
     implementation group: 'org.webjars.npm', name: 'sweetalert2', version: '11.4.14'
     implementation group: 'org.webjars', name: 'bootstrap-daterangepicker', version: '3.1'
     runtimeOnly group: 'org.webjars.bower', name: 'bootstrap-select', version: '1.13.11'
+//    implementation group: 'org.webjars', name: 'bootstrap-select', version: '1.13.18'
+    implementation group: 'org.webjars', name: 'select2', version: '4.0.13'
+
 
     compileOnly 'org.projectlombok:lombok'
 

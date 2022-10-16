@@ -1,0 +1,68 @@
+<th:block th:fragment="tourParticipantAdditionalFormFields">
+    <!--    driver cars -->
+    <div th:each="car, carIndex : ${tourParticipant.cars}">
+        <div class="row form-group">
+            <div class="col-sm-2">
+                <label class="form-label"></label>
+            </div>
+            <div class="col">
+                <input type="text" class="form-control" readonly
+                       th:field="${tourParticipant.cars[__${carIndex.index}__].brandName}">
+            </div>
+            <div class="col">
+                <input type="text" class="form-control" readonly
+                       th:field="${tourParticipant.cars[__${carIndex.index}__].modelName}">
+            </div>
+            <div class="col">
+                <input type="text" class="form-control" readonly
+                       th:field="${tourParticipant.cars[__${carIndex.index}__].number}">
+            </div>
+            <div class="col">
+                <button type="button" class="btn btn-sm btn-outline-danger tourParticipantCarDeleteBtn"
+                        th:data-car-row-id="${carIndex.index}"
+                        th:title="#{delete.title}">
+                    <i class="fas fa-trash-alt"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+
+    <div class="row form-group">
+        <div class="col-sm-2">
+            <label class="form-label"></label>
+        </div>
+        <div class="col">
+            <select id="carBrandSelect" style="width: 100%"
+                    class="form-control form-control-lg  carBrandSelect select2 select2-auto-create"
+                    th:field="${driverCar.brandName}">
+                <option value="" th:text="#{car.brand.select.placeholder}" selected></option>
+                <option th:each="brand : ${allCarBrands}"
+                        th:value="${brand}"
+                        th:text="${brand}">
+                </option>
+            </select>
+        </div>
+
+        <div class="col">
+            <select id="carModelSelect" style="width: 100%"
+                    class="form-control form-control-lg carModelSelect select2 select2-auto-create"
+                    th:field="${driverCar.modelName}">
+            </select>
+        </div>
+
+        <div class="col">
+            <input type="text" class="form-control" id="carNumberInput"
+                   th:value="${driverCar.number}"
+                   th:field="${driverCar.number}"
+                   th:placeholder="#{car.number.input.placeholder}">
+        </div>
+
+        <div class="col">
+            <button id="tourParticipantCarAddBtn" type="button" class="btn btn-outline-success tourParticipantCarAddBtn" th:title="#{add.cap}">
+                <i class="fas fa-plus"></i>
+            </button>
+        </div>
+    </div>
+
+</th:block>
