@@ -4,8 +4,9 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
+import org.novinomad.picasso.dto.DriverModel;
+import org.novinomad.picasso.dto.GuideModel;
 import org.novinomad.picasso.entities.domain.impl.Driver;
-import org.novinomad.picasso.entities.domain.impl.Guide;
 import org.novinomad.picasso.entities.domain.impl.TourParticipant;
 import org.novinomad.picasso.services.ITourParticipantService;
 import org.springframework.stereotype.Controller;
@@ -27,7 +28,7 @@ public class TourParticipantController {
     public String getTourParticipantPage(@PathVariable TourParticipant.Type tourParticipantType, Model model) {
         try {
             TourParticipant tourParticipant = tourParticipantType.getTourParticipantClass().getConstructor().newInstance();
-            model.addAttribute("tourParticipant", tourParticipant);
+            model.addAttribute("tourParticipant", tourParticipant.toModel());
             model.addAttribute("driverCar", new Driver.Car());
         } catch (InvocationTargetException | InstantiationException | IllegalAccessException | NoSuchMethodException e) {
             throw new RuntimeException(e);
@@ -49,10 +50,10 @@ public class TourParticipantController {
 
         if (tourParticipantId != null) {
             tourParticipantService.get(tourParticipantId)
-                    .ifPresentOrElse(tourParticipant -> model.addAttribute("tourParticipant", tourParticipant), () -> {
+                    .ifPresentOrElse(tourParticipant -> model.addAttribute("tourParticipant", tourParticipant.toModel()), () -> {
                         try {
                             TourParticipant tourParticipant = tourParticipantType.getTourParticipantClass().getConstructor().newInstance();
-                            model.addAttribute("tourParticipant", tourParticipant);
+                            model.addAttribute("tourParticipant", tourParticipant.toModel());
 
                         } catch (Exception e) {
                             throw new RuntimeException(e);
@@ -66,17 +67,17 @@ public class TourParticipantController {
     // one possible way is to convert application form url encoded data to JSON and call /api generic route.
     // second variant is to convert MultivaluedMap to exact sub-Class of TourParticipant.
     @PostMapping("/GUIDE")
-    public String saveGuide(Guide guide, Model model) {
-        return saveTourParticipant(guide, model);
+    public String saveGuide(GuideModel guide, Model model) {
+        return saveTourParticipant(guide.toEntity(), model);
     }
 
     @PostMapping("/DRIVER")
-    public String saveDriver(Driver driver, Model model) {
-        return saveTourParticipant(driver, model);
+    public String saveDriver(DriverModel driver, Model model) {
+        return saveTourParticipant(driver.toEntity(), model);
     }
 
     @PostMapping("/driver/add-car")
-    public String addDriverCar(@ModelAttribute("tourParticipant") Driver driver,
+    public String addDriverCar(@ModelAttribute("tourParticipant") DriverModel driver,
                                @ModelAttribute("driverCar") Driver.Car car, Model model) {
         driver.addCar(car);
 
@@ -89,7 +90,7 @@ public class TourParticipantController {
     }
 
     @PostMapping("/driver/remove-car/{driverCarRowId}")
-    public String removeDriverCar(@ModelAttribute("tourParticipant") Driver driver,
+    public String removeDriverCar(@ModelAttribute("tourParticipant") DriverModel driver,
                                   @PathVariable Integer driverCarRowId, Model model) {
 
         driver.getCars().remove(driverCarRowId.intValue());
