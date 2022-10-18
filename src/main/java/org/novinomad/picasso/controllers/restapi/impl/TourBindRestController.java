@@ -47,7 +47,7 @@ public class TourBindRestController implements ICrud<TourBind> {
     @Override
     @PostMapping
     public TourBind save(TourBind tourBind) throws BaseException {
-        return tourBindService.save(tourBind);
+        return tourBindService.bind(tourBind);
     }
 
     @Override

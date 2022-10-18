@@ -8,7 +8,7 @@ spring:
   jpa:
     database-platform: org.hibernate.dialect.${PCS_HIBERNATE_DIALECT:H2Dialect}
     hibernate:
-      ddl-auto: ${PCS_DDL_AUTO:create-drop}
+      ddl-auto: ${PCS_DDL_AUTO:update}
 
   datasource:
     driver-class-name: ${PCS_DB_DRIVER_CLASS:org.h2.Driver}
@@ -31,3 +31,5 @@ logging:
   level:
     org.novinomad.picasso: debug
     org.hibernate.SQL: error
+
+initialize-test-data: false

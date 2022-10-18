@@ -107,8 +107,7 @@ public class TourBindService implements ITourBindService {
         }
     }
 
-    @Override
-    public TourBind save(TourBind tourBind) throws BaseException {
+    private TourBind save(TourBind tourBind) throws BaseException {
         try {
             TourBind savedTourBind = tourBindRepository.save(tourBind);
             log.debug("saved {}", tourBind);
@@ -119,9 +118,8 @@ public class TourBindService implements ITourBindService {
         }
     }
 
-    @Override
     @Transactional
-    public List<TourBind> save(Collection<TourBind> tourBinds) {
+    List<TourBind> save(Collection<TourBind> tourBinds) {
         // TODO fix for update action unique constraint violation exception. Possible variants:
         // 1. Add bind id to model.
         // 2. Fetch existent from db first, check and then save.
@@ -149,6 +147,7 @@ public class TourBindService implements ITourBindService {
         }
     }
 
+    @Override
     @Transactional
     public List<Long> delete(Collection<Long> ids) {
         List<Long> deletedTourBindIds = new ArrayList<>();

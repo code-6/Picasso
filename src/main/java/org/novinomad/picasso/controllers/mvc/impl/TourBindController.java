@@ -1,6 +1,5 @@
 package org.novinomad.picasso.controllers.mvc.impl;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -12,7 +11,7 @@ import org.novinomad.picasso.entities.domain.impl.TourBind;
 import org.novinomad.picasso.dto.bind.BindDateRange;
 import org.novinomad.picasso.dto.bind.TourParticipantBindModel;
 import org.novinomad.picasso.dto.bind.TourBindModel;
-import org.novinomad.picasso.exceptions.BindException;
+import org.novinomad.picasso.exceptions.base.BaseException;
 import org.novinomad.picasso.services.ITourParticipantService;
 import org.novinomad.picasso.services.ITourBindService;
 import org.novinomad.picasso.services.ITourService;
@@ -21,7 +20,6 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
-import java.util.Arrays;
 import java.util.List;
 
 @Slf4j
@@ -88,10 +86,10 @@ public class TourBindController {
     }
 
     @PostMapping
-    public String saveBind(final TourBindModel tourBind) {
+    public String bind(final TourBindModel tourBind) {
         try {
-            tourBindService.save(tourBind.toEntities());
-        } catch (BindException e) {
+            tourBindService.bind(tourBind.toEntities());
+        } catch (BaseException e) {
             log.error(e.getMessage(), e);
         }
         return "redirect:/";
