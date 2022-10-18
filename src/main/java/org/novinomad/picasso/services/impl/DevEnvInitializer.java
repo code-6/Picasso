@@ -17,6 +17,7 @@ import org.novinomad.picasso.repositories.jpa.DriverRepository;
 import org.novinomad.picasso.repositories.jpa.GuideRepository;
 import org.novinomad.picasso.repositories.jpa.TourRepository;
 import org.novinomad.picasso.services.IDevEnvInitializer;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 
@@ -33,6 +34,7 @@ import static org.novinomad.picasso.commons.utils.CommonDateUtils.localDateTimeT
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @RequiredArgsConstructor
 @Profile({"dev", "test"})
+@ConditionalOnProperty(name = "initialize-test-data", havingValue = "true")
 public class DevEnvInitializer implements IDevEnvInitializer {
     static final LocalDate CURRENT_DATE = LocalDate.now();
     static final int NEXT_MONTH_MAX_DAY = CURRENT_DATE.plusMonths(1).lengthOfMonth();
@@ -198,9 +200,9 @@ public class DevEnvInitializer implements IDevEnvInitializer {
                     endDate = tour.getEndDate();
                 TourBind tourBindDriver = new TourBind(driver, tour, startDate, endDate);
                 TourBind tourBindGuide = new TourBind(guide, tour, startDate, endDate);
-                TourBind save1 = tourBindService.save(tourBindDriver);
+                TourBind save1 = tourBindService.bind(tourBindDriver);
                 log.debug("created new {}", save1);
-                TourBind save2 = tourBindService.save(tourBindGuide);
+                TourBind save2 = tourBindService.bind(tourBindGuide);
                 log.debug("created new {}", save2);
                 bindings.add(save1);
                 bindings.add(save2);

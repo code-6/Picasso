@@ -1,6 +1,7 @@
 package org.novinomad.picasso.dto.bind;
 
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.novinomad.picasso.commons.IRange;
 import org.novinomad.picasso.commons.LocalDateTimeRange;
 import org.novinomad.picasso.entities.domain.impl.TourParticipant;
@@ -12,19 +13,32 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @Data
+@NoArgsConstructor
 public class TourBindModel{
 
     private Tour tour = new Tour();
 
     private List<TourParticipantBindModel> tourParticipants = new ArrayList<>();
 
-    public void bindTourParticipant(TourParticipant tourParticipant) {
-        if (tour != null) {
-            bindTourParticipant(null, tourParticipant, tour.getDateRange());
-        }
+    public TourBindModel(Tour tour) {
+        this.tour = tour;
     }
 
-    public void bindTourParticipant(Long bindId, TourParticipant tourParticipant, IRange dateRange) {
+    public TourBindModel bindTourParticipant(TourParticipant tourParticipant) {
+        if (tour != null) {
+            bindTourParticipant(tourParticipant, tour.getDateRange());
+        }
+        return this;
+    }
+
+    public TourBindModel bindTourParticipant(TourParticipant tourParticipant, IRange dateRange) {
+        if (tour != null) {
+            bindTourParticipant(null, tourParticipant, dateRange == null ? tour.getDateRange() : dateRange);
+        }
+        return this;
+    }
+
+    public TourBindModel bindTourParticipant(Long bindId, TourParticipant tourParticipant, IRange dateRange) {
         getBoundTourParticipant(tourParticipant).ifPresentOrElse(tourParticipantBindModel -> {
             List<BindDateRange> dateRanges = tourParticipantBindModel.getBindIdsToDateRanges();
             if (dateRanges.stream().noneMatch(bindDateRange -> bindDateRange.getDateRange().equals(dateRange)))
@@ -35,6 +49,7 @@ public class TourBindModel{
             tourParticipantBindModel.setTourParticipant(tourParticipant);
             tourParticipants.add(tourParticipantBindModel);
         });
+        return this;
     }
 
     public Optional<TourParticipantBindModel> getBoundTourParticipant(TourParticipant tourParticipant) {

@@ -24,8 +24,8 @@ spring:
 
   datasource:
     driver-class-name: ${PCS_DB_DRIVER_CLASS:org.h2.Driver}
-    url: ${PCS_DB_URL:jdbc:h2:file:./db/picasso_dev_db;AUTO_SERVER=true;MODE=MYSQL}
-    username: ${PCS_DB_USERNAME:picasso}
+    url: ${PCS_DB_URL:jdbc:h2:file:./db/picasso_test_db;AUTO_SERVER=true;MODE=MYSQL}
+    username: ${PCS_DB_USERNAME:update}
     password: password
 
     hikari:
@@ -41,3 +41,5 @@ jobs:
   enabled: false
 
 tour-files-folder: ${PCS_TOUR_FILES_FOLDER:}
+
+initialize-test-data: false

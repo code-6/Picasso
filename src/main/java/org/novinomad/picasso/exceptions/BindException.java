@@ -1,5 +1,6 @@
 package org.novinomad.picasso.exceptions;
 
+import lombok.Getter;
 import org.novinomad.picasso.commons.IRange;
 import org.novinomad.picasso.commons.utils.CommonMessageFormat;
 import org.novinomad.picasso.entities.domain.impl.TourParticipant;
@@ -8,16 +9,26 @@ import org.novinomad.picasso.exceptions.base.BaseException;
 
 import java.util.Map;
 
+@Getter
 public class BindException extends BaseException {
     
     private static final String MSG_PATTERN = "Unable to bind: {} to the: {} for dates {} because: {}";
     private static final String MSG_PATTERN_RU = "Не удалось связать: {} с: {} на даты {} причина: {}";
+
+    private TourParticipant tourParticipant;
+    private Tour tour;
+    private IRange dateTimeRange;
+    private Map<Tour, IRange> overlapsToursAndRanges;
+
 
     public BindException(TourParticipant tourParticipant,
                          Tour tour,
                          IRange dateTimeRange,
                          String reason) {
         this(MSG_PATTERN, tourParticipant, tour, dateTimeRange, reason);
+        this.tourParticipant = tourParticipant;
+        this.tour = tour;
+        this.dateTimeRange = dateTimeRange;
     }
 
     public BindException(TourParticipant tourParticipant,
@@ -25,6 +36,10 @@ public class BindException extends BaseException {
                          IRange dateTimeRange,
                          Map<Tour, IRange> overlapsToursAndRanges) {
         super(buildOverlapsCauseMessage(tourParticipant, tour, dateTimeRange, overlapsToursAndRanges));
+        this.tourParticipant = tourParticipant;
+        this.tour = tour;
+        this.dateTimeRange = dateTimeRange;
+        this.overlapsToursAndRanges = overlapsToursAndRanges;
     }
 
     public BindException(String message, Object... args) {

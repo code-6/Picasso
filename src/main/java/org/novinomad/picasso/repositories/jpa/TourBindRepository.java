@@ -1,12 +1,14 @@
 package org.novinomad.picasso.repositories.jpa;
 
 import org.novinomad.picasso.entities.domain.impl.TourBind;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
+@Qualifier("tourBindRepository")
 public interface TourBindRepository extends JpaRepository<TourBind, Long> {
 
     @Query(nativeQuery = true, value = """
