@@ -4,14 +4,14 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
-import org.novinomad.picasso.commons.ICrud;
-import org.novinomad.picasso.entities.domain.impl.TourParticipant;
-import org.novinomad.picasso.exceptions.base.BaseException;
+import org.novinomad.picasso.erm.entities.TourParticipant;
+import org.novinomad.picasso.commons.exceptions.base.CommonException;
 import org.novinomad.picasso.services.IDriverService;
 import org.novinomad.picasso.services.impl.TourParticipantService;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.NoSuchElementException;
 
@@ -28,17 +28,17 @@ public class TourParticipantRestController {
 
 
     @PostMapping(consumes = {MediaType.APPLICATION_FORM_URLENCODED_VALUE}, produces = MediaType.APPLICATION_JSON_VALUE)
-    public TourParticipant save(@RequestBody TourParticipant tourParticipant) throws BaseException {
+    public TourParticipant save(@RequestBody TourParticipant tourParticipant) throws CommonException {
         return tourParticipantService.save(tourParticipant);
     }
 
     @DeleteMapping("/{id}")
-    public void delete(@PathVariable("id") Long id) throws BaseException {
-        tourParticipantService.delete(id);
+    public void delete(@PathVariable("id") Long id) throws CommonException {
+        tourParticipantService.deleteById(id);
     }
 
     @GetMapping("/{id}")
-    public TourParticipant fetch(@PathVariable("id") Long id) {
+    public TourParticipant get(@PathVariable("id") Long id) {
         return tourParticipantService.get(id).orElseThrow(()->new NoSuchElementException("TourParticipant not found by id: " + id));
     }
 
@@ -49,7 +49,7 @@ public class TourParticipantRestController {
 
     @GetMapping(params = "types")
     public List<TourParticipant> get(@RequestParam("types") TourParticipant.Type ... types) {
-        return tourParticipantService.get(types);
+        return tourParticipantService.get(Arrays.asList(types));
     }
 
     @GetMapping("/driver/{carBrand}/model")

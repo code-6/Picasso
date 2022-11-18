@@ -2,6 +2,7 @@ package org.novinomad.picasso.commons.utils;
 
 import lombok.experimental.UtilityClass;
 
+import java.text.MessageFormat;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;

@@ -28,6 +28,18 @@ spring:
       connection-timeout: 60000
       maximum-pool-size: 5
 
+  mail:
+    host: ${SMPT_HOST:smtp.gmail.com}
+    port: ${SMTP_PORT:587}
+    username: ${SMTP_USERNAME}
+    password: ${SMTP_PASSWORD}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+
 logging:
   level:
     org.novinomad.picasso: debug
@@ -46,6 +58,8 @@ app:
       gantt-task: ${PCS_GANTT_TASK_DATE_TIME_FORMAT:dd mon yyyy HH:mi}
       gantt-major: ${PCS_GANTT_MAJOR_DATE_FORMAT:dd mon yyyy}
       date-range-picker: ${PCS_DATE_RANGE_PICKER_DATE_TIME_FORMAT:DD MMM YYYY HH:mm}
+
+super-admin-password: ${SUPER_ADMIN_PASSWORD}
 
 
 

@@ -2,12 +2,9 @@ package org.novinomad.picasso;
 
 import org.junit.jupiter.api.*;
 import org.novinomad.picasso.commons.LocalDateTimeRange;
-import org.novinomad.picasso.dto.bind.TourBindModel;
-import org.novinomad.picasso.entities.domain.impl.Driver;
-import org.novinomad.picasso.entities.domain.impl.Guide;
-import org.novinomad.picasso.entities.domain.impl.Tour;
-import org.novinomad.picasso.entities.domain.impl.TourBind;
-import org.novinomad.picasso.exceptions.BindException;
+import org.novinomad.picasso.erm.dto.bind.TourBindModel;
+import org.novinomad.picasso.erm.entities.*;
+import org.novinomad.picasso.commons.exceptions.BindException;
 import org.novinomad.picasso.services.ITourBindService;
 import org.novinomad.picasso.services.ITourParticipantService;
 import org.novinomad.picasso.services.ITourService;
@@ -39,8 +36,8 @@ class BindTest {
     private ITourService tourService;
 
     // initialize test data.
-    private Guide guide;
-    private Driver driver;
+    private TourParticipant guide;
+    private TourParticipant driver;
 
     private LocalDateTime tour1StartDate;
     private LocalDateTime tour1EndDate;
@@ -84,7 +81,7 @@ class BindTest {
                         LocalDateTime.of(2022,10, 7, 18, 0)));
 
         assertDoesNotThrow(() -> {
-            tour1Binds = tourBindService.bind(tourBindModel.toEntities());
+            tour1Binds = tourBindService.save(tourBindModel.toEntities());
             assertFalse(tour1Binds.isEmpty());
             assertEquals(1, tour1Binds.size());
             tour1Binds.forEach(b -> assertNotNull(b.getId()));
@@ -104,7 +101,7 @@ class BindTest {
                 .bindTourParticipant(guide, new LocalDateTimeRange(tour2StartDate, tour2EndDate));
 
         BindException e = assertThrows(BindException.class, () -> {
-            tour1Binds = tourBindService.bind(tourBindModel.toEntities());
+            tour1Binds = tourBindService.save(tourBindModel.toEntities());
         });
         assertNotNull(e.getOverlapsToursAndRanges());
         assertFalse(e.getOverlapsToursAndRanges().isEmpty());

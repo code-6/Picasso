@@ -4,16 +4,18 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
-import org.novinomad.picasso.dto.DriverModel;
-import org.novinomad.picasso.dto.GuideModel;
-import org.novinomad.picasso.entities.domain.impl.Driver;
-import org.novinomad.picasso.entities.domain.impl.TourParticipant;
+import org.hibernate.mapping.Collection;
+import org.novinomad.picasso.erm.dto.DriverModel;
+import org.novinomad.picasso.erm.dto.GuideModel;
+import org.novinomad.picasso.erm.entities.Driver;
+import org.novinomad.picasso.erm.entities.TourParticipant;
 import org.novinomad.picasso.services.ITourParticipantService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import java.lang.reflect.InvocationTargetException;
+import java.util.Collections;
 
 @Slf4j
 @FieldDefaults(level = AccessLevel.PRIVATE)
@@ -35,7 +37,7 @@ public class TourParticipantController {
         }
         model.addAttribute("participantFragment", tourParticipantType.getThymeleafFragment());
         model.addAttribute("tourParticipantType", tourParticipantType);
-        model.addAttribute("tourParticipants", tourParticipantService.get(tourParticipantType));
+        model.addAttribute("tourParticipants", tourParticipantService.get(Collections.singleton(tourParticipantType)));
 
         return "tourParticipant/tourParticipantPage";
     }

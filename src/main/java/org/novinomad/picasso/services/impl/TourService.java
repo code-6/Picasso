@@ -5,13 +5,14 @@ import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.novinomad.picasso.dto.filters.TourFilter;
-import org.novinomad.picasso.entities.domain.impl.Tour;
-import org.novinomad.picasso.exceptions.StorageException;
-import org.novinomad.picasso.exceptions.base.BaseException;
+import org.novinomad.picasso.erm.dto.filters.TourFilter;
+import org.novinomad.picasso.erm.entities.Tour;
+import org.novinomad.picasso.commons.exceptions.StorageException;
+import org.novinomad.picasso.commons.exceptions.base.CommonRuntimeException;
 import org.novinomad.picasso.repositories.jpa.TourRepository;
 import org.novinomad.picasso.services.ITourService;
 import org.novinomad.picasso.services.StorageService;
+import org.springframework.beans.factory.BeanCreationException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
@@ -20,13 +21,8 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.PostConstruct;
 import javax.transaction.Transactional;
-import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.nio.file.*;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 import static org.novinomad.picasso.services.StorageService.*;
 
@@ -67,7 +63,7 @@ public class TourService implements ITourService {
                     log.info("root directory {} for tour files created successfully", rootLocation.getFileName());
                 } catch (StorageException e) {
                     log.error("root directory {} for tour files not created because {}", filesRootDir, e.getMessage(), e);
-                    throw new RuntimeException(e);
+                    throw new BeanCreationException("root directory "+filesRootDir+" for tour files not created because " + e.getMessage(), e);
                 }
             } else {
                 rootLocation = Paths.get(filesRootDir);
@@ -76,80 +72,68 @@ public class TourService implements ITourService {
     }
 
     @Override
-    public Tour save(Tour tour) throws BaseException {
+    public Tour save(Tour tour) throws CommonRuntimeException {
         try {
-            Tour savedTour = tourRepository.save(tour);
-            log.debug("saved {}", tour);
-            return savedTour;
+            return tourRepository.save(tour);
         } catch (Exception e) {
-            log.error("unable to create: {} because: {}", tour, e.getMessage(), e);
-            throw new BaseException(e, "unable to create: {} because: {}", tour, e.getMessage());
+            throw new CommonRuntimeException(e, "unable to create {} because {}", tour, e.getMessage());
         }
     }
 
-    @Transactional
-    public List<Tour> save(Collection<Tour> tours) {
-        List<Tour> savedTours = new ArrayList<>();
-        tours.forEach(tour -> {
-            try {
-                savedTours.add(save(tour));
-            } catch (BaseException ignored) {
-                // ignored because save contains logging.
-            }
-        });
-        if (savedTours.size() != tours.size())
-            log.warn("not all Tours are saved. To be saved: {} saved: {}", tours.size(), savedTours.size());
-
-        return savedTours;
-    }
-
     @Override
-    public void delete(Long id) throws BaseException {
+    public void deleteById(Long id) {
         try {
             tourRepository.deleteById(id);
         } catch (Exception e) {
-            log.error("unable to delete Tour with id: {} because: {}", id, e.getMessage(), e);
-            throw new BaseException(e, "unable to delete Tour with id: {} because: {}", id, e.getMessage());
+            throw new CommonRuntimeException(e, "unable to delete tour with id {} because {}", id, e.getMessage());
         }
     }
 
-    @Transactional
-    public List<Long> delete(Collection<Long> ids) {
-        List<Long> deletedTours = new ArrayList<>();
-
-        ids.forEach(id -> {
-            try {
-                delete(id);
-                deletedTours.add(id);
-            } catch (BaseException ignored) {
-                // ignored because save contains logging.
-            }
-        });
-        if (deletedTours.size() != ids.size())
-            log.warn("not all Tours are deleted. To be deleted: {} deleted: {}", deletedTours.size(), ids.size());
-
-        return deletedTours;
+    @Override
+    public void deleteById(Iterable<Long> ids) throws CommonRuntimeException {
+        try {
+            tourRepository.deleteAllById(ids);
+        } catch (Exception e) {
+            throw new CommonRuntimeException(e, "unable to delete tours with ids {} because {}", ids, e.getMessage());
+        }
     }
 
-    @Transactional
-    public List<Long> deleteAll(Collection<Tour> tours) {
-        List<Long> ids = tours.stream().map(Tour::getId).toList();
-        return delete(ids);
+    /**
+     * @implNote If tours not provided wil be removed all items. So be careful when using this method
+     * */
+    @Override
+    public void delete(Tour... tours) throws CommonRuntimeException {
+        try {
+            if(tours == null || tours.length == 0) {
+                tourRepository.deleteAll();
+            } else {
+                tourRepository.deleteAll(Arrays.asList(tours));
+            }
+        } catch (Exception e) {
+            throw new CommonRuntimeException(e, "unable to delete tours {} because {}", tours, e.getMessage());
+        }
     }
 
     @Override
-    public Optional<Tour> get(Long id) {
+    public List<Tour> get(Long... ids) throws CommonRuntimeException {
+        try {
+            if(ids == null || ids.length == 0) {
+                return tourRepository.findAll();
+            } else {
+                return tourRepository.findAllById(Arrays.asList(ids));
+            }
+        } catch (Exception e) {
+            throw new CommonRuntimeException(e, "unable to get tours by ids {} because {}", ids, e.getMessage());
+        }
+    }
+
+    @Override
+    public Optional<Tour> get(Long id) throws CommonRuntimeException {
         try {
             return tourRepository.findById(id);
         } catch (Exception e) {
-            log.error("unable to get Tour by id: {} because: {}", id, e.getMessage(), e);
-            return Optional.empty();
+            throw new CommonRuntimeException(e, "unable to get tour by id {} because {}", id, e.getMessage());
         }
-    }
-
-    @Override
-    public List<Tour> get() {
-        return tourRepository.findAll();
     }
 
     @Override
@@ -163,7 +147,7 @@ public class TourService implements ITourService {
     }
 
     @Override
-    public Tour save(Tour tour, List<MultipartFile> newFiles) throws BaseException {
+    public Tour save(Tour tour, List<MultipartFile> newFiles) throws CommonRuntimeException {
         if(!CollectionUtils.isEmpty(newFiles))
             tour.addFile(newFiles);
 

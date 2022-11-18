@@ -1,31 +1,44 @@
 package org.novinomad.picasso.commons;
 
-import org.novinomad.picasso.entities.base.AbstractEntity;
-import org.novinomad.picasso.exceptions.base.BaseException;
+import org.novinomad.picasso.erm.entities.base.IdAware;
+import org.novinomad.picasso.erm.entities.system.Permission;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Collections;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 
-public interface ICrud<T extends AbstractEntity> {
+public interface ICrud<Id, Entity extends IdAware<Id>> {
 
-    T save(T t) throws BaseException;
+    Entity save(Entity entity);
 
-    void delete(Long id) throws BaseException;
-
-    default void delete(T t) throws BaseException {
-        delete(t.getId());
+    @Transactional
+    default List<Entity> save(Iterable<Entity> entities) {
+        List<Entity> savedEntities = new ArrayList<>();
+        for (Entity entity : entities) {
+            savedEntities.add(save(entity));
+        }
+        return savedEntities;
     }
 
-    default Optional<T> get(Long id) {
-        return Optional.empty();
+    void deleteById(Id id);
+
+    @Transactional
+    default void deleteById(Iterable<Id> ids) {
+        for (Id id : ids) {
+            deleteById(id);
+        }
     }
 
-    default List<T> get(Long ... ids) {
-        return Collections.emptyList();
+    @Transactional
+    default void delete(Entity... entity) {
+        for (Entity e : entity) {
+            deleteById(e.getId());
+        }
     }
 
-    default List<T> get() {
-        return Collections.emptyList();
-    }
+    List<Entity> get(Id... ids);
+
+    Optional<Entity> get(Id id);
 }

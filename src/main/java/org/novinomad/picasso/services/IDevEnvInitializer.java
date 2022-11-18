@@ -1,7 +1,7 @@
 package org.novinomad.picasso.services;
 
-import org.novinomad.picasso.entities.domain.impl.*;
-import org.novinomad.picasso.exceptions.base.BaseException;
+import org.novinomad.picasso.commons.exceptions.base.CommonException;
+import org.novinomad.picasso.erm.entities.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -14,9 +14,9 @@ public interface IDevEnvInitializer {
 
     List<Guide> createGuides();
 
-    List<TourBind> createTourBindings(List<Tour> tours, List<TourParticipant> tourParticipants) throws BaseException;
+    List<TourBind> createTourBindings(List<Tour> tours, List<TourParticipant> tourParticipants) throws CommonException;
 
-    default List<TourBind> createTourBindings() throws BaseException {
+    default List<TourBind> createTourBindings() throws CommonException {
         return createTourBindings(createTours(), createTourParticipants());
     }
 

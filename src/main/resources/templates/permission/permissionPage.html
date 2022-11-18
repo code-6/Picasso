@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{fragments/layout}">
+<head>
+    <title>PCS - Permissions</title>
+
+    <link rel="stylesheet" type="text/css"
+          th:href="@{/webjars/vis-network/styles/vis-network.min.css}"/>
+    <style>
+        #permissionsGraph {
+            width: 100vh;
+            height: 100vh;
+            border: 1px solid lightgray;
+        }
+
+    </style>
+</head>
+<body class="sb-nav-fixed">
+<div th:fragment="pageManageComponents" class="mx-auto order-0"></div>
+<div layout:fragment="content">
+
+    <div id="permissionsGraph" class="card-body"></div>
+
+    <!-- Modal -->
+    <div class="modal fade" id="permissionModal" data-backdrop="static" data-keyboard="false" tabindex="-1" aria-labelledby="permissionModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="permissionModalLabel">
+                        <span id="permissionOperation"
+                              th:text="${permission.name} == null ? #{permission.add} : #{permission.edit} + ${permission.name}"></span>
+                    </h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form id="permissionForm" th:object="${permission}">
+                        <input id="permissionId" type="hidden" name="id" th:field="*{id}">
+                        <div class="form-group">
+                            <label for="permissionName" th:text="#{name.cap}"></label>
+                            <input type="text" class="form-control" id="permissionName"
+                                   th:placeholder="#{permission.name.placeholder}" name="name" th:field="*{name}">
+                        </div>
+                        <div class="form-group">
+                            <label for="permissionDescription" th:text="#{description.cap}"></label>
+                            <textarea class="form-control" id="permissionDescription"
+                                      th:placeholder="#{permission.description.placeholder}" rows="3"
+                                      th:field="*{description}" th:text="${permission.description}"></textarea>
+                        </div>
+
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button id="savePermission" type="button" class="btn btn-primary" th:text="#{submit.cap}"></button>
+                    <button id="closePermissionForm" type="button" class="btn btn-secondary" data-dismiss="modal"
+                            th:text="#{close.cap}">Close
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div th:fragment="scripts">
+
+    <script th:src="@{/webjars/vis-network/dist/vis-network.min.js}"></script>
+
+    <script type="module" th:inline="javascript">
+
+        import * as ajaxUtil from "/picasso/js/AjaxUtil.js";
+
+        const mainUrl = $("meta[name='mainUrl']").attr("content");
+
+        let network;
+
+        $(document).ready(function () {
+            network = drawPermissionGraph();
+        });
+
+        function drawPermissionGraph() {
+            // create a network
+            let options = {
+                autoResize: true,
+                height: '100%',
+                width: '100%',
+                layout: {
+                    randomSeed: undefined,
+                    hierarchical: {
+                        enabled: true,
+                        parentCentralization: true,
+                        sortMethod: 'directed',
+                        direction: 'DU'
+                    }
+                },
+                edges: {
+                    arrows: 'to',
+                    shadow: true,
+                    smooth: true,
+                },
+                manipulation: {
+                    enabled: true,
+                    initiallyActive: true,
+                    addNode: function (data, callback) {
+                        document.getElementById("permissionOperation").innerText = [[#{permission.add}]] + '';
+                        data.label = null;
+                        editNode(data, clearNodePopUp, callback);
+                    },
+                    editNode: function (data, callback) {
+                        // filling in the popup DOM elements
+                        document.getElementById("permissionOperation").innerText = [[#{permission.edit}]] + ' ' + data.label;
+                        editNode(data, cancelNodeEdit, callback);
+                    },
+                    addEdge: function (data, callback) {
+                        // prevent to reference to himself
+                        if (data.from === data.to) {
+                            return;
+                        }
+                        saveEdgeData(data, callback);
+                    },
+                    editEdge: false,
+                    deleteNode: function (data, callback) {
+                        deleteNode(data, callback);
+                    },
+                    deleteEdge: function (data, callback) {
+                        deleteEdge(data, callback);
+                    }
+                }
+            };
+            let container = document.getElementById("permissionsGraph");
+            let visJsDataSet = [[${visJsDataSet}]];
+            let network = new vis.Network(container, visJsDataSet, options);
+
+            network.on('doubleClick', function (doubleClickEvent) {
+                console.log('double click event fired');
+                let nodes = doubleClickEvent.nodes;
+                if(nodes.length === 0) {
+                    network.addNodeMode();
+                } else {
+                    network.editNode();
+                    $('#permissionModal').modal('toggle');
+                }
+            });
+            return network;
+        }
+
+        function editNode(data, cancelAction, callback) {
+            $('#permissionName').val(data.label);
+            $('#permissionId').val($.isNumeric(data.id) ? data.id : null);
+            $('#permissionDescription').val(data.title);
+
+            document.getElementById("savePermission").onclick = saveNodeData.bind(this, data, callback);
+            document.getElementById("closePermissionForm").onclick = cancelAction.bind(this, callback);
+
+            $("#permissionModal").modal('toggle');
+        }
+
+        // Callback passed as parameter is ignored
+        function clearNodePopUp() {
+            document.getElementById("savePermission").onclick = null;
+            document.getElementById("closePermissionForm").onclick = null;
+        }
+
+        function cancelNodeEdit(callback) {
+            clearNodePopUp();
+            callback(null);
+            $("#permissionModal").modal('toggle');
+        }
+
+        function saveNodeData(data, callback) {
+
+            ajaxUtil.post(mainUrl + '/api/permission', $('#permissionForm').serialize())
+                .then((createdPermission) => {
+
+                    console.log('successfully created permission %s', createdPermission);
+
+                    data.label = createdPermission.name;
+                    data.id = createdPermission.id;
+                    data.title = createdPermission.description;
+
+                    clearNodePopUp();
+
+                    callback(data);
+                })
+                .catch((error) => {
+                    console.error('unable to create permission because %s', error.responseJSON.message);
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'unable to create permission because ' + error.responseJSON.message
+                    });
+                })
+                .finally(() => $('#permissionModal').modal('toggle'));
+        }
+
+        function deleteNode(data, callback) {
+            ajaxUtil.del(mainUrl + '/api/permission/' + data.nodes[0])
+                .then(() => {
+                    callback(data);
+                })
+                .catch((error) => {
+                    let exceptionMessage = error.responseJSON.message;
+                    console.error('unable delete permission because %s', exceptionMessage);
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'unable delete permission because ' + exceptionMessage
+                    });
+                })
+        }
+
+        function deleteEdge(data, callback) {
+            if(network !== null && network !== undefined) {
+                let nodes = network.getConnectedNodes(data.edges[0]);
+                ajaxUtil.del(mainUrl + '/api/permission/' + nodes[0] + '/' + nodes[1])
+                    .then(() => {
+                        callback(data);
+                    })
+                    .catch((error) => {
+                        let exceptionMessage = error.responseJSON.message;
+                        console.error('unable delete edge because %s', exceptionMessage);
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'unable delete edge because ' + exceptionMessage
+                        });
+                    })
+            }
+        }
+
+        function saveEdgeData(data, callback) {
+            if (typeof data.to === "object") data.to = data.to.id;
+            if (typeof data.from === "object") data.from = data.from.id;
+
+            if(data.to === data.from) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'self-reference not allowed'
+                });
+                return;
+            }
+
+            ajaxUtil.put(mainUrl + '/api/permission/' + data.from + '/' + data.to)
+                .then((updatedParentPermission) => {
+                    console.log('successfully added child permission %s to parent permission %s %s', data.from, data.to, updatedParentPermission);
+                    callback(data);
+                })
+                .catch((error) => {
+                    console.log('error add child permission %s to parent permission %s', data.from, data.to);
+
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'unable to inherit permissions ' + error.responseJSON.message
+                    });
+                });
+        }
+
+        let highlightActive;
+    </script>
+
+</div>
+</body>
+</html>

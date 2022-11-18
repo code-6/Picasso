@@ -4,14 +4,15 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
-import org.novinomad.picasso.dto.filters.TourBindFilter;
-import org.novinomad.picasso.entities.domain.impl.TourParticipant;
-import org.novinomad.picasso.entities.domain.impl.Tour;
-import org.novinomad.picasso.entities.domain.impl.TourBind;
-import org.novinomad.picasso.dto.bind.BindDateRange;
-import org.novinomad.picasso.dto.bind.TourParticipantBindModel;
-import org.novinomad.picasso.dto.bind.TourBindModel;
-import org.novinomad.picasso.exceptions.base.BaseException;
+import org.novinomad.picasso.commons.exceptions.BindException;
+import org.novinomad.picasso.erm.dto.filters.TourBindFilter;
+import org.novinomad.picasso.erm.entities.TourParticipant;
+import org.novinomad.picasso.erm.entities.Tour;
+import org.novinomad.picasso.erm.entities.TourBind;
+import org.novinomad.picasso.erm.dto.bind.BindDateRange;
+import org.novinomad.picasso.erm.dto.bind.TourParticipantBindModel;
+import org.novinomad.picasso.erm.dto.bind.TourBindModel;
+import org.novinomad.picasso.commons.exceptions.base.CommonException;
 import org.novinomad.picasso.services.ITourParticipantService;
 import org.novinomad.picasso.services.ITourBindService;
 import org.novinomad.picasso.services.ITourService;
@@ -86,12 +87,8 @@ public class TourBindController {
     }
 
     @PostMapping
-    public String bind(final TourBindModel tourBind) {
-        try {
-            tourBindService.bind(tourBind.toEntities());
-        } catch (BaseException e) {
-            log.error(e.getMessage(), e);
-        }
+    public String bind(final TourBindModel tourBind) throws BindException {
+        tourBindService.save(tourBind.toEntities());
         return "redirect:/";
     }
 

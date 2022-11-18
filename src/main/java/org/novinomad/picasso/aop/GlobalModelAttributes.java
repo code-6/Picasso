@@ -1,9 +1,8 @@
 package org.novinomad.picasso.aop;
 
 import lombok.RequiredArgsConstructor;
-import org.novinomad.picasso.entities.domain.impl.Driver;
-import org.novinomad.picasso.entities.domain.impl.Guide;
-import org.novinomad.picasso.entities.domain.impl.TourParticipant;
+import org.novinomad.picasso.erm.entities.Driver;
+import org.novinomad.picasso.erm.entities.TourParticipant;
 import org.novinomad.picasso.services.IDriverService;
 import org.novinomad.picasso.services.IGuideService;
 import org.springframework.web.bind.annotation.ControllerAdvice;

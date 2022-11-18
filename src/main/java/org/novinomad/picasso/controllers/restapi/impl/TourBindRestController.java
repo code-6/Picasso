@@ -4,13 +4,14 @@ import groovy.util.logging.Slf4j;
 import lombok.RequiredArgsConstructor;
 import org.novinomad.picasso.commons.ICrud;
 import org.novinomad.picasso.commons.IRange;
-import org.novinomad.picasso.dto.filters.TourBindFilter;
-import org.novinomad.picasso.entities.domain.impl.TourBind;
-import org.novinomad.picasso.dto.gantt.Task;
-import org.novinomad.picasso.exceptions.BindException;
-import org.novinomad.picasso.exceptions.base.BaseException;
-import org.novinomad.picasso.services.ITourParticipantService;
+import org.novinomad.picasso.commons.exceptions.BindException;
+import org.novinomad.picasso.commons.exceptions.base.CommonException;
+import org.novinomad.picasso.commons.exceptions.base.CommonRuntimeException;
+import org.novinomad.picasso.erm.dto.filters.TourBindFilter;
+import org.novinomad.picasso.erm.dto.gantt.Task;
+import org.novinomad.picasso.erm.entities.TourBind;
 import org.novinomad.picasso.services.ITourBindService;
+import org.novinomad.picasso.services.ITourParticipantService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -23,7 +24,7 @@ import java.util.Optional;
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/api/bind")
-public class TourBindRestController implements ICrud<TourBind> {
+public class TourBindRestController {
 
     final ITourParticipantService tourParticipantService;
 
@@ -32,7 +33,7 @@ public class TourBindRestController implements ICrud<TourBind> {
     @GetMapping("/validate/{tourId}/{tourParticipantId}/{localDateTimeRange}")
     public ResponseEntity<String> validate(@PathVariable Long tourId,
                                    @PathVariable Long tourParticipantId,
-                                   @PathVariable IRange localDateTimeRange) throws BaseException {
+                                   @PathVariable IRange localDateTimeRange) throws CommonException {
         try {
             tourBindService.validateBind(tourId, tourParticipantId, localDateTimeRange);
             return new ResponseEntity<>("OK", HttpStatus.OK);
@@ -44,16 +45,14 @@ public class TourBindRestController implements ICrud<TourBind> {
     }
 
 
-    @Override
     @PostMapping
-    public TourBind save(TourBind tourBind) throws BaseException {
-        return tourBindService.bind(tourBind);
+    public TourBind save(TourBind tourBind) throws CommonRuntimeException {
+        return tourBindService.save(tourBind);
     }
 
-    @Override
-    @DeleteMapping
-    public void delete(Long id) throws BaseException {
-        tourBindService.delete(id);
+    @DeleteMapping("/{id}")
+    public void deleteById(@PathVariable Long id) {
+        tourBindService.deleteById(id);
     }
 
     @PostMapping(value = "/gantt-tasks", produces = MediaType.APPLICATION_JSON_VALUE)

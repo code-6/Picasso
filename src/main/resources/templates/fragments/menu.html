@@ -24,6 +24,16 @@
                         </a>
                     </nav>
                 </div>
+
+                <a class="nav-link" th:href="@{/user}">
+                    <div class="sb-nav-link-icon"><i class="fas fa-users"></i></div>
+                    <span th:text="#{user.cap.pl}"></span>
+                </a>
+
+                <a class="nav-link" th:href="@{/permission}">
+                    <i class="fas fa-project-diagram"></i>
+                    <span th:text="#{permission.cap.pl}"></span>
+                </a>
             </div>
         </div>
     </nav>
