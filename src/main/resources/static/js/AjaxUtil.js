@@ -23,6 +23,14 @@ export function delSync(endpointUrl, payloadData) {
     return exchangeSync('delete', endpointUrl, payloadData);
 }
 
+export function put(endpointUrl, payloadData) {
+    return exchange('put', endpointUrl, payloadData);
+}
+
+export function putSync(endpointUrl, payloadData) {
+    return exchangeSync('put', endpointUrl, payloadData);
+}
+
 export function exchange(httpRequestType, endpointUrl, payloadData) {
     return new Promise((resolve, reject) => {
         $.ajax({

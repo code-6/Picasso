@@ -2,37 +2,34 @@ package org.novinomad.picasso.services;
 
 import org.novinomad.picasso.commons.ICrud;
 import org.novinomad.picasso.commons.IRange;
-import org.novinomad.picasso.dto.filters.TourBindFilter;
-import org.novinomad.picasso.entities.domain.impl.TourParticipant;
-import org.novinomad.picasso.entities.domain.impl.Tour;
-import org.novinomad.picasso.entities.domain.impl.TourBind;
-import org.novinomad.picasso.dto.gantt.Task;
-import org.novinomad.picasso.exceptions.BindException;
-import org.novinomad.picasso.exceptions.base.BaseException;
+import org.novinomad.picasso.erm.dto.filters.TourBindFilter;
+import org.novinomad.picasso.erm.entities.TourParticipant;
+import org.novinomad.picasso.erm.entities.Tour;
+import org.novinomad.picasso.erm.entities.TourBind;
+import org.novinomad.picasso.erm.dto.gantt.Task;
+import org.novinomad.picasso.commons.exceptions.BindException;
+import org.novinomad.picasso.commons.exceptions.base.CommonRuntimeException;
 
 import javax.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.Optional;
 
-public interface ITourBindService {
+public interface ITourBindService extends ICrud<Long, TourBind> {
 
-    TourBind bind(TourParticipant tourParticipant, Tour tour, IRange dateRange) throws BaseException;
-    TourBind bind(Long tourParticipantID, Long tourId, IRange dateRange) throws BaseException;
-    default TourBind bind(TourBind tourBind) throws BaseException {
-        return bind(tourBind.getTourParticipant(), tourBind.getTour(), tourBind.getDateRange());
-    }
+    TourBind bind(TourParticipant tourParticipant, Tour tour, IRange dateRange) throws BindException;
+    TourBind bind(Long tourParticipantId, Long tourId, IRange dateRange) throws BindException;
 
-    @Transactional
-    default List<TourBind> bind(Collection<TourBind> tourBinds) throws BaseException {
-        List<TourBind> savedBinds = new ArrayList<>();
-        for (TourBind tourBind : tourBinds) {
-            savedBinds.add(bind(tourBind));
+    @Override
+    default TourBind save(TourBind tourBind) {
+        try {
+            return bind(tourBind.getTourParticipant(), tourBind.getTour(), tourBind.getDateRange());
+        } catch (BindException e) {
+            throw new CommonRuntimeException(e);
         }
-        return savedBinds;
     }
-    void validateBind(Long tourId, Long tourParticipantId, IRange bindRange) throws BaseException;
+
+    void validateBind(Long tourId, Long tourParticipantId, IRange bindRange) throws BindException;
     void validateBind(TourBind tourBind) throws BindException;
     default boolean overlapsWithOtherTour(TourBind tourBind) {
         try {
@@ -42,15 +39,6 @@ public interface ITourBindService {
             return true;
         }
     }
-
-    void delete(Long id) throws BaseException;
-
-    @Transactional
-    List<Long> delete(Collection<Long> ids);
-
-    Optional<TourBind> get(Long id);
-
-    List<TourBind> get();
 
     List<TourBind> get(TourBindFilter tourBindFilter);
 

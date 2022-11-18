@@ -4,7 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.math.NumberUtils;
-import org.novinomad.picasso.entities.domain.impl.TourParticipant;
+import org.novinomad.picasso.erm.entities.TourParticipant;
 import org.novinomad.picasso.services.impl.TourParticipantService;
 import org.springframework.format.Formatter;
 import org.springframework.stereotype.Component;

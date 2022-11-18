@@ -8,7 +8,7 @@ spring:
   jpa:
     database-platform: org.hibernate.dialect.${PCS_HIBERNATE_DIALECT:H2Dialect}
     hibernate:
-      ddl-auto: ${PCS_DDL_AUTO:update}
+      ddl-auto: ${PCS_DDL_AUTO:create-drop}
 
   datasource:
     driver-class-name: ${PCS_DB_DRIVER_CLASS:org.h2.Driver}
@@ -20,6 +20,17 @@ spring:
       connection-timeout: 60000
       maximum-pool-size: 5
 
+  mail:
+    host: ${SMPT_HOST:smtp.gmail.com}
+    port: ${SMTP_PORT:587}
+    username: ${SMTP_USERNAME}
+    password: ${SMTP_PASSWORD}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
 server:
   host: ${PCS_SERVER_HOST:localhost}
   port: ${PCS_SERVER_PORT:8080}
@@ -32,4 +43,4 @@ logging:
     org.novinomad.picasso: debug
     org.hibernate.SQL: error
 
-initialize-test-data: false
+initialize-test-data: true

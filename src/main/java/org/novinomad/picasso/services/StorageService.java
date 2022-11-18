@@ -1,15 +1,12 @@
 package org.novinomad.picasso.services;
 
-import org.novinomad.picasso.exceptions.StorageException;
+import org.novinomad.picasso.commons.exceptions.StorageException;
 import org.springframework.core.io.Resource;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.nio.file.*;
 import java.util.Collection;
 import java.util.List;
-import java.util.stream.Stream;
 
 public interface StorageService {
     String PATH_SEPARATOR = FileSystems.getDefault().getSeparator();

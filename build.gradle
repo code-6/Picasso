@@ -29,6 +29,8 @@ dependencies {
     implementation group: 'com.github.javafaker', name: 'javafaker', version: '1.0.2'
     implementation group: 'org.yaml', name: 'snakeyaml', version: '1.32'
     implementation group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310', version: '2.13.3'
+    implementation group: 'org.jgrapht', name: 'jgrapht-core', version: '1.5.1'
+    implementation group: 'org.springframework.boot', name: 'spring-boot-starter-mail', version: '2.7.5'
 
     // frontend
     implementation group: 'org.webjars', name: 'webjars-locator', version: '0.45'
@@ -40,6 +42,7 @@ dependencies {
     implementation group: 'org.webjars', name: 'jquery-easing', version: '1.4.1'
     implementation group: 'org.webjars.npm', name: 'sweetalert2', version: '11.4.14'
     implementation group: 'org.webjars', name: 'bootstrap-daterangepicker', version: '3.1'
+    implementation group: 'org.webjars.npm', name: 'vis-network', version: '9.1.2'
 
     implementation('org.webjars.bower:bootstrap-select:1.13.11') {
         exclude group: 'org.webjars.bower', module: 'bootstrap'

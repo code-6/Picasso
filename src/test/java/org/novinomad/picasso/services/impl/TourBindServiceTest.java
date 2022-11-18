@@ -1,13 +1,11 @@
 package org.novinomad.picasso.services.impl;
 
-import com.github.javafaker.Faker;
 import org.junit.jupiter.api.*;
-import org.novinomad.picasso.commons.LocalDateTimeRange;
-import org.novinomad.picasso.dto.bind.TourBindModel;
-import org.novinomad.picasso.entities.domain.impl.Driver;
-import org.novinomad.picasso.entities.domain.impl.Guide;
-import org.novinomad.picasso.entities.domain.impl.Tour;
-import org.novinomad.picasso.entities.domain.impl.TourParticipant;
+import org.novinomad.picasso.erm.dto.bind.TourBindModel;
+import org.novinomad.picasso.erm.entities.Driver;
+import org.novinomad.picasso.erm.entities.Guide;
+import org.novinomad.picasso.erm.entities.Tour;
+import org.novinomad.picasso.erm.entities.TourParticipant;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
@@ -15,8 +13,6 @@ import org.springframework.test.context.TestPropertySource;
 
 import javax.annotation.PostConstruct;
 import java.time.LocalDateTime;
-import java.util.*;
-import java.util.concurrent.atomic.AtomicLong;
 
 @SpringBootTest
 @ActiveProfiles("test")

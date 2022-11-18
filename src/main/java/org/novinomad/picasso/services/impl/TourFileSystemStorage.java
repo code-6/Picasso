@@ -1,8 +1,7 @@
 package org.novinomad.picasso.services.impl;
 
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
-import org.novinomad.picasso.exceptions.StorageException;
+import org.novinomad.picasso.commons.exceptions.StorageException;
 import org.novinomad.picasso.services.StorageService;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
@@ -13,12 +12,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.nio.file.*;
-import java.util.Arrays;
-import java.util.Iterator;
 import java.util.List;
 import java.util.stream.Stream;
-
-import static org.novinomad.picasso.services.StorageService.*;
 
 @Service
 @Slf4j

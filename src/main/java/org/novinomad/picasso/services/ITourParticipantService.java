@@ -1,30 +1,14 @@
 package org.novinomad.picasso.services;
 
-import org.novinomad.picasso.entities.domain.impl.TourParticipant;
-import org.novinomad.picasso.exceptions.base.BaseException;
+import org.novinomad.picasso.commons.ICrud;
+import org.novinomad.picasso.erm.entities.TourParticipant;
+import org.novinomad.picasso.commons.exceptions.base.CommonException;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
-public interface ITourParticipantService {
+public interface ITourParticipantService extends ICrud<Long, TourParticipant> {
 
-    default List<TourParticipant> get(TourParticipant.Type... types) {
-        return get(Arrays.asList(types));
-    }
-
-    <T extends TourParticipant> T save(T tourParticipant) throws BaseException;
-
-    void delete(Long id) throws BaseException;
-
-    Optional<TourParticipant> get(Long id);
-
-    List<TourParticipant> get();
-
-    List<TourParticipant> get(Long... ids);
-
-    <T extends TourParticipant> List<T> get(TourParticipant.Type tourParticipantType);
+    List<TourParticipant> get(Collection<TourParticipant.Type> tourParticipantTypes);
 
     default List<TourParticipant> getOrEmpty(TourParticipant.Type... types) {
         if(types == null || types.length == 0)
@@ -32,17 +16,4 @@ public interface ITourParticipantService {
 
         return get(Arrays.asList(types));
     }
-
-    default List<TourParticipant> getOrEmpty(List<TourParticipant.Type> types) {
-        if(types == null || types.isEmpty())
-            return Collections.emptyList();
-
-        return get(types);
-    }
-
-    <T extends TourParticipant> List<T> get(String className);
-
-    List<TourParticipant> get(List<TourParticipant.Type> types);
-
-    List<TourParticipant.Type> getTourParticipantTypes();
 }

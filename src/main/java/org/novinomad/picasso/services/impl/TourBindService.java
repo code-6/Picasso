@@ -1,73 +1,78 @@
 package org.novinomad.picasso.services.impl;
 
 import lombok.AccessLevel;
-import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.novinomad.picasso.commons.IRange;
-import org.novinomad.picasso.dto.filters.TourBindFilter;
-import org.novinomad.picasso.dto.gantt.Task;
-import org.novinomad.picasso.entities.domain.impl.TourParticipant;
-import org.novinomad.picasso.entities.domain.impl.Tour;
-import org.novinomad.picasso.entities.domain.impl.TourBind;
-import org.novinomad.picasso.exceptions.BindException;
-import org.novinomad.picasso.exceptions.base.BaseException;
-import org.novinomad.picasso.repositories.jpa.TourBindRepository;
-import org.novinomad.picasso.services.ITourParticipantService;
+import org.novinomad.picasso.commons.exceptions.BindException;
+import org.novinomad.picasso.commons.exceptions.base.CommonRuntimeException;
+import org.novinomad.picasso.erm.dto.filters.TourBindFilter;
+import org.novinomad.picasso.erm.dto.gantt.Task;
+import org.novinomad.picasso.erm.entities.Tour;
+import org.novinomad.picasso.erm.entities.TourBind;
+import org.novinomad.picasso.erm.entities.TourParticipant;
+import org.novinomad.picasso.repositories.TourBindRepository;
 import org.novinomad.picasso.services.ITourBindService;
+import org.novinomad.picasso.services.ITourParticipantService;
 import org.novinomad.picasso.services.ITourService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
-import javax.transaction.Transactional;
-import java.util.*;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static org.novinomad.picasso.commons.utils.CommonDateUtils.findOverlappedRange;
 
 @Slf4j
 @Service
-@RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class TourBindService implements ITourBindService {
 
-    final TourBindRepository tourBindRepository;
 
-    final ITourService tourService;
+    private final TourBindRepository tourBindRepository;
 
-    final ITourParticipantService tourParticipantService;
+    private final ITourService tourService;
 
-    @Autowired
-    @Qualifier("tourBindJdbcRepository")
-    TourBindRepository tourBindJdbcRepository;
+    private final ITourParticipantService tourParticipantService;
+
+    public TourBindService(@Qualifier("tourBindRepository") TourBindRepository tourBindRepository,
+                           ITourService tourService,
+                           ITourParticipantService tourParticipantService) {
+
+        this.tourBindRepository = tourBindRepository;
+        this.tourService = tourService;
+        this.tourParticipantService = tourParticipantService;
+    }
 
     /**
      * Disallow bind if:
      * 1. dates to bind is out of tour dates range.
-     * 2. Intersects with dates of other allTours.
+     * 2. Intersects with dates of other tours.
      * */
     @Override
-    public TourBind bind(TourParticipant tourParticipant, Tour tour, IRange dateRange) throws BaseException {
+    public TourBind bind(TourParticipant tourParticipant, Tour tour, IRange dateRange) throws CommonRuntimeException, BindException {
         try {
             TourBind tourBind = new TourBind(tourParticipant, tour, dateRange);
 
             validateBind(tourBind);
 
-            return save(tourBind);
-        } catch (BaseException e) {
+            return tourBindRepository.save(tourBind);
+        } catch (CommonRuntimeException | BindException e) {
             log.error(e.getMessage(), e);
             throw e;
         }
     }
 
     @Override
-    public TourBind bind(Long tourParticipantID, Long tourId, IRange dateRange) throws BaseException {
+    public TourBind bind(Long tourParticipantID, Long tourId, IRange dateRange) throws CommonRuntimeException, BindException {
         TourParticipant tourParticipant = tourParticipantService.get(tourParticipantID)
-                .orElseThrow(() -> new BaseException("TourParticipant with id: {} not found in DB", tourParticipantID));
+                .orElseThrow(() -> new CommonRuntimeException("TourParticipant with id: {} not found in DB", tourParticipantID));
 
         Tour tour = tourService.get(tourId)
-                .orElseThrow(() -> new BaseException("Tour with id: {} not found in DB", tourId));
+                .orElseThrow(() -> new CommonRuntimeException("Tour with id: {} not found in DB", tourId));
 
         return bind(tourParticipant, tour, dateRange);
     }
@@ -90,7 +95,7 @@ public class TourBindService implements ITourBindService {
     }
 
     @Override
-    public void validateBind(Long tourId, Long tourParticipantId, IRange bindRange) throws BaseException {
+    public void validateBind(Long tourId, Long tourParticipantId, IRange bindRange) throws CommonRuntimeException, BindException {
         List<TourBind> overlapsBinds = tourBindRepository.findOverlappedBinds(tourId, tourParticipantId, bindRange.getStartDate(), bindRange.getEndDate());
 
         if (!overlapsBinds.isEmpty()) {
@@ -98,93 +103,13 @@ public class TourBindService implements ITourBindService {
                     .collect(Collectors.toMap(TourBind::getTour, tb -> findOverlappedRange(bindRange, tb.getDateRange())));
 
             TourParticipant tourParticipant = tourParticipantService.get(tourParticipantId)
-                    .orElseThrow(() -> new BaseException("TourParticipant with id: {} not found in DB", tourParticipantId));
+                    .orElseThrow(() -> new CommonRuntimeException("TourParticipant with id: {} not found in DB", tourParticipantId));
 
             Tour tour = tourService.get(tourId)
-                    .orElseThrow(() -> new BaseException("Tour with id: {} not found in DB", tourId));
+                    .orElseThrow(() -> new CommonRuntimeException("Tour with id: {} not found in DB", tourId));
 
             throw new BindException(tourParticipant, tour, bindRange, overlapsToursAndRanges);
         }
-    }
-
-    private TourBind save(TourBind tourBind) throws BaseException {
-        try {
-            TourBind savedTourBind = tourBindRepository.save(tourBind);
-            log.debug("saved {}", tourBind);
-            return savedTourBind;
-        } catch (Exception e) {
-            log.error("unable to save: {} because: {}", tourBind, e.getMessage(), e);
-            throw new BaseException(e, "unable to save: {} because: {}", tourBind, e.getMessage());
-        }
-    }
-
-    @Transactional
-    List<TourBind> save(Collection<TourBind> tourBinds) {
-        // TODO fix for update action unique constraint violation exception. Possible variants:
-        // 1. Add bind id to model.
-        // 2. Fetch existent from db first, check and then save.
-        List<TourBind> savedTourBinds = new ArrayList<>();
-        tourBinds.forEach(tourBind -> {
-            try {
-                savedTourBinds.add(save(tourBind));
-            } catch (BaseException ignored) {
-                // ignored because save contains logging.
-            }
-        });
-        if(savedTourBinds.size() != tourBinds.size())
-            log.warn("not all TourBinds are saved. To be saved: {} saved: {}", tourBinds.size(), savedTourBinds.size());
-
-        return savedTourBinds;
-    }
-
-    @Override
-    public void delete(Long id) throws BaseException {
-        try {
-            tourBindRepository.deleteById(id);
-        } catch (Exception e) {
-            log.error("unable to delete TourBind with id: {} because: {}", id, e.getMessage(), e);
-            throw new BaseException(e, "unable to delete TourBind with id: {} because: {}", id, e.getMessage());
-        }
-    }
-
-    @Override
-    @Transactional
-    public List<Long> delete(Collection<Long> ids) {
-        List<Long> deletedTourBindIds = new ArrayList<>();
-
-        ids.forEach(id -> {
-            try {
-                delete(id);
-                deletedTourBindIds.add(id);
-            } catch (BaseException ignored) {
-                // ignored because save contains logging.
-            }
-        });
-        if(deletedTourBindIds.size() != ids.size())
-            log.warn("not all TourBinds are deleted. To be deleted: {} deleted: {}", deletedTourBindIds.size(), ids.size());
-
-        return deletedTourBindIds;
-    }
-
-    @Transactional
-    public List<Long> deleteAll(Collection<TourBind> tourBinds) {
-        List<Long> ids = tourBinds.stream().map(TourBind::getId).toList();
-        return delete(ids);
-    }
-
-    @Override
-    public Optional<TourBind> get(Long id) {
-        try {
-            return tourBindRepository.findById(id);
-        } catch (Exception e) {
-            log.error("unable to get TourBind by id: {} because: {}", id, e.getMessage(), e);
-            return Optional.empty();
-        }
-    }
-
-    @Override
-    public List<TourBind> get() {
-        return tourBindRepository.findAll();
     }
 
     @Override
@@ -192,7 +117,7 @@ public class TourBindService implements ITourBindService {
         List<Long> tourIds = tourBindFilter.getTourIds().isEmpty() ? null : tourBindFilter.getTourIds();
         List<Long> tourParticipantIds = tourBindFilter.getTourParticipantIds().isEmpty() ? null : tourBindFilter.getTourParticipantIds();
 
-        return tourBindJdbcRepository.findByFilter(tourBindFilter.getStartDate(), tourBindFilter.getEndDate(), tourIds, tourParticipantIds);
+        return tourBindRepository.findByFilter(tourBindFilter.getStartDate(), tourBindFilter.getEndDate(), tourIds, tourParticipantIds);
     }
 
     @Override
@@ -201,5 +126,58 @@ public class TourBindService implements ITourBindService {
             tourBindFilter = new TourBindFilter();
 
         return Task.fromBindsWithChildrenInList(get(tourBindFilter));
+    }
+
+    @Override
+    public void deleteById(Long id) {
+        try {
+            tourBindRepository.deleteById(id);
+        } catch (Exception e) {
+            throw new CommonRuntimeException(e, "unable to delete bind with id {} because {}", id, e.getMessage());
+        }
+    }
+
+    @Override
+    public void deleteById(Iterable<Long> ids) throws CommonRuntimeException {
+        try {
+            tourBindRepository.deleteAllById(ids);
+        } catch (Exception e) {
+            throw new CommonRuntimeException(e, "unable to delete binds with ids {} because {}", ids, e.getMessage());
+        }
+    }
+
+    @Override
+    public void delete(TourBind... tourBinds) throws CommonRuntimeException {
+        try {
+            if(tourBinds == null || tourBinds.length == 0) {
+                tourBindRepository.deleteAll();
+            } else {
+                tourBindRepository.deleteAll(Arrays.asList(tourBinds));
+            }
+        } catch (Exception e) {
+            throw new CommonRuntimeException(e, "unable to delete binds {} because {}", tourBinds, e.getMessage());
+        }
+    }
+
+    @Override
+    public List<TourBind> get(Long... ids) throws CommonRuntimeException {
+        try {
+            if(ids == null || ids.length == 0) {
+                return tourBindRepository.findAll();
+            } else {
+                return tourBindRepository.findAllById(Arrays.asList(ids));
+            }
+        } catch (Exception e) {
+            throw new CommonRuntimeException(e, "unable to get binds by ids {} because {}", ids, e.getMessage());
+        }
+    }
+
+    @Override
+    public Optional<TourBind> get(Long id) throws CommonRuntimeException {
+        try {
+            return tourBindRepository.findById(id);
+        } catch (Exception e) {
+            throw new CommonRuntimeException(e, "unable to get bind by id {} because {}", id, e.getMessage());
+        }
     }
 }

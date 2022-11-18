@@ -6,18 +6,20 @@ import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.RandomUtils;
+import org.novinomad.picasso.commons.exceptions.BindException;
+import org.novinomad.picasso.commons.exceptions.base.CommonException;
+import org.novinomad.picasso.commons.exceptions.base.CommonRuntimeException;
 import org.novinomad.picasso.commons.utils.CarUtils;
 import org.novinomad.picasso.commons.utils.CommonDateUtils;
-import org.novinomad.picasso.entities.AppSettings;
-import org.novinomad.picasso.entities.domain.impl.*;
-import org.novinomad.picasso.exceptions.BindException;
-import org.novinomad.picasso.exceptions.base.BaseException;
+import org.novinomad.picasso.erm.entities.*;
+import org.novinomad.picasso.erm.entities.system.AppSettings;
 import org.novinomad.picasso.repositories.jpa.AppSettingsRepository;
 import org.novinomad.picasso.repositories.jpa.DriverRepository;
 import org.novinomad.picasso.repositories.jpa.GuideRepository;
 import org.novinomad.picasso.repositories.jpa.TourRepository;
 import org.novinomad.picasso.services.IDevEnvInitializer;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.context.annotation.DependsOn;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 
@@ -35,6 +37,7 @@ import static org.novinomad.picasso.commons.utils.CommonDateUtils.localDateTimeT
 @RequiredArgsConstructor
 @Profile({"dev", "test"})
 @ConditionalOnProperty(name = "initialize-test-data", havingValue = "true")
+@DependsOn("userService")
 public class DevEnvInitializer implements IDevEnvInitializer {
     static final LocalDate CURRENT_DATE = LocalDate.now();
     static final int NEXT_MONTH_MAX_DAY = CURRENT_DATE.plusMonths(1).lengthOfMonth();
@@ -165,7 +168,7 @@ public class DevEnvInitializer implements IDevEnvInitializer {
     }
 
     @Override
-    public List<TourBind> createTourBindings(List<Tour> tours, List<TourParticipant> tourParticipants) throws BaseException {
+    public List<TourBind> createTourBindings(List<Tour> tours, List<TourParticipant> tourParticipants) throws CommonException {
         log.info("start create bindings");
         List<TourBind> bindings = new ArrayList<>();
 
@@ -200,17 +203,14 @@ public class DevEnvInitializer implements IDevEnvInitializer {
                     endDate = tour.getEndDate();
                 TourBind tourBindDriver = new TourBind(driver, tour, startDate, endDate);
                 TourBind tourBindGuide = new TourBind(guide, tour, startDate, endDate);
-                TourBind save1 = tourBindService.bind(tourBindDriver);
+                TourBind save1 = tourBindService.save(tourBindDriver);
                 log.debug("created new {}", save1);
-                TourBind save2 = tourBindService.bind(tourBindGuide);
+                TourBind save2 = tourBindService.save(tourBindGuide);
                 log.debug("created new {}", save2);
                 bindings.add(save1);
                 bindings.add(save2);
-            } catch (BindException e) {
-                log.error(e.getMessage(), e);
-            } catch (Exception e) {
-                log.error("Something went wrong while creating bindings. {}", e.getMessage(), e);
-                throw e;
+            } catch (BindException | CommonRuntimeException e) {
+                log.warn(e.getMessage());
             }
         }
         return bindings;

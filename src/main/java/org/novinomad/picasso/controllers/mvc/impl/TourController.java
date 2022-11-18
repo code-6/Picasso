@@ -4,10 +4,9 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
-import org.novinomad.picasso.entities.domain.impl.Tour;
-import org.novinomad.picasso.dto.filters.TourFilter;
-import org.novinomad.picasso.entities.domain.impl.TourParticipant;
-import org.novinomad.picasso.exceptions.base.BaseException;
+import org.novinomad.picasso.erm.entities.Tour;
+import org.novinomad.picasso.erm.dto.filters.TourFilter;
+import org.novinomad.picasso.commons.exceptions.base.CommonException;
 import org.novinomad.picasso.services.ITourService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
@@ -53,8 +52,8 @@ public class TourController {
     }
 
     @DeleteMapping
-    public String deleteTour(Long tourId) throws BaseException {
-        tourService.delete(tourId);
+    public String deleteTour(Long tourId) throws CommonException {
+        tourService.deleteById(tourId);
         return "tour/toursTable :: toursTable";
     }
 
@@ -77,7 +76,7 @@ public class TourController {
 
         try {
             tourService.save(tour, Arrays.asList(tourFiles));
-        } catch (BaseException e) {
+        } catch (CommonException e) {
             model.addAttribute("exception", e.getMessage());
         }
 
