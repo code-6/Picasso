@@ -2,8 +2,8 @@ package org.novinomad.picasso.repositories;
 
 import com.github.javafaker.Faker;
 import org.junit.jupiter.api.*;
-import org.novinomad.picasso.erm.entities.Driver;
-import org.novinomad.picasso.erm.entities.TourParticipant;
+import org.novinomad.picasso.domain.erm.entities.tour_participants.Driver;
+import org.novinomad.picasso.domain.erm.entities.tour_participants.TourParticipant;
 import org.novinomad.picasso.repositories.jpa.TourParticipantRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;

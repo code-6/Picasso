@@ -1,7 +1,8 @@
 package org.novinomad.picasso.repositories.jpa;
 
-import org.novinomad.picasso.erm.entities.TourParticipant;
+import org.novinomad.picasso.domain.erm.entities.tour_participants.TourParticipant;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
@@ -19,4 +20,12 @@ public interface TourParticipantRepository extends JpaRepository<TourParticipant
 
     @Query("from TourParticipant tp where TYPE(tp) = :entityClass")
     List<TourParticipant> findAllByClass(String entityClass);
+
+    @Query("update TourParticipant set deleted = true where id = :id")
+    @Modifying
+    int softDeleteById(Long id);
+
+    @Query("update TourParticipant set deleted = true where id in(:ids)")
+    @Modifying
+    int softDeleteById(Collection<Long> ids);
 }

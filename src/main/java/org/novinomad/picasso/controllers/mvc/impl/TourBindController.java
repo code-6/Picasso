@@ -4,20 +4,20 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
+import org.novinomad.picasso.aop.annotations.logging.LogIgnore;
+import org.novinomad.picasso.aop.annotations.logging.Loggable;
 import org.novinomad.picasso.commons.exceptions.BindException;
-import org.novinomad.picasso.erm.dto.filters.TourBindFilter;
-import org.novinomad.picasso.erm.entities.TourParticipant;
-import org.novinomad.picasso.erm.entities.Tour;
-import org.novinomad.picasso.erm.entities.TourBind;
-import org.novinomad.picasso.erm.dto.bind.BindDateRange;
-import org.novinomad.picasso.erm.dto.bind.TourParticipantBindModel;
-import org.novinomad.picasso.erm.dto.bind.TourBindModel;
-import org.novinomad.picasso.commons.exceptions.base.CommonException;
-import org.novinomad.picasso.services.ITourParticipantService;
-import org.novinomad.picasso.services.ITourBindService;
-import org.novinomad.picasso.services.ITourService;
+import org.novinomad.picasso.domain.dto.tour.filters.TourBindFilter;
+import org.novinomad.picasso.domain.erm.entities.tour_participants.TourParticipant;
+import org.novinomad.picasso.domain.erm.entities.tour.Tour;
+import org.novinomad.picasso.domain.erm.entities.tour.TourBind;
+import org.novinomad.picasso.domain.dto.tour.bind.BindDateRange;
+import org.novinomad.picasso.domain.dto.tour.bind.TourParticipantBindModel;
+import org.novinomad.picasso.domain.dto.tour.bind.TourBindModel;
+import org.novinomad.picasso.services.tour_participants.TourParticipantService;
+import org.novinomad.picasso.services.tour.TourBindService;
+import org.novinomad.picasso.services.tour.TourService;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
@@ -32,36 +32,44 @@ public class TourBindController {
 
     public static final String CTX = "/";
 
-    final ITourParticipantService tourParticipantService;
-    final ITourService tourService;
-    final ITourBindService tourBindService;
-
+    final TourParticipantService tourParticipantService;
+    final TourService tourService;
+    final TourBindService tourBindService;
     @ModelAttribute("allTours")
-    public List<Tour> getAllTours() {
+    public List<Tour> allTours() {
         return tourService.get();
     }
 
+    @ModelAttribute("tourBindFilter")
+    public TourBindFilter tourBindFilter() {
+        return new TourBindFilter();
+    }
+
     @ModelAttribute("tourParticipant")
-    public TourParticipant getTourParticipant() {
+    public TourParticipant tourParticipant() {
         return new TourParticipant();
     }
 
     @ModelAttribute("tour")
-    public Tour getTour() {
+    public Tour tour() {
         return new Tour();
     }
 
+    @GetMapping("/new")
+    public ModelAndView showNewTourBindPage() {
+        return new ModelAndView("tourBind/tourBindNew");
+    }
+
     @GetMapping
-    public ModelAndView index(@ModelAttribute("tourBindFilter") final TourBindFilter tourBindFilter) {
+    public ModelAndView showTouBindsPage(@ModelAttribute("tourBindFilter") final TourBindFilter tourBindFilter) {
 
         return new ModelAndView("tourBind/tourBind")
-                .addObject("tourBindFilter", tourBindFilter)
                 .addObject("tourBind", new TourBindModel())
                 .addObject("toursForGantt", tourBindService.getForGanttChart(tourBindFilter));
     }
 
     @GetMapping("/{tourId}")
-    public String getTourBindForm(@PathVariable Long tourId, Model model) {
+    public ModelAndView getTourBindForm(@PathVariable Long tourId) {
         TourBindModel tourBind;
         if(tourId != null && tourId > 0) {
             TourBindFilter tourBindFilter = new TourBindFilter();
@@ -71,37 +79,35 @@ public class TourBindController {
         } else {
             tourBind = new TourBindModel();
         }
-        model.addAttribute("tourBind", tourBind);
-
-        return "tourBind/tourBind :: tourBindForm";
+        return new ModelAndView("tourBind/tourBind :: tourBindForm")
+                .addObject("tourBind", tourBind);
     }
 
     @GetMapping("/ganttTooltipFragment")
-    public String getGanttTooltipFragment(@RequestParam String taskId, Model model) {
-
-        model.addAttribute("ctx", CTX);
-        model.addAttribute("isTourTask", "84".equals(taskId.substring(0,2)));
-        model.addAttribute("entityId", Long.parseLong(taskId.substring(2)));
-
-        return "fragments/ganttTaskTooltip :: ganttTaskTooltip";
+    public ModelAndView getGanttTooltipFragment(@RequestParam String taskId) {
+        return new ModelAndView("fragments/ganttTaskTooltip :: ganttTaskTooltip")
+                .addObject("ctx", CTX)
+                .addObject("isTourTask", "84".equals(taskId.substring(0, 2)))
+                .addObject("entityId", Long.parseLong(taskId.substring(2)));
     }
 
     @PostMapping
     public String bind(final TourBindModel tourBind) throws BindException {
-        tourBindService.save(tourBind.toEntities());
+        tourBindService.bind(tourBind);
         return "redirect:/";
     }
 
     @PostMapping(value = "/bindTourParticipant")
-    public String bindTourParticipant(final TourBindModel tourBind, Model model) {
-        tourBind.bindTourParticipant(new TourParticipant());
-        model.addAttribute("tourBind", tourBind);
+    public ModelAndView bindTourParticipant(final TourBindModel tourBind) {
 
-        return "tourBind/tourBind :: bindResultTourParticipants";
+        tourBind.bindTourParticipant(new TourParticipant());
+
+        return new ModelAndView("tourBind/tourBind :: bindResultTourParticipants")
+                .addObject("tourBind", tourBind);
     }
 
     @PostMapping("/unbindTourParticipant/{tourParticipantRowId}")
-    public String unbindTourParticipant(final TourBindModel tourBind, Model model, @PathVariable Integer tourParticipantRowId) {
+    public ModelAndView unbindTourParticipant(final TourBindModel tourBind, @PathVariable Integer tourParticipantRowId) {
 
         try {
             if(tourParticipantRowId != null) {
@@ -110,29 +116,27 @@ public class TourBindController {
         } catch (NumberFormatException e) {
             log.error(e.getMessage(), e);
         }
-        model.addAttribute("tourBind", tourBind);
-
-        return "tourBind/tourBind :: bindResultTourParticipants";
+        return new ModelAndView("tourBind/tourBind :: bindResultTourParticipants")
+                .addObject("tourBind", tourBind);
     }
 
     @PostMapping("/bindTourParticipantDateRange/{tourParticipantRowId}")
-    public String bindTourParticipantDateRange(final TourBindModel tourBind, Model model, @PathVariable Integer tourParticipantRowId) {
+    public ModelAndView bindTourParticipantDateRange(final TourBindModel tourBind, @PathVariable Integer tourParticipantRowId) {
         try {
             if(tourParticipantRowId != null) {
                 TourParticipantBindModel tourParticipantBindModel = tourBind.getTourParticipants().get(tourParticipantRowId);
                 Tour tour = tourBind.getTour();
-                tourParticipantBindModel.getBindIdsToDateRanges().add(new BindDateRange(tour.getDateRange()));
+                tourParticipantBindModel.getBindIdsToDateRanges().add(new BindDateRange(tour.getDateTimeRange()));
             }
         } catch (NumberFormatException e) {
             log.error(e.getMessage(), e);
         }
-        model.addAttribute("tourBind", tourBind);
-
-        return "tourBind/tourBind :: bindResultTourParticipants";
+        return new ModelAndView("tourBind/tourBind :: bindResultTourParticipants")
+                .addObject("tourBind", tourBind);
     }
 
     @PostMapping("/unbindTourParticipantDateRange/{tourParticipantRowId}/{tourParticipantDateRangeRowId}")
-    public String unbindTourParticipantDateRange(final TourBindModel tourBind, Model model, @PathVariable Integer tourParticipantRowId,
+    public ModelAndView unbindTourParticipantDateRange(final TourBindModel tourBind, @PathVariable Integer tourParticipantRowId,
                                           @PathVariable Integer tourParticipantDateRangeRowId) {
         try {
             if(tourParticipantRowId != null && tourParticipantDateRangeRowId != null) {
@@ -142,8 +146,7 @@ public class TourBindController {
         } catch (NumberFormatException e) {
             log.error(e.getMessage(), e);
         }
-        model.addAttribute("tourBind", tourBind);
-
-        return "tourBind/tourBind :: bindResultTourParticipants";
+        return new ModelAndView("tourBind/tourBind :: bindResultTourParticipants")
+                .addObject("tourBind", tourBind);
     }
 }

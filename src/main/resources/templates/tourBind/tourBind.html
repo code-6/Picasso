@@ -84,7 +84,7 @@
                                         <option th:each="tour : ${allTours}"
                                                 th:value="${tour.id}"
                                                 th:text="${tour.id + ': ' + tour.name}"
-                                                th:data-subtext="${tour.getDateRange()}"
+                                                th:data-subtext="${tour.getDateTimeRange()}"
                                                 th:selected="${tourBind.tour.id == tour.id}">
                                         </option>
                                     </select>
@@ -101,7 +101,7 @@
                                     </div>
                                     <div class="col">
                                         <input id="bindResultTourDates" class="form-control" readonly
-                                               th:value="${tourBind.tour?.getDateRange()?.toString()}">
+                                               th:value="${tourBind.tour?.getDateTimeRange()?.toString()}">
                                     </div>
                                     <div class="col-sm-1"></div>
                                 </div>
@@ -180,8 +180,8 @@
                                                        th:id="${'tourParticipantTourDateRange_'+tourParticipantBindRow.index+'-'+tourParticipantDateRangeRow.index}"
                                                        th:data-tourParticipant-id="${tourParticipantBind?.tourParticipant?.id}"
                                                        th:data-tour-id="${tourBind.tour.id}" name="dateRange"
-                                                       th:field="${tourBind.tourParticipants[__${tourParticipantBindRow.index}__].bindIdsToDateRanges[__${tourParticipantDateRangeRow.index}__]?.dateRange}"
-                                                       th:value="${tourBind.tourParticipants[__${tourParticipantBindRow.index}__].bindIdsToDateRanges[__${tourParticipantDateRangeRow.index}__]?.dateRange.toString()}">
+                                                       th:field="${tourBind.tourParticipants[__${tourParticipantBindRow.index}__].bindIdsToDateRanges[__${tourParticipantDateRangeRow.index}__]?.getDateTimeRange}"
+                                                       th:value="${tourBind.tourParticipants[__${tourParticipantBindRow.index}__].bindIdsToDateRanges[__${tourParticipantDateRangeRow.index}__]?.getDateTimeRange.toString()}">
                                             </div>
                                             <div class="col-sm-1">
                                                 <button class="btn btn-outline-primary unbindTourParticipantDateRangeBtn" type="button"

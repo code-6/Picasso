@@ -54,3 +54,8 @@ function toggleSpinner(element) {
         });
     }
 }
+
+const DEFAULT_TOAST_TIME_OUT = 3000;
+$(function () {
+    $('[data-toggle="popover"]').popover();
+});

@@ -4,10 +4,12 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
-import org.novinomad.picasso.erm.entities.Tour;
-import org.novinomad.picasso.erm.dto.filters.TourFilter;
+import org.novinomad.picasso.aop.annotations.logging.LogIgnore;
+import org.novinomad.picasso.aop.annotations.logging.Loggable;
+import org.novinomad.picasso.domain.erm.entities.tour.Tour;
+import org.novinomad.picasso.domain.dto.tour.filters.TourFilter;
 import org.novinomad.picasso.commons.exceptions.base.CommonException;
-import org.novinomad.picasso.services.ITourService;
+import org.novinomad.picasso.services.tour.TourService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
@@ -29,7 +31,7 @@ import java.util.Optional;
 @Controller
 @RequestMapping("/tour")
 public class TourController {
-    final ITourService tourService;
+    final TourService tourService;
 
     static final String TOUR_PAGE = "tour/tourPage";
 
@@ -44,7 +46,7 @@ public class TourController {
     @GetMapping("/{tourId}")
     public String getTourFormFragment(@PathVariable Long tourId, Model model) {
         if(tourId != null) {
-            tourService.get(tourId)
+            tourService.getById(tourId)
                     .ifPresentOrElse(tour -> model.addAttribute("tour", tour),
                             () -> model.addAttribute("tour", new Tour()));
         }
@@ -52,7 +54,7 @@ public class TourController {
     }
 
     @DeleteMapping
-    public String deleteTour(Long tourId) throws CommonException {
+    public String deleteTour(Long tourId) {
         tourService.deleteById(tourId);
         return "tour/toursTable :: toursTable";
     }
@@ -91,14 +93,12 @@ public class TourController {
             HttpHeaders httpHeaders = new HttpHeaders();
             httpHeaders.add(HttpHeaders.CONTENT_DISPOSITION, tourFile.getFilename());
             httpHeaders.add(HttpHeaders.CONTENT_LENGTH, String.valueOf(tourFile.contentLength()));
-            return new ResponseEntity<>(tourFile,
-                    httpHeaders,
-                    HttpStatus.OK);
+            return new ResponseEntity<>(tourFile, httpHeaders, HttpStatus.OK);
         } catch (FileNotFoundException e) {
             log.error(e.getMessage(),e );
             return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
         } catch (Exception e) {
-            log.error(e.getMessage(),e );
+            log.error(e.getMessage(), e);
             return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }

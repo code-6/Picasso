@@ -1,28 +1,40 @@
 package org.novinomad.picasso.commons;
 
+import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.novinomad.picasso.commons.utils.CommonDateUtils;
+import org.springframework.format.annotation.DateTimeFormat;
 
+import javax.persistence.Embeddable;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Locale;
 import java.util.Objects;
 
-@Getter
-@Setter
-public class LocalDateTimeRange implements IRange, Comparable<LocalDateTimeRange> {
+@Embeddable
+public class LocalDateTimeRange implements ILocalDateTimeRange, Comparable<ILocalDateTimeRange> {
 
-    
+    @Getter
+    @Setter(AccessLevel.PROTECTED)
+    @DateTimeFormat(pattern = CommonDateUtils.UI_DATE_TIME_NO_SEC)
     private LocalDateTime startDate;
 
-    
+    @Getter
+    @Setter(AccessLevel.PROTECTED)
+    @DateTimeFormat(pattern = CommonDateUtils.UI_DATE_TIME_NO_SEC)
     private LocalDateTime endDate;
 
-    public LocalDateTimeRange(LocalDateTime startDate, LocalDateTime endDate) {
-        if(startDate == null || endDate == null)
-            throw new IllegalArgumentException("start and end dates may not be null");
+    public LocalDateTimeRange() {
+        startDate = LocalDateTime.now();
+        endDate = LocalDateTime.now();;
+    }
 
+    public LocalDateTimeRange(@NotNull(message = "start date may not be null") LocalDateTime startDate,
+                              @NotNull(message = "end date may not be null") LocalDateTime endDate) {
         this.startDate = startDate;
         this.endDate = endDate;
     }
@@ -37,7 +49,7 @@ public class LocalDateTimeRange implements IRange, Comparable<LocalDateTimeRange
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         LocalDateTimeRange that = (LocalDateTimeRange) o;
-        return Objects.equals(startDate, that.startDate) && Objects.equals(endDate, that.endDate);
+        return startDate.equals(that.startDate) && endDate.equals(that.endDate);
     }
 
     @Override
@@ -46,15 +58,15 @@ public class LocalDateTimeRange implements IRange, Comparable<LocalDateTimeRange
     }
 
     @Override
-    public int compareTo(LocalDateTimeRange o) {
+    public int compareTo(ILocalDateTimeRange dateTimeRange) {
 
-        if(startDate.equals(o.getStartDate()))
-            return endDate.compareTo(o.getEndDate());
+        if(startDate.equals(dateTimeRange.getStartDate()))
+            return endDate.compareTo(dateTimeRange.getEndDate());
 
-        return startDate.compareTo(o.getStartDate());
+        return startDate.compareTo(dateTimeRange.getStartDate());
     }
 
-    public static LocalDateTimeRange parse(String text) {
+    public static LocalDateTimeRange parse(@NotBlank(message = "local date time range string may not be null") String text) {
         DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern(CommonDateUtils.UI_DATE_TIME_NO_SEC, CommonDateUtils.DEFAULT_LOCALE);
 
         String[] split = text.split("\s[~\\-]\s");
@@ -67,7 +79,8 @@ public class LocalDateTimeRange implements IRange, Comparable<LocalDateTimeRange
         return new LocalDateTimeRange(LocalDateTime.parse(split[0], dateTimeFormatter), LocalDateTime.parse(split[1], dateTimeFormatter));
     }
 
-    public static LocalDateTimeRange parse(String text, Locale locale) {
+    public static LocalDateTimeRange parse(@NotBlank(message = "local date time range string may not be null") String text,
+                                           @NotNull(message = " locale may not be null") Locale locale) {
         DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern(CommonDateUtils.UI_DATE_TIME_NO_SEC, locale);
 
         String[] split = text.split("\s[~\\-]\s");

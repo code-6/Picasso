@@ -24,8 +24,8 @@
   <tr th:each="tour, row : ${tours}">
     <td><span th:text="${tour.id}"></span></td>
     <td><span th:text="${tour.name}"></span></td>
-    <td><span th:text="${tour.getStartDateAsString()}"></span></td>
-    <td><span th:text="${tour.getEndDateAsString()}"></span></td>
+    <td><span th:text="${tour.dateTimeRange.getStartDateAsString()}"></span></td>
+    <td><span th:text="${tour.dateTimeRange.getEndDateAsString()}"></span></td>
     <td th:title="${tour.description}"><span th:text="${tour.description}"></span></td>
     <td>
 

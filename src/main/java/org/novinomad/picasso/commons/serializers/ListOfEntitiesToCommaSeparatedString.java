@@ -3,7 +3,7 @@ package org.novinomad.picasso.commons.serializers;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.JsonSerializer;
 import com.fasterxml.jackson.databind.SerializerProvider;
-import org.novinomad.picasso.erm.entities.base.IdAware;
+import org.novinomad.picasso.commons.IdAware;
 
 import java.io.IOException;
 import java.util.List;

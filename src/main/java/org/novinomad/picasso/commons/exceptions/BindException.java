@@ -1,11 +1,11 @@
 package org.novinomad.picasso.commons.exceptions;
 
 import lombok.Getter;
-import org.novinomad.picasso.commons.IRange;
-import org.novinomad.picasso.commons.exceptions.base.CommonRuntimeException;
+import org.novinomad.picasso.commons.ILocalDateTimeRange;
+import org.novinomad.picasso.commons.LocalDateTimeRange;
 import org.novinomad.picasso.commons.utils.CommonMessageFormat;
-import org.novinomad.picasso.erm.entities.TourParticipant;
-import org.novinomad.picasso.erm.entities.Tour;
+import org.novinomad.picasso.domain.erm.entities.tour_participants.TourParticipant;
+import org.novinomad.picasso.domain.erm.entities.tour.Tour;
 import org.novinomad.picasso.commons.exceptions.base.CommonException;
 
 import java.util.Map;
@@ -14,17 +14,16 @@ import java.util.Map;
 public class BindException extends CommonException {
     
     private static final String MSG_PATTERN = "Unable to bind: {} to the: {} for dates {} because: {}";
-    private static final String MSG_PATTERN_RU = "Не удалось связать: {} с: {} на даты {} причина: {}";
 
     private TourParticipant tourParticipant;
     private Tour tour;
-    private IRange dateTimeRange;
-    private Map<Tour, IRange> overlapsToursAndRanges;
+    private LocalDateTimeRange dateTimeRange;
+    private Map<Tour, LocalDateTimeRange> overlapsToursAndRanges;
 
 
     public BindException(TourParticipant tourParticipant,
                          Tour tour,
-                         IRange dateTimeRange,
+                         LocalDateTimeRange dateTimeRange,
                          String reason) {
         this(MSG_PATTERN, tourParticipant, tour, dateTimeRange, reason);
         this.tourParticipant = tourParticipant;
@@ -34,8 +33,8 @@ public class BindException extends CommonException {
 
     public BindException(TourParticipant tourParticipant,
                          Tour tour,
-                         IRange dateTimeRange,
-                         Map<Tour, IRange> overlapsToursAndRanges) {
+                         LocalDateTimeRange dateTimeRange,
+                         Map<Tour, LocalDateTimeRange> overlapsToursAndRanges) {
         super(buildOverlapsCauseMessage(tourParticipant, tour, dateTimeRange, overlapsToursAndRanges));
         this.tourParticipant = tourParticipant;
         this.tour = tour;
@@ -65,16 +64,16 @@ public class BindException extends CommonException {
 
     private static String buildOverlapsCauseMessage(TourParticipant tourParticipant,
                                                     Tour newBindTour,
-                                                    IRange newBindDateTimeRange,
-                                                    Map<Tour, IRange> overlappedToursAndRanges) {
+                                                    LocalDateTimeRange newBindDateTimeRange,
+                                                    Map<Tour, LocalDateTimeRange> overlappedToursAndRanges) {
         String baseMessage = CommonMessageFormat.format(MSG_PATTERN, tourParticipant, newBindTour, newBindDateTimeRange, "overlaps with: \n");
 
         StringBuilder overlapsCauseBuilder = new StringBuilder(baseMessage);
 
-        for (Map.Entry<Tour, IRange> overlapsTourAndRange : overlappedToursAndRanges.entrySet()) {
+        for (Map.Entry<Tour, LocalDateTimeRange> overlapsTourAndRange : overlappedToursAndRanges.entrySet()) {
 
             Tour overlappedTour = overlapsTourAndRange.getKey();
-            IRange overlappedRange = overlapsTourAndRange.getValue();
+            LocalDateTimeRange overlappedRange = overlapsTourAndRange.getValue();
 
             overlapsCauseBuilder.append(overlappedTour.toString()).append(" overlapped date range: ")
                     .append(overlappedRange.toString()).append("\n");

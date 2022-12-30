@@ -2,7 +2,7 @@ package org.novinomad.picasso.commons.utils;
 
 import lombok.experimental.UtilityClass;
 import org.apache.commons.lang3.RandomUtils;
-import org.novinomad.picasso.erm.entities.Driver;
+import org.novinomad.picasso.domain.erm.entities.tour_participants.Driver;
 
 import java.util.*;
 

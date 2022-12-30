@@ -1,6 +1,6 @@
 package org.novinomad.picasso.repositories.jpa;
 
-import org.novinomad.picasso.erm.entities.system.Permission;
+import org.novinomad.picasso.domain.erm.entities.auth.Permission;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;

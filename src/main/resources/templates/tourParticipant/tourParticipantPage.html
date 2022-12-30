@@ -53,10 +53,73 @@
     <!--    tourParticipants table -->
     <div class="collapse show">
         <div class="card">
-            <div class="card-header"><span th:text="${tourParticipantType + ' '} + #{table}"></span></div>
+            <div class="card-header">
+                <div class="d-flex">
+                    <div class="mr-auto p-0">
+                        <span th:text="${tourParticipantType + ' '} + #{table}"></span>
+                    </div>
+                    <div class="p-0">
+                        <button  type="button" class="btn btn-sm btn-outline-danger tourParticipantDeleteBtn"
+                                th:title="#{delete.title}">
+                            <i class="fas fa-trash-alt"></i>
+                            <span class="selectedTourParticipantsCountSpan">Delete</span>
+                        </button>
+                    </div>
+                    <div class="p-0">
+                        <button  type="button" class="btn btn-sm btn-outline-primary tourParticipantDeselectAllBtn">
+                            <i class="fa-regular fa-square"></i>
+                            <span>Deselect all</span>
+                        </button>
+                    </div>
+                    <div class="p-0">
+                        <button  type="button" class="btn btn-sm btn-outline-primary tourParticipantSelectAllBtn">
+                            <i class="fa-solid fa-square-check"></i>
+                            <span>Select all</span>
+                        </button>
+                    </div>
+                    <div class="p-0">
+                        <button  type="button" class="btn btn-sm btn-outline-primary tourParticipantExpCollBtn">
+                            <i class="fas fa-plus-circle tourParticipantExpCollIcon"></i>
+                            <span class="tourParticipantExpCollSpan">Expand all</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
             <div id="tourParticipantsTableDiv" class="card-body">
                 <table id="tourParticipantsTable" class="display compact cell-border hover stripe"
                        th:replace="tourParticipant/tourParticipantsTable :: tourParticipantsTable"></table>
+            </div>
+            <div class="card-footer text-muted">
+                <div class="d-flex">
+                    <div class="mr-auto p-0">
+                        <span th:text="${tourParticipantType + ' '} + #{table}"></span>
+                    </div>
+                    <div class="p-0">
+                        <button  type="button" class="btn btn-sm btn-outline-danger tourParticipantDeleteBtn"
+                                th:title="#{delete.title}">
+                            <i class="fas fa-trash-alt"></i>
+                            <span class="selectedTourParticipantsCountSpan">Delete</span>
+                        </button>
+                    </div>
+                    <div class="p-0">
+                        <button  type="button" class="btn btn-sm btn-outline-primary tourParticipantDeselectAllBtn">
+                            <i class="fa-regular fa-square"></i>
+                            <span>Deselect all</span>
+                        </button>
+                    </div>
+                    <div class="p-0">
+                        <button  type="button" class="btn btn-sm btn-outline-primary tourParticipantSelectAllBtn">
+                            <i class="fa-solid fa-square-check"></i>
+                            <span>Select all</span>
+                        </button>
+                    </div>
+                    <div class="p-0">
+                        <button  type="button" class="btn btn-sm btn-outline-primary tourParticipantExpCollBtn">
+                            <i class="fas fa-plus-circle tourParticipantExpCollIcon"></i>
+                            <span class="tourParticipantExpCollSpan">Expand all</span>
+                        </button>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -90,19 +153,51 @@
             .subscribe(initAddDriverCarButton)
             .subscribe(initResetFormButton)
             .subscribe(initDeleteDriverCarButton)
+            .subscribe(initFormSubmitButton)
         ;
 
         const tourParticipantsTableFragmentSubject = new FragmentSubject()
-            .subscribe(initTableParticipantEditTourButtons)
+            .subscribe(initTableParticipantEditButtons)
+            .subscribe(initTableParticipantSelectCheckBoxes)
+            .subscribe(initTableRowExpand)
         ;
 
+        let tourParticipantsTable;
+
+        let selectedTourParticipantsArray = [];
+
         $(document).ready(function() {
+
+            console.log("tourParticipantType = " + [[${tourParticipantType}]])
+
+            let exception = [[${exception}]];
+
+            if(exception) {
+                Swal.fire({
+                    icon: 'error',
+                    title: exception
+                });
+            }
+
+            let success = [[${success}]];
+            console.log("success = " + success);
+            if(success) {
+                Swal.fire({
+                    toast: true,
+                    position: 'top-end',
+                    icon: 'success',
+                    title: success,
+                    showConfirmButton: false,
+                    timer: DEFAULT_TOAST_TIME_OUT
+                });
+            }
+
             // page load initialization
             moment.locale(userLocale); // to fix different locale issue in date-range picker
 
             $.fn.dataTable.moment(dateRangePickerDateFormat, userLocale); // to fix sort by date columns
 
-            $('#tourParticipantsTable').DataTable({
+            tourParticipantsTable = $('#tourParticipantsTable').DataTable({
                 "drawCallback": function( settings ) {
                     console.debug('datatables draw callback fired');
                     tourParticipantsTableFragmentSubject.notifyObservers(); // to fix edit/delete tour buttons when search in tours table
@@ -115,6 +210,87 @@
 
             tourParticipantsTableFragmentSubject.notifyObservers();
             tourParticipantFormSubject.notifyObservers();
+
+            $('.tourParticipantDeleteBtn').hide();
+
+            $('.tourParticipantSelectAllBtn').click(function(e) {
+
+                e.stopImmediatePropagation();
+                e.preventDefault();
+
+                // $('.tourParticipantDeleteCheckBox').attr('checked', 'checked');
+
+                $('.tourParticipantDeleteCheckBox').each(function(idx) {
+
+                    let tourParticipantId = $(this).attr('data-tour-participant-id');
+
+                    $(this).prop("checked", true);
+                    selectedTourParticipantsArray[idx] = tourParticipantId;
+                });
+                $('.selectedTourParticipantsCountSpan').text('Delete (' + selectedTourParticipantsArray.length + ') items');
+                $('.tourParticipantDeleteBtn').show();
+                console.log('selectedTourParticipantsArray ' + selectedTourParticipantsArray)
+            });
+
+            $('.tourParticipantDeselectAllBtn').click(function(e) {
+
+                e.stopImmediatePropagation();
+                e.preventDefault();
+
+                $('.tourParticipantDeleteCheckBox').prop('checked', false);
+
+                selectedTourParticipantsArray = [];
+
+                $('.selectedTourParticipantsCountSpan').text('Delete (' + selectedTourParticipantsArray.length + ') items');
+                $('.tourParticipantDeleteBtn').hide();
+
+                console.log('selectedTourParticipantsArray ' + selectedTourParticipantsArray)
+            });
+
+            $('.tourParticipantDeleteBtn').click(function(event) {
+
+                event.stopImmediatePropagation();
+                event.preventDefault();
+
+                Swal.fire({
+                    title: 'Are you sure?',
+                    text: "You won't be able to revert this!",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#3085d6',
+                    cancelButtonColor: '#d33',
+                    confirmButtonText: 'Yes, delete it!'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        let url = mainUrl + '/api/tour-participant/' + selectedTourParticipantsArray;
+
+                        ajaxUtil.del(url)
+                            .then(() => {
+                                for (let i = 0; i < selectedTourParticipantsArray.length; i++) {
+                                    tourParticipantsTable.row('#' + selectedTourParticipantsArray[i]).remove();
+                                }
+                                tourParticipantsTable.draw();
+                                $('.tourParticipantDeleteBtn').hide();
+                                console.log('deleted tour participants %s', selectedTourParticipantsArray)
+                                Swal.fire({
+                                    toast: true,
+                                    position: 'top-end',
+                                    icon: 'success',
+                                    title: 'Tour participants '+selectedTourParticipantsArray+' successfully deleted',
+                                    showConfirmButton: false,
+                                    timer: DEFAULT_TOAST_TIME_OUT
+                                });
+                            })
+                            .catch((error) => {
+                                console.error('unable to delete tour participant %s %s', selectedTourParticipantsArray, error);
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'unable to delete tour participant'
+                                });
+                            });
+                    }
+                });
+            });
         });
 
         function initSelect2() {
@@ -132,19 +308,20 @@
 
             $('#carBrandSelect').on('select2:select', function(event) {
                let carBrandName = event.params.data.id;
-               ajaxUtil.get(mainUrl + '/api/tour-participant/driver/'+carBrandName+'/model').then((carModelNames)=>{
-                   $('#carModelSelect').empty();
+                ajaxUtil.get(mainUrl + '/api/tour-participant/driver/' + carBrandName + '/model')
+                    .then((carModelNames) => {
+                        $('#carModelSelect').empty();
 
-                   $(carModelNames).each(function(index, carModelName) {
-                       $('#carModelSelect').append(new Option(carModelName, carModelName));
-                   });
+                        $(carModelNames).each(function (index, carModelName) {
+                            $('#carModelSelect').append(new Option(carModelName, carModelName));
+                        });
 
-                   $('#carModelSelect').select2({
-                       tags: true,
-                       tokenSeparators: [','],
-                       width: 'resolve'
-                   })
-               });
+                        $('#carModelSelect').select2({
+                            tags: true,
+                            tokenSeparators: [','],
+                            width: 'resolve'
+                        })
+                    });
             });
         }
 
@@ -183,7 +360,7 @@
                     .catch((error) => {
                         Swal.fire({
                             icon: 'error',
-                            title: 'unable to delete driver car'
+                            title: 'unable to delete driver car ' + error
                         });
                     })
                     .finally($(this).prop('disabled', false));
@@ -194,28 +371,33 @@
             $('#resetTourParticipantFormBtn').on('click', function(e){
                 e.preventDefault();
                 $(this).prop('disabled', true);
-
                 let tourParticipantType = $(this).attr('data-tour-participant-type');
-                let url = mainUrl + '/tour-participant/' + tourParticipantType + '/-1';
-
-                ajaxUtil.get(url)
-                    .then((tourParticipantFormHTML) => {
-                        $('#tourParticipantForm').html(tourParticipantFormHTML);
-                        tourParticipantFormSubject.notifyObservers();
-                    })
-                    .catch((error) => {
-                        console.error('unable to load tour participant form HTML for participant %s %s',tourParticipantType, error);
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'unable to open tour participant form'
-                        });
-                    })
-                    .finally($(this).prop('disabled', false));
+                resetForm(tourParticipantType);
             })
         }
 
-        function initTableParticipantEditTourButtons() {
+        function resetForm(tourParticipantType) {
+
+            let url = mainUrl + '/tour-participant/' + tourParticipantType + '/-1';
+
+            ajaxUtil.get(url)
+                .then((tourParticipantFormHTML) => {
+                    $('#tourParticipantForm').html(tourParticipantFormHTML);
+                    tourParticipantFormSubject.notifyObservers();
+                })
+                .catch((error) => {
+                    console.error('unable to load tour participant form HTML for participant %s %s',tourParticipantType, error);
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'unable to open tour participant form'
+                    });
+                })
+                .finally($(this).prop('disabled', false));
+        }
+
+        function initTableParticipantEditButtons() {
             $('.tourParticipantEditBtn').on('click', function (e) {
+                e.stopImmediatePropagation();
                 e.preventDefault();
                 let btn = $(this);
                 btn.prop('disabled', true);
@@ -239,6 +421,134 @@
                         });
                     })
                     .finally(btn.prop('disabled', false));
+            });
+        }
+
+        function initTableParticipantSelectCheckBoxes() {
+            $('.tourParticipantDeleteCheckBox').change(function (e) {
+                e.stopImmediatePropagation();
+                e.preventDefault();
+                let tourParticipantId = $(this).attr('data-tour-participant-id');
+
+                if($(this).is(':checked')) {
+                    let length = selectedTourParticipantsArray.length;
+
+                    selectedTourParticipantsArray[length] = tourParticipantId;
+                } else {
+                    selectedTourParticipantsArray = jQuery.grep(selectedTourParticipantsArray, function(value) {
+                        return value !== tourParticipantId;
+                    });
+                }
+
+                if(selectedTourParticipantsArray.length === 0) {
+                    $('.tourParticipantDeleteBtn').hide();
+                } else {
+                    $('.tourParticipantDeleteBtn').show();
+                    $('.selectedTourParticipantsCountSpan').text('Delete (' + selectedTourParticipantsArray.length + ') items');
+                }
+                console.log('selectedTourParticipantsArray ' + selectedTourParticipantsArray);
+            });
+        }
+
+        function initTableRowExpand() {
+            $('#tourParticipantsTable tbody').on('click', 'td.dt-control', function(e) {
+
+                e.stopImmediatePropagation();
+                e.preventDefault();
+
+                toggleExpandCollapseRow($(this));
+            });
+        }
+
+        $('.tourParticipantExpCollBtn').click(function(e) {
+            e.stopImmediatePropagation();
+            e.preventDefault();
+
+            $('td.dt-control').each(function(i) {
+                toggleExpandCollapseRow($(this));
+            });
+            let span = $(this).children('span')[0];
+
+            $(this).find('[data-fa-i2svg]')
+                .toggleClass('fa-plus-circle')
+                .toggleClass('fa-minus-circle');
+
+            if($(span).text() === 'Expand all') {
+                $('.tourParticipantExpCollSpan').text('Collapse all');
+            } else if($(span).text() === 'Collapse all') {
+                $('.tourParticipantExpCollSpan').text('Expand all');
+            }
+        });
+
+        function toggleExpandCollapseRow(dtControl) {
+            let tr = dtControl.closest('tr');
+            let parentRowId = tr.attr('id');
+            let row = tourParticipantsTable.row(tr);
+
+            if (row.child.isShown()) {
+                // This row is already open - close it
+                row.child.hide();
+                tr.removeClass('shown');
+            } else {
+                // Open this row
+                let childRow = $('.child-row[data-parent-id="'+parentRowId+'"]').clone();
+                childRow.show();
+                row.child(childRow).show();
+                tr.addClass('shown');
+            }
+        }
+
+        function initFormSubmitButton() {
+            $('#submitTourParticipantFormBtn').click(function(e) {
+
+                $(this).prop('disabled', true);
+
+                e.stopImmediatePropagation();
+                e.preventDefault();
+
+                let tpt = [[${tourParticipantType}]];
+                let url = mainUrl + '/api/tour-participant/' + tpt;
+                let formData = $('#tourParticipantForm').serialize();
+                console.log("tpt = " + tpt);
+
+                ajaxUtil.post(url, formData)
+                    .then((tourParticipantJson) => {
+                        // reset form
+                        resetForm(tpt);
+                        // reload table
+                        let url = mainUrl + '/tour-participant/fragment/table/'+ tpt;
+                        ajaxUtil.get(url)
+                            .then((tourParticipantsTableFragment) => {
+                                $('#tourParticipantsTable').html(tourParticipantsTableFragment);
+                                tourParticipantsTableFragmentSubject.notifyObservers();
+                            })
+                            .catch((error) => {
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'unable to reload tour participants table ' + error
+                                });
+                            });
+
+                        // show success toast
+                        console.log('saved tour participant %s', tourParticipantJson);
+                        Swal.fire({
+                            toast: true,
+                            position: 'top-end',
+                            icon: 'success',
+                            title: 'Tour participant created successfully',
+                            showConfirmButton: false,
+                            timer: DEFAULT_TOAST_TIME_OUT
+                        });
+                    })
+                    .catch((error) => {
+                        console.error('unable to create tour participant %s %s', formData, error);
+
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'unable to create tour participant ' + error
+                        });
+                    })
+                    .finally(()=>$(this).prop('disabled', false));
             });
         }
     </script>

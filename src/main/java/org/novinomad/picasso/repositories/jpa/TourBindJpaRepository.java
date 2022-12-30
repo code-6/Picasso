@@ -1,6 +1,6 @@
 package org.novinomad.picasso.repositories.jpa;
 
-import org.novinomad.picasso.erm.entities.TourBind;
+import org.novinomad.picasso.domain.erm.entities.tour.TourBind;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 

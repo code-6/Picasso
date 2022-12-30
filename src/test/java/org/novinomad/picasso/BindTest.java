@@ -2,12 +2,16 @@ package org.novinomad.picasso;
 
 import org.junit.jupiter.api.*;
 import org.novinomad.picasso.commons.LocalDateTimeRange;
-import org.novinomad.picasso.erm.dto.bind.TourBindModel;
-import org.novinomad.picasso.erm.entities.*;
+import org.novinomad.picasso.domain.dto.tour.bind.TourBindModel;
 import org.novinomad.picasso.commons.exceptions.BindException;
-import org.novinomad.picasso.services.ITourBindService;
-import org.novinomad.picasso.services.ITourParticipantService;
-import org.novinomad.picasso.services.ITourService;
+import org.novinomad.picasso.domain.erm.entities.tour.Tour;
+import org.novinomad.picasso.domain.erm.entities.tour.TourBind;
+import org.novinomad.picasso.domain.erm.entities.tour_participants.Driver;
+import org.novinomad.picasso.domain.erm.entities.tour_participants.Guide;
+import org.novinomad.picasso.domain.erm.entities.tour_participants.TourParticipant;
+import org.novinomad.picasso.services.tour.TourBindService;
+import org.novinomad.picasso.services.tour_participants.TourParticipantService;
+import org.novinomad.picasso.services.tour.TourService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
@@ -27,13 +31,13 @@ import static org.junit.jupiter.api.Assertions.*;
 class BindTest {
 
     @Autowired
-    private ITourBindService tourBindService;
+    private TourBindService tourBindService;
 
     @Autowired
-    private ITourParticipantService participantService;
+    private TourParticipantService participantService;
 
     @Autowired
-    private ITourService tourService;
+    private TourService tourService;
 
     // initialize test data.
     private TourParticipant guide;

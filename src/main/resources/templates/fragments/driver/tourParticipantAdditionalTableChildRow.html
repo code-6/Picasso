@@ -1,0 +1,14 @@
+<th:block th:fragment="tourParticipantAdditionalTableChildRow">
+  <div class="row child-row" th:data-parent-id="${row.index} + '_' + ${tourParticipant.id}" th:data-tour-participant-id="${tourParticipant.id}" style="display: none">
+
+    <div class="col-1"></div>
+    <div class="col">
+      <div class="input-group input-group-sm mb-1 mt-1">
+        <div class="input-group-prepend">
+          <span class="input-group-text" id="inputGroup-sizing-sm"><span th:text="#{car.cap.pl} + ': '" class="fw-bolder"></span></span>
+        </div>
+        <input readonly type="text" class="form-control" aria-label="Small" aria-describedby="inputGroup-sizing-sm" th:value="${tourParticipant.getCarsAsString()}">
+      </div>
+    </div>
+  </div>
+</th:block>

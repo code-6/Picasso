@@ -32,7 +32,7 @@
                data-target="#userFormContainer"
                aria-expanded="false" aria-controls="userFormContainer" href="#userFormContainer">
                 <i id="userFormToggleBtnIcon" class="fas fa-eye"></i>
-                <span th:text="#{user.cap.pl} + #{form}"></span>
+                <span th:text="#{user.cap} + #{form}"></span>
             </a>
         </div>
     </div>
@@ -51,13 +51,13 @@
         </div>
     </div>
 
-    <!--    tourParticipants table -->
+    <!--    users table -->
     <div class="collapse show">
         <div class="card">
-            <div class="card-header"><span th:text="${tourParticipantType + ' '} + #{table}"></span></div>
-            <div id="tourParticipantsTableDiv" class="card-body">
-                <table id="tourParticipantsTable" class="display compact cell-border hover stripe"
-                       th:replace="tourParticipant/tourParticipantsTable :: tourParticipantsTable"></table>
+            <div class="card-header"><span th:text="#{user.cap.pl}"></span></div>
+            <div id="usersTableDiv" class="card-body">
+                <table id="usersTable" class="display compact cell-border hover stripe"
+                       th:replace="user/usersTable :: usersTable"></table>
             </div>
         </div>
     </div>
@@ -79,22 +79,19 @@
 
     <script type="module" th:inline="javascript">
         // main url stored in head tag of layout.html
-        import {FragmentSubject} from "../js/Observer.js";
-        import * as ajaxUtil from "../js/AjaxUtil.js";
+        import {FragmentSubject} from "../picasso/js/Observer.js";
+        import * as ajaxUtil from "../picasso/js/AjaxUtil.js";
 
         const mainUrl = $("meta[name='mainUrl']").attr("content");
         const userLocale = $("meta[name='userLocale']").attr('content');
         const dateRangePickerDateFormat = $("meta[name='dateRangePickerDateFormat']").attr('content');
 
-        const tourParticipantFormSubject = new FragmentSubject()
-            .subscribe(initSelect2)
-            .subscribe(initAddDriverCarButton)
-            .subscribe(initResetFormButton)
-            .subscribe(initDeleteDriverCarButton)
+        const userFormSubject = new FragmentSubject()
+            .subscribe(initResetUserFormButton)
         ;
 
-        const tourParticipantsTableFragmentSubject = new FragmentSubject()
-            .subscribe(initTableParticipantEditTourButtons)
+        const usersTableFragmentSubject = new FragmentSubject()
+            .subscribe(initTableUserEditTourButtons)
         ;
 
         $(document).ready(function() {
@@ -103,10 +100,10 @@
 
             $.fn.dataTable.moment(dateRangePickerDateFormat, userLocale); // to fix sort by date columns
 
-            $('#tourParticipantsTable').DataTable({
+            $('#usersTable').DataTable({
                 "drawCallback": function( settings ) {
                     console.debug('datatables draw callback fired');
-                    tourParticipantsTableFragmentSubject.notifyObservers(); // to fix edit/delete tour buttons when search in tours table
+                    usersTableFragmentSubject.notifyObservers(); // to fix edit/delete tour buttons when search in tours table
                 },
                 paging: true,
                 searching: true,
@@ -114,129 +111,54 @@
                 fixedHeader: true
             });
 
-            tourParticipantsTableFragmentSubject.notifyObservers();
-            tourParticipantFormSubject.notifyObservers();
+            usersTableFragmentSubject.notifyObservers();
+            userFormSubject.notifyObservers();
         });
 
-        function initSelect2() {
-            $('#carBrandSelect').select2({
-                tags: true,
-                tokenSeparators: [','],
-                width: 'resolve'
-            });
-
-            $('#guideLanguagesSelect').select2({
-                tags: true,
-                tokenSeparators: [',', ' '],
-                width: 'resolve'
-            });
-
-            $('#carBrandSelect').on('select2:select', function(event) {
-                let carBrandName = event.params.data.id;
-                ajaxUtil.get(mainUrl + '/api/tour-participant/driver/'+carBrandName+'/model').then((carModelNames)=>{
-                    $('#carModelSelect').empty();
-
-                    $(carModelNames).each(function(index, carModelName) {
-                        $('#carModelSelect').append(new Option(carModelName, carModelName));
-                    });
-
-                    $('#carModelSelect').select2({
-                        tags: true,
-                        tokenSeparators: [','],
-                        width: 'resolve'
-                    })
-                });
-            });
-        }
-
-        function initAddDriverCarButton() {
-            $('#tourParticipantCarAddBtn').on('click', function(e) {
+        function initResetUserFormButton() {
+            $('#resetUserFormBtn').on('click', function(e){
                 e.preventDefault();
                 $(this).prop('disabled', true);
 
-                let formData = $('#tourParticipantForm').serialize();
-
-                ajaxUtil.post(mainUrl + '/tour-participant/driver/add-car', formData)
-                    .then((tourParticipantFormFragment) => {
-                        $('#tourParticipantForm').html(tourParticipantFormFragment);
-                        tourParticipantFormSubject.notifyObservers();
-                    }).catch((error) => {
-                    console.error('initAddDriverCarButton unable to load tourParticipant/tourParticipantForm :: tourParticipantForm fragment %s', error.responseJSON.message);
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Unable add new row for bind add driver car.'
-                    }).finally(() => $(this).prop('disabled', false));
-                });
-            });
-        }
-
-        function initDeleteDriverCarButton() {
-            $('.tourParticipantCarDeleteBtn').on('click', function (e) {
-                e.preventDefault();
-                $(this).prop('disabled', true);
-                let carRowId = $(this).attr('data-car-row-id');
-                let formData = $('#tourParticipantForm').serialize();
-                ajaxUtil.post(mainUrl + '/tour-participant/driver/remove-car/' + carRowId, formData)
-                    .then((tourParticipantFormHTML) => {
-                        $('#tourParticipantForm').html(tourParticipantFormHTML);
-                        tourParticipantFormSubject.notifyObservers();
-                    })
-                    .catch((error) => {
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'unable to delete driver car'
-                        });
-                    })
-                    .finally($(this).prop('disabled', false));
-            });
-        }
-
-        function initResetFormButton() {
-            $('#resetTourParticipantFormBtn').on('click', function(e){
-                e.preventDefault();
-                $(this).prop('disabled', true);
-
-                let tourParticipantType = $(this).attr('data-tour-participant-type');
-                let url = mainUrl + '/tour-participant/' + tourParticipantType + '/-1';
+                let url = mainUrl + '/user/-1';
 
                 ajaxUtil.get(url)
-                    .then((tourParticipantFormHTML) => {
-                        $('#tourParticipantForm').html(tourParticipantFormHTML);
-                        tourParticipantFormSubject.notifyObservers();
+                    .then((userFormHTML) => {
+                        $('#userForm').html(userFormHTML);
+                        userFormSubject.notifyObservers();
                     })
                     .catch((error) => {
-                        console.error('unable to load tour participant form HTML for participant %s %s',tourParticipantType, error);
+                        console.error('unable to reset user form HTML %s', error);
                         Swal.fire({
                             icon: 'error',
-                            title: 'unable to open tour participant form'
+                            title: 'unable to reset user form'
                         });
                     })
                     .finally($(this).prop('disabled', false));
             })
         }
 
-        function initTableParticipantEditTourButtons() {
-            $('.tourParticipantEditBtn').on('click', function (e) {
+        function initTableUserEditTourButtons() {
+            $('.userEditBtn').on('click', function (e) {
                 e.preventDefault();
                 let btn = $(this);
                 btn.prop('disabled', true);
 
-                let tourParticipantId = btn.attr('data-tour-participant-id');
-                let tourParticipantType = btn.attr('data-tour-participant-type');
+                let username = btn.attr('data-username');
 
-                let url = mainUrl + '/tour-participant/' + tourParticipantType + '/' + tourParticipantId;
+                let url = mainUrl + '/user/' + username;
 
                 ajaxUtil.get(url)
-                    .then((tourParticipantFormHTML) => {
-                        $('#tourParticipantForm').html(tourParticipantFormHTML);
-                        tourParticipantFormSubject.notifyObservers();
-                        $('#tourParticipantFormContainer').collapse('show');
+                    .then((userFormHTML) => {
+                        $('#userForm').html(userFormHTML);
+                        userFormSubject.notifyObservers();
+                        $('#userFormContainer').collapse('show');
                     })
                     .catch((error) => {
-                        console.error('unable to load tour participant form HTML for participant %s %d %s',tourParticipantType, tourParticipantId, error);
+                        console.error('unable to load user form HTML for username %s %s', username, error);
                         Swal.fire({
                             icon: 'error',
-                            title: 'unable to open tour form'
+                            title: 'unable to open user form'
                         });
                     })
                     .finally(btn.prop('disabled', false));

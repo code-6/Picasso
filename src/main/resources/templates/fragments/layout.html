@@ -8,8 +8,8 @@
     <meta name="author" content="Stanislav Wong">
     <meta name="ctxPath" th:content="${#httpServletRequest.getContextPath()}" />
     <meta name="mainUrl" th:content="${#httpServletRequest.getScheme()} + '://' + ${#httpServletRequest.getServerName()} + ':' + ${#httpServletRequest.getServerPort()} + ${#httpServletRequest.getContextPath()}" />
-    <meta name="userLocale" th:content="${@userService.getCurrentUserLocale()}" />
-    <meta name="userLanguage" th:content="${@userService.getCurrentUserLocale().getLanguage()}" />
+    <meta name="userLocale" th:content="${@userServiceImpl.getCurrentUserLocale()}" />
+    <meta name="userLanguage" th:content="${@userServiceImpl.getCurrentUserLocale().getLanguage()}" />
     <meta name="ganttTaskDateFormat" th:content="${@environment.getProperty('app.date.format.gantt-task')}" />
     <meta name="ganttMajorDateFormat" th:content="${@environment.getProperty('app.date.format.gantt-major')}" />
     <meta name="dateRangePickerDateFormat" th:content="${@environment.getProperty('app.date.format.date-range-picker')}" />
@@ -74,7 +74,24 @@
 <script>
     $(function () {
         $('[data-toggle="popover"]').popover()
-    })
+    });
+
+    function buildChildAuditInfoRow(createdBy, createDate, updatedBy, updateDate) {
+        return ('<table class="table-striped table-bordered" style="padding-left:50px;">' +
+            '<tr>' +
+            '<td >Created by:</td>' +
+            '<td >' + createdBy + '</td>' +
+            '<td >Create date:</td>' +
+            '<td >' + createDate + '</td>' +
+            '</tr>' +
+            '<tr>' +
+            '<td >Updated by:</td>' +
+            '<td >' + updatedBy + '</td>' +
+            '<td >Update date:</td>' +
+            '<td >' + updateDate + '</td>' +
+            '</tr>' +
+            '</table>');
+    }
 </script>
 
 <!--page specific dependencies-->

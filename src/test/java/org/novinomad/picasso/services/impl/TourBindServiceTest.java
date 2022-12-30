@@ -1,11 +1,13 @@
 package org.novinomad.picasso.services.impl;
 
 import org.junit.jupiter.api.*;
-import org.novinomad.picasso.erm.dto.bind.TourBindModel;
-import org.novinomad.picasso.erm.entities.Driver;
-import org.novinomad.picasso.erm.entities.Guide;
-import org.novinomad.picasso.erm.entities.Tour;
-import org.novinomad.picasso.erm.entities.TourParticipant;
+import org.novinomad.picasso.commons.LocalDateTimeRange;
+import org.novinomad.picasso.domain.dto.tour.bind.TourBindModel;
+import org.novinomad.picasso.domain.erm.entities.tour_participants.Driver;
+import org.novinomad.picasso.domain.erm.entities.tour_participants.Guide;
+import org.novinomad.picasso.domain.erm.entities.tour.Tour;
+import org.novinomad.picasso.domain.erm.entities.tour_participants.TourParticipant;
+import org.novinomad.picasso.services.tour.TourBindServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
@@ -22,7 +24,7 @@ import java.time.LocalDateTime;
 class TourBindServiceTest {
 
     @Autowired
-    private TourBindService tourBindService;
+    private TourBindServiceImpl tourBindService;
 
     Tour tour1 = new Tour();
     Tour tour2 = new Tour();
@@ -41,13 +43,11 @@ class TourBindServiceTest {
     void init() {
         tour1.setId(1L);
         tour1.setName("test tour 1");
-        tour1.setStartDate(tour1Start);
-        tour1.setEndDate(tour1End);
+        tour1.setDateTimeRange(new LocalDateTimeRange(tour1Start, tour1End));
 
         tour2.setId(2L);
         tour2.setName("test tour 2");
-        tour2.setStartDate(tour2Start);
-        tour2.setEndDate(tour2End);
+        tour2.setDateTimeRange(new LocalDateTimeRange(tour2Start, tour2End));
 
         guide1.setId(1L);
         guide2.setId(2L);
