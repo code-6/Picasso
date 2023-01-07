@@ -5,12 +5,13 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import javax.transaction.Transactional;
 import java.util.*;
 
 public interface PermissionRepository extends JpaRepository<Permission, Long> {
 
     @Query(nativeQuery = true, value = """
-            select p.id, p.name, p.description
+            select p.*
             from PERMISSION_CHILDREN pc
             join permission p on pc.PARENT_ID = p.ID
             where pc.CHILD_ID = :id
@@ -20,7 +21,7 @@ public interface PermissionRepository extends JpaRepository<Permission, Long> {
     SortedSet<Permission> getClosestParents(@Param("id") Long id);
 
     @Query(nativeQuery = true, value = """
-            select p.id, p.name, p.description
+            select p.*
             from PERMISSION p
             left join PERMISSION_CHILDREN pc on p.id = pc.CHILD_ID
             where pc.PARENT_ID is null
@@ -38,5 +39,11 @@ public interface PermissionRepository extends JpaRepository<Permission, Long> {
             """)
     Set<Permission> findByParentId(@Param("parentPermissionId") Long parentPermissionId);
 
+    @Query("""
+            select distinct p from Permission p 
+            left join fetch p.children cp 
+            left join fetch p.users u
+            where p.name = :name
+            """)
     Optional<Permission> findByName(String name);
 }

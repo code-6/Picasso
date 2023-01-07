@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{fragments/layout}">
+<head>
+  <title>Bind | PCS</title>
+
+  <!-- Latest compiled and minified CSS -->
+  <link th:href="@{/vendor/jsgantt-improved/dist/jsgantt.css}" rel="stylesheet" type="text/css"/>
+
+  <link rel="stylesheet" type="text/css"
+        th:href="@{/webjars/bootstrap-daterangepicker/css/bootstrap-daterangepicker.css}"/>
+
+  <link rel="stylesheet" type="text/css"
+        th:href="@{/webjars/bootstrap-select/dist/css/bootstrap-select.min.css}"/>
+
+  <link th:href="@{/vendor/popover/css/bootstrap-popover-x.min.css}" rel="stylesheet">
+
+  <style>
+    .card-body {
+      padding: 0 1rem 1rem;
+    }
+
+    .selectpicker {
+      border: 1px solid #ccc !important;
+      border-radius: 16px;
+    }
+
+    div.tour-select-identitfier-text {
+      text-align: left;
+    }
+
+    div.tour-select-date-range-text {
+      text-align: right;
+    }
+  </style>
+</head>
+<body class="sb-nav-fixed">
+
+<!-- Page management components -->
+<div th:fragment="pageManageComponents" class="mx-auto order-0">
+
+  <div class="btn-toolbar" role="toolbar" aria-label="Toolbar with button groups">
+    <div class="btn-group mr-2" role="group" aria-label="First group">
+      <a class="nav-link" href="#tourBindFilter" data-target="#tourBindFilter" data-toggle="collapse" aria-controls="tourBindFilter"
+         aria-expanded="false">
+        <i class="fas fa-filter"></i>
+        <span th:text="#{filter.cap.pl}"></span>
+      </a>
+    </div>
+
+    <div class="btn-group mr-2" role="group" aria-label="Second group">
+      <a class="nav-link" id="bindFormToggleBtn" data-toggle="collapse" data-target="#tourBindFormCollapse"
+         aria-expanded="false" aria-controls="tourBindFormCollapse" href="#tourBindFormCollapse">
+        <i id="tourFormToggleBtnIcon" class="fas fa-eye"></i>
+        <span th:text="#{bindFormToggleBtn}"></span>
+      </a>
+    </div>
+  </div>
+</div>
+
+<div layout:fragment="content">
+
+  <div class="row">
+    <div class="col">
+      <div class="collapse" id="tourBindFormCollapse">
+        <div class="card">
+          <div class="card-body">
+            <form th:object="${tourBind}" th:method="post" th:action="@{/bind}" th:id="tourBindForm" >
+              <div th:replace="tourBind/tourBindForm :: tourBindFormContent"></div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!--            tour bind filter form (filter gantt chart)-->
+  <div class="row">
+    <div class="col">
+      <div class="collapse" id="tourBindFilter">
+        <div class="card">
+          <div class="card-body">
+            <form th:object="${tourBindFilter}" th:id="tourBindFilterForm" th:fragment="tourBindFilterForm">
+              <div class="row g-2 align-items-end" th:include="tourBind/tourBindFilterForm :: tourBindFilterFormContent"></div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col">
+      <div class="collapse show">
+        <div class="card w-auto">
+          <div class="card-header">Gantt chart</div>
+          <div class="card-body">
+            <div style="position:relative; padding-top: 1rem;" class="gantt" id="GanttChartDIV"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+<!--all page related scripts should be wrapped into 'scripts' thymeleaf fragment-->
+<div th:fragment="scripts">
+
+  <script th:src="@{/vendor/jsgantt-improved/dist/jsgantt.js}" type="text/javascript"></script>
+
+  <script type="text/javascript" th:src="@{/webjars/momentjs/moment.js}"></script>
+
+  <script type="text/javascript"
+          th:src="@{/webjars/bootstrap-daterangepicker/js/bootstrap-daterangepicker.js}"></script>
+
+  <script type="text/javascript" th:src="@{/webjars/bootstrap-select/dist/js/bootstrap-select.js}"></script>
+
+  <script th:src="@{/vendor/popover/js/bootstrap-popover-x.min.js}"></script>
+
+  <script type="module" th:inline="javascript">
+    import * as ajaxUtil from "./js/AjaxUtil.js";
+    import {FragmentSubject} from "./js/Observer.js";
+
+    // main url stored in head tag of layout.html
+    const mainUrl = $("meta[name='mainUrl']").attr("content");
+
+    const userLanguage = $("meta[name='userLanguage']").attr('content');
+
+    const dateRangePickerDateFormat = $("meta[name='dateRangePickerDateFormat']").attr('content');
+    const ganttTaskDateFormat = $("meta[name='ganttTaskDateFormat']").attr('content');
+    const ganttMajorDateFormat = $("meta[name='ganttMajorDateFormat']").attr('content');
+
+    moment.locale(userLanguage); // to fix different locale issue in date-range picker
+
+    const bindFormFragmentSubject = new FragmentSubject()
+            .subscribe(initBindFormTourSelect)
+
+    $(document).ready(function () {
+
+      bindFormFragmentSubject.notifyObservers();
+
+      initSingleDatePickers();
+
+      initFilterDates();
+
+      initFilterSubmitButton();
+
+      initGanttChart();
+    });
+
+    function initBindFormTourSelect() {
+      $('.tour-single-selectpicker').selectpicker('refresh');
+
+      $('#bindFormTourSelect').on('changed.bs.select', function(e) {
+        let tourDescriptionCollapse = $('#tourDescriptionCollapse');
+
+        let selectedOption =  $(this).find(":selected");
+
+        let selectedTourIdArr = selectedOption.map((_, e) => e.value).get();
+
+        if (selectedTourIdArr != null && selectedTourIdArr.length > 0 && selectedTourIdArr[0] !== '') {
+          let tourRowId = selectedOption.attr('data-tour-row-id');
+
+          let tour = [[${allTours}]][tourRowId];
+
+          let description = tour.description;
+
+          $('#tourDescriptionTextArea').text(description);
+
+          tourDescriptionCollapse.collapse('show');
+        } else {
+          tourDescriptionCollapse.collapse('hide');
+        }
+      });
+    }
+
+    /**
+     * Initialize bootstrap single date range pickers
+     * */
+    function initSingleDatePickers() {
+      $('.date-picker-single').daterangepicker({
+        singleDatePicker: true,
+        showDropdowns: true,
+        timePicker: true,
+        timePicker24Hour: true,
+        timePickerIncrement: 5,
+        autoApply: true,
+        autoUpdateInput: true,
+        locale: {
+          format: dateRangePickerDateFormat,
+        }
+      });
+    }
+
+    function initFilterDates() {
+      let defaultStartDate = new Date([[${tourBindFilter.getStartDateAsString()}]].toString());
+      let defaultEndDate = new Date([[${tourBindFilter.getEndDateAsString()}]].toString());
+
+      $('#filterStartDate').data('daterangepicker').setStartDate(defaultStartDate);
+      $('#filterEndDate').data('daterangepicker').setStartDate(defaultEndDate);
+    }
+    /**
+     * Get tour binds as gantt chart task from server and reinitialize (redraw) gantt chart
+     * */
+    function initFilterSubmitButton() {
+      $('#submitFilterBtn').on('click', function (e) {
+        e.preventDefault();
+
+        $(this).prop('disabled', true);
+
+        let url = mainUrl + '/api/bind/gantt-tasks';
+        let formData = $('#tourBindFilterForm').serialize();
+
+        ajaxUtil.post(url, formData)
+                .then((ganttTasks) => {
+                  initGanttChart(ganttTasks);
+                })
+                .catch((error) => {
+                  console.error('unable to load tour binds for Gantt chart from server %s', error.responseJSON.message);
+                  Swal.fire({
+                    icon: 'error',
+                    title: 'unable to load tour binds for Gantt chart from server'
+                  });
+                })
+                .finally($(this).prop('disabled', false));
+      });
+    }
+    function initGanttChart(ganttTasks) {
+
+      if (!ganttTasks)
+        ganttTasks = [[${toursForGantt}]];
+
+      let ganttChart = new JSGantt.GanttChart(document.getElementById('GanttChartDIV'), 'day');
+
+      // configure ganttChart columns
+      ganttChart.setShowRes(0);
+      ganttChart.setShowDur(0);
+      ganttChart.setShowComp(0);
+      ganttChart.setShowStartDate(0);
+      ganttChart.setShowEndDate(0);
+      ganttChart.setShowPlanStartDate(0);
+      ganttChart.setShowPlanEndDate(0);
+      ganttChart.setShowCost(0);
+      ganttChart.setShowDeps(0);
+
+      // add vertical scroll
+      ganttChart.setTotalHeight('300px')
+
+      // configure ganttChart date columns width
+      ganttChart.setDayColWidth(22);
+
+      // configure ganttChart date format displayed on top and bottom of the table
+      ganttChart.setDayMajorDateDisplayFormat(ganttMajorDateFormat);
+      ganttChart.setDateTaskTableDisplayFormat(ganttTaskDateFormat);
+      ganttChart.setDateTaskDisplayFormat(ganttTaskDateFormat);
+
+      // configure ganttChart tooltip information
+      ganttChart.setShowTaskInfoRes(0)
+      ganttChart.setShowTaskInfoLink(0)
+
+      // add data to chart
+      $.each(ganttTasks, function (index, data) {
+        ganttChart.AddTaskItemObject(data);
+      });
+
+      ganttChart.setTotalHeight(document.documentElement.clientWidth);
+
+      ganttChart.setTooltipTemplate(function (task) {
+        let tooltipHtml;
+        $.ajax({
+          url: mainUrl + '/ganttTooltipFragment?taskId=' + task.getDataObject().pID,
+          type: "get",
+          async: false,
+          success: function (responsePayload) {
+            console.log('get tooltip fragment success ')
+            tooltipHtml = responsePayload;
+          },
+          error: function (responsePayload) {
+            console.log('get tooltip fragment failed ' + responsePayload)
+            Swal.fire({
+              icon: 'error',
+              title: responsePayload
+            });
+          }
+        });
+        return tooltipHtml;
+      });
+
+      ganttChart.Draw();
+    }
+
+  </script>
+</div>
+</body>
+</html>

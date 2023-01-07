@@ -8,7 +8,7 @@
                     <span th:text="#{tour.cap.pl}"></span>
                 </a>
 
-                <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseTourParticipantsNavs"
+                <a class="nav-link" href="#" data-toggle="collapse" data-target="#collapseTourParticipantsNavs"
                    aria-expanded="false" aria-controls="collapseTourParticipantsNavs">
                     <div class="sb-nav-link-icon"><i class="fas fa-users"></i></div>
                     <span th:text="#{tour.participant.cap.pl}"></span>
@@ -16,7 +16,7 @@
                         <i class="fas fa-angle-down"></i>
                     </div>
                 </a>
-                <div class="collapse" id="collapseTourParticipantsNavs" aria-labelledby="headingOne" data-bs-parent="#sidenavAccordion">
+                <div class="collapse show" id="collapseTourParticipantsNavs" aria-labelledby="headingOne" data-bs-parent="#sidenavAccordion">
                     <nav class="sb-sidenav-menu-nested nav" th:each="tourParticipantType : ${allTourParticipantTypes}">
                         <a class="nav-link" th:href="@{/tour-participant/{tourParticipantType}(tourParticipantType=${tourParticipantType})}" >
                             <div class="sb-nav-link-icon"><i th:class="${tourParticipantType.getIconCssClass()}"></i></div>

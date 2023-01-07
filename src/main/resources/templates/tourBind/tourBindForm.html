@@ -1,0 +1,40 @@
+<div th:fragment="tourBindFormContent">
+    <div class="container">
+        <div class="row form-group">
+            <div class="col-sm-2">
+                <label for="bindFormTourSelect" th:text="#{tour.cap}"></label>
+            </div>
+            <div class="col">
+                <select id="bindFormTourSelect"
+                        class="form-control selectpicker tour-single-selectpicker show-tick"
+                        required
+                        data-show-subtext="true"
+                        data-live-search="true" data-selected-text-format="count > 1" data-actions-box="true"
+                        th:field="*{tour}" name="tour">
+
+                    <option th:value="${null}" th:data-subtext="#{tour.select.placeholder}"></option>
+
+                    <option th:each="tour, row : ${allTours}"
+                            th:value="${tour.id}"
+                            th:text="${tour.id + ': ' + tour.name}"
+                            th:data-subtext="${tour.getDateTimeRange()}"
+                            th:selected="${tourBind.tour.id == tour.id}"
+                            th:data-tour-row-id="${row.index}">
+                    </option>
+                </select>
+            </div>
+            <div class="col-sm-1">
+            </div>
+        </div>
+        <div class="row form-group collapse" id="tourDescriptionCollapse">
+            <div class="col-sm-2">
+                <label for="tourDescriptionTextArea" th:text="#{description.cap}"></label>
+            </div>
+            <div class="col">
+            <textarea id="tourDescriptionTextArea" class="form-control tour-description-text-area" readonly
+                      th:text="${tourBind.tour.description}"></textarea>
+            </div>
+            <div class="col-sm-1"></div>
+        </div>
+    </div>
+</div>

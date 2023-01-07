@@ -55,11 +55,6 @@ public class TourBindController {
         return new Tour();
     }
 
-    @GetMapping("/new")
-    public ModelAndView showNewTourBindPage() {
-        return new ModelAndView("tourBind/tourBindNew");
-    }
-
     @GetMapping
     public ModelAndView showTouBindsPage(@ModelAttribute("tourBindFilter") final TourBindFilter tourBindFilter) {
 

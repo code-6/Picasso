@@ -4,6 +4,7 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.apache.commons.lang3.time.DurationFormatUtils;
 import org.novinomad.picasso.commons.utils.CommonDateUtils;
 import org.springframework.format.annotation.DateTimeFormat;
 
@@ -12,19 +13,21 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
 import java.util.Locale;
 import java.util.Objects;
+import java.util.concurrent.TimeUnit;
 
 @Embeddable
 public class LocalDateTimeRange implements ILocalDateTimeRange, Comparable<ILocalDateTimeRange> {
 
     @Getter
-    @Setter(AccessLevel.PROTECTED)
+    @Setter
     @DateTimeFormat(pattern = CommonDateUtils.UI_DATE_TIME_NO_SEC)
     private LocalDateTime startDate;
 
     @Getter
-    @Setter(AccessLevel.PROTECTED)
+    @Setter
     @DateTimeFormat(pattern = CommonDateUtils.UI_DATE_TIME_NO_SEC)
     private LocalDateTime endDate;
 

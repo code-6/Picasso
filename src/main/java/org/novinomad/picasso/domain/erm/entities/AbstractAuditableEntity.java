@@ -3,6 +3,8 @@ package org.novinomad.picasso.domain.erm.entities;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 import org.novinomad.picasso.commons.utils.CommonDateUtils;
+import org.novinomad.picasso.commons.utils.SpringContextUtil;
+import org.novinomad.picasso.services.auth.UserService;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.persistence.*;
@@ -42,18 +44,22 @@ public abstract class AbstractAuditableEntity extends AbstractEntity {
     Boolean deleted = false;
 
     @PrePersist
-    void initCreateDate() {
-        LocalDateTime now = LocalDateTime.now();
-        createDate = now;
+    void prePersist() {
+        createDate = LocalDateTime.now();
+        if(createdBy == null) {
+            createdBy = SpringContextUtil.getBean(UserService.class).getCurrentUserName();
+        }
     }
 
     @PreUpdate
-    void initUpdateDate() {
+    void preUpdate() {
         lastUpdateDate = LocalDateTime.now();
+        lastUpdatedBy = SpringContextUtil.getBean(UserService.class).getCurrentUserName();
     }
 
     @PreRemove
-    void initDeleted() {
+    void preDelete() {
+        preUpdate();
         deleted = true;
     }
 

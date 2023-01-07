@@ -71,26 +71,27 @@
 
 <script th:src="@{/webjars/sweetalert2/dist/sweetalert2.all.min.js}" ></script>
 <!--    common dependencies-->
-<script>
+<script th:inline="javascript">
     $(function () {
         $('[data-toggle="popover"]').popover()
     });
 
-    function buildChildAuditInfoRow(createdBy, createDate, updatedBy, updateDate) {
-        return ('<table class="table-striped table-bordered" style="padding-left:50px;">' +
-            '<tr>' +
-            '<td >Created by:</td>' +
-            '<td >' + createdBy + '</td>' +
-            '<td >Create date:</td>' +
-            '<td >' + createDate + '</td>' +
-            '</tr>' +
-            '<tr>' +
-            '<td >Updated by:</td>' +
-            '<td >' + updatedBy + '</td>' +
-            '<td >Update date:</td>' +
-            '<td >' + updateDate + '</td>' +
-            '</tr>' +
-            '</table>');
+    if([[${exception}]]) {
+        Swal.fire({
+            icon: 'error',
+            title: [[${exception}]]
+        });
+    }
+
+    if([[${success}]]) {
+        Swal.fire({
+            toast: true,
+            position: 'top-end',
+            icon: 'success',
+            title: [[${success}]],
+            showConfirmButton: false,
+            timer: DEFAULT_TOAST_TIME_OUT
+        });
     }
 </script>
 

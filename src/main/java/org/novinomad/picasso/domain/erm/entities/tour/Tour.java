@@ -1,20 +1,20 @@
 package org.novinomad.picasso.domain.erm.entities.tour;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 import org.hibernate.annotations.Nationalized;
-import org.hibernate.annotations.SQLDelete;
-import org.hibernate.annotations.Where;
 import org.novinomad.picasso.commons.LocalDateTimeRange;
 import org.novinomad.picasso.domain.ITour;
 import org.novinomad.picasso.domain.erm.entities.AbstractAuditableEntity;
-import org.novinomad.picasso.domain.erm.entities.AbstractEntity;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 
@@ -24,10 +24,11 @@ import java.util.Objects;
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @Table(indexes = {
-        @Index(columnList = "start_date, end_date", name = "tour_date_range_idx"),
-        @Index(columnList = "name", name = "tour_name_idx")
+//        @Index(columnList = "start_date, end_date", name = "tour_date_range_idx"),
+//        @Index(columnList = "name", name = "tour_name_idx"),
+        @Index(columnList = "name, start_date, end_date", name = "tour_date_name_idx", unique = true)
 })
-public class Tour extends AbstractAuditableEntity implements ITour {
+public class Tour extends AbstractAuditableEntity implements ITour, Comparable<Tour> {
 
     @Nationalized
     @Column(nullable = false)
@@ -70,7 +71,7 @@ public class Tour extends AbstractAuditableEntity implements ITour {
     }
 
     public int getDaysCount() {
-       return (int) dateTimeRange.getDuration().toDays();
+        return (int) dateTimeRange.getDuration().toDays();
     }
 
     //region equals, hashCode, toString
@@ -94,7 +95,7 @@ public class Tour extends AbstractAuditableEntity implements ITour {
     public String toString() {
         return super.toString().replace("}", "") +
                 ", name='" + name + '\'' +
-                ", dateTimeRange=" +(dateTimeRange == null ? null : dateTimeRange.toString())  +
+                ", dateTimeRange=" + (dateTimeRange == null ? null : dateTimeRange.toString()) +
                 ", files=" + fileNames +
                 '}';
     }
@@ -105,6 +106,21 @@ public class Tour extends AbstractAuditableEntity implements ITour {
 
     public LocalDateTime getEndDate() {
         return dateTimeRange.getEndDate();
+    }
+
+    public void setStartDate(LocalDateTime startDate) {
+        dateTimeRange.setStartDate(startDate);
+    }
+
+    public void setEndDate(LocalDateTime endDate) {
+        dateTimeRange.setEndDate(endDate);
+    }
+
+    @Override
+    public int compareTo(Tour o) {
+        return Comparator.comparing(Tour::getStartDate)
+                .thenComparing(Tour::getEndDate)
+                .compare(this, o);
     }
     //endregion
 

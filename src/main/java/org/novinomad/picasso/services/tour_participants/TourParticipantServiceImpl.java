@@ -13,6 +13,7 @@ import org.springframework.util.CollectionUtils;
 
 import javax.transaction.Transactional;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service("tourParticipantService")
@@ -29,6 +30,11 @@ public class TourParticipantServiceImpl extends AbstractCrudCacheService<Long, T
     }
 
     @Override
+    public List<TourParticipant> get() {
+        return super.get().stream().filter(tp -> !tp.getDeleted()).collect(Collectors.toList());
+    }
+
+    @Override
     public List<TourParticipant> get(Collection<TourParticipant.Type> tourParticipantTypes) {
         if(CollectionUtils.isEmpty(tourParticipantTypes)) {
             return get();
@@ -39,7 +45,7 @@ public class TourParticipantServiceImpl extends AbstractCrudCacheService<Long, T
             } else {
                 tourParticipants = new ArrayList<>(CACHE.asMap().values());
             }
-            return tourParticipants.stream().filter(tp -> tourParticipantTypes.contains(tp.getType())).toList();
+            return tourParticipants.stream().filter(tp -> !tp.getDeleted() && tourParticipantTypes.contains(tp.getType())).toList();
 //            return tourParticipantRepository.findAllByTypeIn(tourParticipantTypes);
         }
     }

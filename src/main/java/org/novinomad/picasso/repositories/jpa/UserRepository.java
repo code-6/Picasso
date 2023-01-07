@@ -21,4 +21,11 @@ public interface UserRepository extends JpaRepository<User, Long> {
     List<User> findAllByUsername(@Param("usernames") Set<String> usernames);
 
     Optional<User> findByUsername(String username);
+
+    @Query(value = """
+            select distinct u.*
+            from user_permissions up where up.PERMISSION_ID = :permissionId
+            join users u on up.USER_NAME = u.USERNAME
+            """, nativeQuery = true)
+    Set<User> findAllByPermissionId(@Param("permissionId") Long permissionId);
 }

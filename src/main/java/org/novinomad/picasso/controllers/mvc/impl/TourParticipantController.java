@@ -14,6 +14,8 @@ import org.novinomad.picasso.domain.erm.entities.tour_participants.TourParticipa
 import org.novinomad.picasso.services.tour_participants.DriverService;
 import org.novinomad.picasso.services.tour_participants.GuideService;
 import org.novinomad.picasso.services.tour_participants.TourParticipantService;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -32,6 +34,7 @@ import java.util.List;
 @Controller
 @RequestMapping("/tour-participant")
 @Loggable
+@SessionAttributes(value = {"tablePageSize"})
 public class TourParticipantController {
 
     final TourParticipantService tourParticipantService;
@@ -39,6 +42,14 @@ public class TourParticipantController {
     final DriverService driverService;
 
     final GuideService guideService;
+
+    @Value("${app.default-table-page-size}")
+    Integer tablePageSize;
+
+    @ModelAttribute("tablePageSize")
+    public Integer tablePageSize() {
+        return tablePageSize;
+    }
 
     @LogIgnore
     @ModelAttribute("allLanguages")
@@ -81,7 +92,7 @@ public class TourParticipantController {
 
     @GetMapping("/fragment/table/{tourParticipantType}")
     public ModelAndView getTourParticipantsTableFragment(@PathVariable TourParticipant.Type tourParticipantType) {
-        ModelAndView modelAndView = new ModelAndView("tourParticipant/tourParticipantsTable :: tourParticipantsTable");
+        ModelAndView modelAndView = new ModelAndView("tourParticipant/tourParticipantPage :: tourParticipantsTable");
         modelAndView.addObject("tourParticipantType", tourParticipantType);
         modelAndView.addObject("participantFragment", tourParticipantType.getThymeleafFragment());
         try {
@@ -97,7 +108,7 @@ public class TourParticipantController {
     public ModelAndView getTourParticipantFormFragment(@PathVariable TourParticipant.Type tourParticipantType,
                                                         @PathVariable Long tourParticipantId) {
 
-        ModelAndView modelAndView = new ModelAndView("tourParticipant/tourParticipantForm :: tourParticipantForm");
+        ModelAndView modelAndView = new ModelAndView("tourParticipant/tourParticipantPage :: tourParticipantFormContent");
 
         modelAndView.addObject("participantFragment", tourParticipantType.getThymeleafFragment());
         modelAndView.addObject("tourParticipantType", tourParticipantType);
@@ -136,7 +147,7 @@ public class TourParticipantController {
     public ModelAndView addDriverCar(@ModelAttribute("tourParticipant") Driver driver,
                                      @ModelAttribute("driverCar") Driver.Car car) {
 
-        ModelAndView modelAndView = new ModelAndView("tourParticipant/tourParticipantForm :: tourParticipantForm");
+        ModelAndView modelAndView = new ModelAndView("tourParticipant/tourParticipantPage :: tourParticipantFormContent");
 
         driver.addCar(car);
 
@@ -152,7 +163,7 @@ public class TourParticipantController {
     public ModelAndView removeDriverCar(@ModelAttribute("tourParticipant") Driver driver,
                                         @PathVariable Integer driverCarRowId) {
 
-        ModelAndView modelAndView = new ModelAndView("tourParticipant/tourParticipantForm :: tourParticipantForm");
+        ModelAndView modelAndView = new ModelAndView("tourParticipant/tourParticipantPage :: tourParticipantFormContent");
 
         driver.getCars().remove(driverCarRowId.intValue());
 
@@ -176,5 +187,11 @@ public class TourParticipantController {
             modelAndView.addObject("exception", e.getMessage());
         }
         return modelAndView;
+    }
+
+    @PutMapping("/table/len/{tablePageSize}")
+    @ResponseStatus(value = HttpStatus.OK)
+    public void changeTablePageSize(@PathVariable Integer tablePageSize, Model model) {
+        model.addAttribute("tablePageSize", tablePageSize);
     }
 }

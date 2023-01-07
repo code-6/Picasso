@@ -2,15 +2,14 @@ package org.novinomad.picasso.domain.erm.entities.tour_participants;
 
 import lombok.*;
 import lombok.experimental.FieldDefaults;
-import org.hibernate.annotations.LazyCollection;
-import org.hibernate.annotations.LazyCollectionOption;
-import org.hibernate.annotations.SQLDelete;
-import org.hibernate.annotations.Where;
+import org.hibernate.annotations.*;
 import org.novinomad.picasso.commons.collections.CommonCollections;
 import org.novinomad.picasso.domain.dto.tour_participants.DriverDto;
 import org.novinomad.picasso.domain.IDriver;
 
 import javax.persistence.*;
+import javax.persistence.Entity;
+import javax.persistence.Index;
 import java.util.*;
 
 @Entity
@@ -21,7 +20,7 @@ import java.util.*;
 public class Driver extends TourParticipant implements IDriver {
 
     @ElementCollection
-    @LazyCollection(LazyCollectionOption.FALSE)
+    @Fetch(FetchMode.SUBSELECT)
     @CollectionTable(indexes = @Index(columnList = "brandName, modelName"))
     List<Car> cars = new LinkedList<>();
 

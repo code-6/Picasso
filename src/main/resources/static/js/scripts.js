@@ -7,23 +7,42 @@
 // Scripts
 // 
 
+const mainUrl = $("meta[name='mainUrl']").attr("content");
+
 window.addEventListener('DOMContentLoaded', event => {
 
     // Toggle the side navigation
     const sidebarToggle = document.body.querySelector('#sidebarToggle');
     if (sidebarToggle) {
         // Uncomment Below to persist sidebar toggle between refreshes
-        if (localStorage.getItem('sb|sidebar-toggle') === 'true') {
-            document.body.classList.toggle('sb-sidenav-toggled');
-        }
+        // if (localStorage.getItem('sb|sidebar-toggle') === 'true') {
+        //     document.body.classList.toggle('sb-sidenav-toggled');
+        // }
         sidebarToggle.addEventListener('click', event => {
             event.preventDefault();
-            document.body.classList.toggle('sb-sidenav-toggled');
-            localStorage.setItem('sb|sidebar-toggle', document.body.classList.contains('sb-sidenav-toggled'));
+            toggleSideBar();
         });
     }
 
 });
+
+function toggleSideBar() {
+    document.body.classList.toggle('sb-sidenav-toggled');
+    let b = document.body.classList.contains('sb-sidenav-toggled');
+    localStorage.setItem('sb|sidebar-toggle', b);
+    let url = mainUrl + '/sidenav/collapse/' + b;
+    $.ajax({
+        url: url,
+        type: 'PUT',
+        success: function(result) {
+            if(b) {
+                console.log('sidenav collapsed ');
+            } else {
+                console.log('sidenav displayed ');
+            }
+        }
+    });
+}
 
 /**
  * @param element any HTML element eg. button

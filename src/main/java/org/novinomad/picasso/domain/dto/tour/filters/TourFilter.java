@@ -2,7 +2,9 @@ package org.novinomad.picasso.domain.dto.tour.filters;
 
 import lombok.Data;
 import org.novinomad.picasso.commons.ILocalDateTimeRange;
+import org.novinomad.picasso.commons.LocalDateTimeRange;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.temporal.TemporalAdjusters;
@@ -36,7 +38,7 @@ public class TourFilter implements ILocalDateTimeRange {
             startDate = currentDate.with(TemporalAdjusters.firstDayOfYear()).with(LocalTime.MIN);
 
         if(endDate == null)
-            endDate = startDate.plusYears(1);
+            endDate = currentDate.with(TemporalAdjusters.lastDayOfYear()).with(LocalTime.MIN);
 
         if(startDate.isAfter(endDate)) {
             // swap dates
@@ -44,5 +46,9 @@ public class TourFilter implements ILocalDateTimeRange {
             startDate = endDate;
             endDate = date;
         }
+    }
+
+    public LocalDateTimeRange getLocalDateTimeRange() {
+        return new LocalDateTimeRange(startDate, endDate);
     }
 }

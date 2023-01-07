@@ -1,6 +1,5 @@
 package org.novinomad.picasso.services.tour;
 
-import lombok.RequiredArgsConstructor;
 import org.novinomad.picasso.commons.LocalDateTimeRange;
 import org.novinomad.picasso.commons.exceptions.BindException;
 import org.novinomad.picasso.commons.exceptions.base.CommonRuntimeException;
@@ -11,24 +10,20 @@ import org.novinomad.picasso.domain.erm.entities.tour.Tour;
 import org.novinomad.picasso.domain.erm.entities.tour.TourBind;
 import org.novinomad.picasso.domain.erm.entities.tour_participants.TourParticipant;
 import org.novinomad.picasso.repositories.jpa.TourBindJpaRepository;
+import org.novinomad.picasso.services.AbstractCrudCacheService;
 import org.novinomad.picasso.services.tour_participants.TourParticipantService;
-import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
-import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static org.novinomad.picasso.commons.utils.CommonDateUtils.findOverlappedRange;
-import static org.novinomad.picasso.commons.utils.CommonDateUtils.localDateTimeToDate;
 
 @Service
-@RequiredArgsConstructor
-public class TourBindServiceImpl implements TourBindService {
+public class TourBindServiceImpl extends AbstractCrudCacheService<Long, TourBind> implements TourBindService {
 
     private final TourBindJpaRepository tourBindRepository;
 
@@ -40,9 +35,17 @@ public class TourBindServiceImpl implements TourBindService {
 
     private final TourBindRowMapper tourBindRowMapper;
 
-    @Override
-    public List<TourBind> save(Collection<TourBind> tourBinds) {
-        return TourBindService.super.save(tourBinds);
+    protected TourBindServiceImpl(TourBindJpaRepository tourBindRepository,
+                                  TourService tourService,
+                                  TourParticipantService tourParticipantService,
+                                  NamedParameterJdbcTemplate namedParameterJdbcTemplate,
+                                  TourBindRowMapper tourBindRowMapper) {
+        super(tourBindRepository);
+        this.tourBindRepository = tourBindRepository;
+        this.tourService = tourService;
+        this.tourParticipantService = tourParticipantService;
+        this.namedParameterJdbcTemplate = namedParameterJdbcTemplate;
+        this.tourBindRowMapper = tourBindRowMapper;
     }
 
     @Override
@@ -51,7 +54,7 @@ public class TourBindServiceImpl implements TourBindService {
 
         validateBind(tourBind);
 
-        return tourBindRepository.save(tourBind);
+        return save(tourBind);
     }
 
     @Override
@@ -106,36 +109,52 @@ public class TourBindServiceImpl implements TourBindService {
 
     @Override
     public List<TourBind> get(TourBindFilter tourBindFilter) {
+        return get().parallelStream()
+                .filter(tourBindFilter.getStartDate() != null
+                        ? t -> t.getStartDate().isAfter(tourBindFilter.getStartDate()) || t.getStartDate().isEqual(tourBindFilter.getStartDate())
+                        : t -> true)
+                .filter(tourBindFilter.getEndDate() != null
+                        ? t -> t.getEndDate().isBefore(tourBindFilter.getEndDate()) || t.getEndDate().isEqual(tourBindFilter.getEndDate())
+                        : t -> true)
+                .filter(!CollectionUtils.isEmpty(tourBindFilter.getTourIds())
+                        ? t -> tourBindFilter.getTourIds().contains(t.getId())
+                        : t -> true)
+                .filter(!CollectionUtils.isEmpty(tourBindFilter.getTourParticipantIds())
+                        ? t -> t.getTourParticipant() == null || tourBindFilter.getTourParticipantIds().contains(t.getTourParticipant().getId())
+                        : t -> true)
+                .filter(tb -> !tb.getDeleted())
+                .sorted()
+                .toList();
 
-        StringBuilder sql = new StringBuilder("""
-                select tb.id, tb.tour_id, tb.tour_participant_id, tb.start_date, tb.end_date, tb.CREATE_DATE, tb.CREATED_BY, tb.DELETED, tb.LAST_UPDATE_DATE, tb.LAST_UPDATED_BY
-                from TOUR_BIND tb
-                join TOUR t on tb.tour_id = t.id
-                left join TOUR_PARTICIPANT e on tb.TOUR_PARTICIPANT_ID = e.ID
-                where (:endDate is null or t.start_date <= :endDate)
-                and (:startDate is null or t.end_date >= :startDate)
-                """);
-
-        MapSqlParameterSource params = new MapSqlParameterSource()
-                .addValue("startDate", localDateTimeToDate(tourBindFilter.getStartDate()))
-                .addValue("endDate", localDateTimeToDate(tourBindFilter.getEndDate()));
-
-        if (!CollectionUtils.isEmpty(tourBindFilter.getTourIds())) {
-            sql.append(" and (t.id in (:tourIds)) ");
-            params.addValue("tourIds", tourBindFilter.getTourIds());
-        }
-
-        if (!CollectionUtils.isEmpty(tourBindFilter.getTourParticipantIds())) {
-            sql.append(" and (e.id in (:tourParticipantIds)) ");
-            params.addValue("tourParticipantIds", tourBindFilter.getTourParticipantIds());
-        }
-
-        sql.append("""                                            
-                group by tb.id, tb.tour_id, tb.tour_participant_id, tb.start_date, tb.end_date
-                order by t.START_DATE, tb.START_DATE, t.END_DATE, tb.END_DATE   
-                """);
-
-        return namedParameterJdbcTemplate.query(sql.toString(), params, tourBindRowMapper);
+//        StringBuilder sql = new StringBuilder("""
+//                select tb.id, tb.tour_id, tb.tour_participant_id, tb.start_date, tb.end_date, tb.CREATE_DATE, tb.CREATED_BY, tb.DELETED, tb.LAST_UPDATE_DATE, tb.LAST_UPDATED_BY
+//                from TOUR_BIND tb
+//                join TOUR t on tb.tour_id = t.id
+//                left join TOUR_PARTICIPANT e on tb.TOUR_PARTICIPANT_ID = e.ID
+//                where (:endDate is null or t.start_date <= :endDate)
+//                and (:startDate is null or t.end_date >= :startDate)
+//                """);
+//
+//        MapSqlParameterSource params = new MapSqlParameterSource()
+//                .addValue("startDate", localDateTimeToDate(tourBindFilter.getStartDate()))
+//                .addValue("endDate", localDateTimeToDate(tourBindFilter.getEndDate()));
+//
+//        if (!CollectionUtils.isEmpty(tourBindFilter.getTourIds())) {
+//            sql.append(" and (t.id in (:tourIds)) ");
+//            params.addValue("tourIds", tourBindFilter.getTourIds());
+//        }
+//
+//        if (!CollectionUtils.isEmpty(tourBindFilter.getTourParticipantIds())) {
+//            sql.append(" and (e.id in (:tourParticipantIds)) ");
+//            params.addValue("tourParticipantIds", tourBindFilter.getTourParticipantIds());
+//        }
+//
+//        sql.append("""
+//                group by tb.id, tb.tour_id, tb.tour_participant_id, tb.start_date, tb.end_date
+//                order by t.START_DATE, tb.START_DATE, t.END_DATE, tb.END_DATE
+//                """);
+//
+//        return namedParameterJdbcTemplate.query(sql.toString(), params, tourBindRowMapper);
     }
 
     @Override
@@ -144,26 +163,5 @@ public class TourBindServiceImpl implements TourBindService {
             tourBindFilter = new TourBindFilter();
 
         return Task.fromBindsWithChildrenInList(get(tourBindFilter));
-    }
-
-
-    @Override
-    public void deleteById(Long id) {
-        tourBindRepository.deleteById(id);
-    }
-
-    @Override
-    public List<TourBind> getById(Collection<Long> ids) {
-        return tourBindRepository.findAllById(ids);
-    }
-
-    @Override
-    public List<TourBind> get() {
-        return tourBindRepository.findAll();
-    }
-
-    @Override
-    public Optional<TourBind> getById(Long id) {
-        return tourBindRepository.findById(id);
     }
 }

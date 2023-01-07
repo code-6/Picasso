@@ -1,13 +1,9 @@
 package org.novinomad.picasso.services.tour;
 
-import com.github.benmanes.caffeine.cache.Caffeine;
-import com.github.benmanes.caffeine.cache.LoadingCache;
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.novinomad.picasso.aop.annotations.logging.LogIgnore;
-import org.novinomad.picasso.aop.annotations.logging.Loggable;
 import org.novinomad.picasso.commons.exceptions.StorageException;
 import org.novinomad.picasso.commons.exceptions.base.CommonRuntimeException;
 import org.novinomad.picasso.domain.dto.tour.filters.TourFilter;
@@ -15,20 +11,21 @@ import org.novinomad.picasso.domain.erm.entities.tour.Tour;
 import org.novinomad.picasso.repositories.jpa.TourRepository;
 import org.novinomad.picasso.services.AbstractCrudCacheService;
 import org.novinomad.picasso.services.common.FileSystemStorageService;
-import org.slf4j.event.Level;
 import org.springframework.beans.factory.BeanCreationException;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.autoconfigure.cache.CacheProperties;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.PostConstruct;
+import javax.transaction.Transactional;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Stream;
 
 import static org.novinomad.picasso.services.common.FileSystemStorageService.PATH_SEPARATOR;
 
@@ -107,14 +104,37 @@ public class TourServiceImpl extends AbstractCrudCacheService<Long, Tour> implem
     }
 
     @Override
+    public List<Tour> get() {
+        return super.get().parallelStream().filter(t -> !t.getDeleted()).toList();
+    }
+
+    @Override
     public List<Tour> get(TourFilter tourFilter) {
-        return tourRepository.findByFilter(tourFilter.getStartDate(), tourFilter.getEndDate(), tourFilter.getTourIds().isEmpty() ? null : tourFilter.getTourIds());
+        return get().stream()
+                .filter(t -> !t.getDeleted()
+                        && t.getDateTimeRange().between(tourFilter.getLocalDateTimeRange())
+                        && (tourFilter.getTourIds().isEmpty() || tourFilter.getTourIds().contains(t.getId())))
+                .sorted(Comparator.reverseOrder())
+                .toList();
+
+//        if(tourFilter.getStartDate() != null) {
+//            stream = stream.filter(t -> t.getStartDate().isAfter(tourFilter.getStartDate()) || t.getStartDate().isEqual(tourFilter.getStartDate()));
+//        }
+//        if(tourFilter.getEndDate() != null) {
+//            stream = stream.filter(t -> t.getEndDate().isBefore(tourFilter.getEndDate()) || t.getEndDate().isEqual(tourFilter.getEndDate()));
+//        }
+//        if(!CollectionUtils.isEmpty(tourFilter.getTourIds())) {
+//            stream = stream.filter(t -> tourFilter.getTourIds().contains(t.getId()));
+//        }
+//        return stream.toList();
+//        return tourRepository.findByFilter(tourFilter.getStartDate(), tourFilter.getEndDate(), tourFilter.getTourIds().isEmpty() ? null : tourFilter.getTourIds());
     }
 
     @Override
     public Tour save(Tour tour, List<MultipartFile> newFiles) throws CommonRuntimeException, StorageException {
-        if(!CollectionUtils.isEmpty(newFiles))
+        if(!CollectionUtils.isEmpty(newFiles)) {
             tour.addFile(newFiles);
+        }
 
         tour = save(tour);
 
@@ -151,6 +171,20 @@ public class TourServiceImpl extends AbstractCrudCacheService<Long, Tour> implem
     public Resource getTourFile(Long tourId, String fileName) throws StorageException {
         String filePath = rootLocation.toString() + PATH_SEPARATOR + tourId + PATH_SEPARATOR + fileName;
         return fileSystemStorageService.loadAsResource(filePath);
+    }
+
+    @Override
+    @Transactional
+    public void deleteSoft(Long id) {
+        tourRepository.softDeleteById(id);
+        CACHE.invalidate(id);
+    }
+
+    @Override
+    @Transactional
+    public void deleteSoft(Collection<Long> ids) {
+        tourRepository.softDeleteById(ids);
+        CACHE.invalidateAll(ids);
     }
 
     public void deleteAllTourFiles(Tour tour) {

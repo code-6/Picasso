@@ -30,7 +30,8 @@
         <div class="btn-group mr-2" role="group" aria-label="Second group">
             <a class="nav-link" id="tourParticipantFormToggleBtn" data-toggle="collapse"
                data-target="#tourParticipantFormContainer"
-               aria-expanded="false" aria-controls="tourParticipantFormContainer" href="#tourParticipantFormContainer">
+               aria-expanded="false" aria-controls="tourParticipantFormContainer"
+               href="#tourParticipantFormContainer">
                 <i id="tourParticipantFormToggleBtnIcon" class="fas fa-eye"></i>
                 <span th:text="#{show.cap} + ${tourParticipantType} + ' ' + #{form}"></span>
             </a>
@@ -39,13 +40,62 @@
 </div>
 
 <div layout:fragment="content">
+
     <!--    tourParticipant form-->
     <div class="collapse" id="tourParticipantFormContainer">
         <div class="card">
             <div class="card-header"><span th:text="${tourParticipantType + ' '} + #{form}"></span></div>
             <div id="tourParticipantFormDiv" class="card-body">
-                <form th:object="${tourParticipant}" th:action="@{/tourParticipant}" th:method="post" id="tourParticipantForm"
-                      th:replace="tourParticipant/tourParticipantForm :: tourParticipantForm"></form>
+                <form th:object="${tourParticipant}" th:action="@{${'/tour-participant/' + tourParticipantType}}"
+                      th:method="post" id="tourParticipantForm">
+
+                    <div id="tourParticipantFormContent" class="tour-participant-form-content" th:fragment="tourParticipantFormContent">
+                        <input type="hidden" name="id" th:value="${tourParticipant.id}">
+                        <input type="hidden" name="type" th:value="${tourParticipantType}">
+
+                        <div class="row form-group">
+                            <div class="col-sm-2">
+                                <label for="tourParticipantName" class="form-label" th:text="#{name.cap}"></label>
+                            </div>
+                            <div class="col">
+                                <input required type="text" class="form-control" id="tourParticipantName" th:value="${tourParticipant.name}"
+                                       th:placeholder="#{tourParticipantName.placeholder}" name="name">
+                            </div>
+                        </div>
+
+                        <th:block th:replace="~{'fragments/' + ${participantFragment} + '/tourParticipantAdditionalFormFields' :: tourParticipantAdditionalFormFields}"></th:block>
+                    </div>
+
+                    <div class="row form-group" th:fragment="tourParticipantFormButtonsRow">
+                        <div class="col-sm-2"></div>
+
+                        <div class="col">
+                            <button id="submitTourParticipantFormBtn" type="button" class="btn btn-outline-success btn-block">
+                                <i class="fas fa-check-square"></i>
+                                <span th:text="#{submit.cap}"></span>
+                            </button>
+                        </div>
+
+                        <div class="col">
+                            <button type="button" class="btn btn-outline-secondary btn-block" data-toggle="collapse"
+                                    href="#tourParticipantFormContainer"
+                                    aria-expanded="true" aria-controls="tourParticipantFormContainer">
+                                <i class="fas fa-window-close"></i>
+                                <span th:text="#{close.cap}"></span>
+                            </button>
+                        </div>
+
+                        <div class="col">
+                            <button class="btn btn-outline-warning btn-block" id="resetTourParticipantFormBtn"
+                                    type="button"
+                                    th:data-tour-participant-type="${tourParticipantType}"
+                                    th:title="#{clear.title}">
+                                <i class="fas fa-eraser"></i>
+                                <span th:text="#{clear.cap} + #{form}"></span>
+                            </button>
+                        </div>
+                    </div>
+                </form>
             </div>
         </div>
     </div>
@@ -78,17 +128,81 @@
                         </button>
                     </div>
                     <div class="p-0">
-                        <button  type="button" class="btn btn-sm btn-outline-primary tourParticipantExpCollBtn">
-                            <i class="fas fa-plus-circle tourParticipantExpCollIcon"></i>
-                            <span class="tourParticipantExpCollSpan">Expand all</span>
+                        <button  type="button" class="btn btn-sm btn-outline-primary tableExpandCollapseAllBtn">
+                            <i class="fa-solid fa-bars-staggered"></i>
+                            <span class="tableExpandCollapseAllSpan">Expand all</span>
                         </button>
                     </div>
                 </div>
             </div>
+
             <div id="tourParticipantsTableDiv" class="card-body">
-                <table id="tourParticipantsTable" class="display compact cell-border hover stripe"
-                       th:replace="tourParticipant/tourParticipantsTable :: tourParticipantsTable"></table>
+                <table id="tourParticipantsTable" class="display compact cell-border hover stripe" th:fragment="tourParticipantsTable">
+                    <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th th:text="#{name.cap}"></th>
+                        <th th:text="#{created-by}"></th>
+                        <th th:text="#{create-date}"></th>
+                        <th th:text="#{updated-by}"></th>
+                        <th th:text="#{update-date}"></th>
+                        <th:block th:replace="~{'fragments/' + ${participantFragment} + '/tourParticipantAdditionalTableColumnHeaders' :: tourParticipantAdditionalTableColumnHeaders}"></th:block>
+                        <th></th>
+                    </tr>
+                    </thead>
+                    <tfoot>
+                    <tr>
+                        <th>ID</th>
+                        <th th:text="#{name.cap}"></th>
+                        <th th:text="#{created-by}"></th>
+                        <th th:text="#{create-date}"></th>
+                        <th th:text="#{updated-by}"></th>
+                        <th th:text="#{update-date}"></th>
+                        <th:block th:replace="~{'fragments/' + ${participantFragment} + '/tourParticipantAdditionalTableColumnHeaders' :: tourParticipantAdditionalTableColumnHeaders}"></th:block>
+                        <th></th>
+                    </tr>
+                    </tfoot>
+                    <tbody>
+                    <th:block th:each="tourParticipant, row : ${tourParticipants}">
+                        <tr class="parent-row" th:id="${tourParticipant.id}" th:data-tour-participant-id="${tourParticipant.id}">
+                            <td><span th:text="${tourParticipant.id}"></span></td>
+                            <td><span th:text="${tourParticipant.name}"></span></td>
+                            <td><span th:text="${tourParticipant.createdBy}"></span></td>
+                            <td><span th:text="${tourParticipant.getCreateDateAsString}"></span></td>
+                            <td><span th:text="${tourParticipant.lastUpdatedBy}"></span></td>
+                            <td><span th:text="${tourParticipant.getUpdateDateAsString}"></span></td>
+                            <th:block th:replace="~{'fragments/' + ${participantFragment} + '/tourParticipantAdditionalTableColumns' :: tourParticipantAdditionalTableColumns}"></th:block>
+                            <td>
+                                <div class="d-flex flex-row align-items-center">
+                                    <div class="pr-1 pl-1">
+                                        <a href="#" class="tourParticipantEditBtn"
+                                           th:data-tour-participant-id="${tourParticipant.id}"
+                                           th:data-tour-participant-type="${tourParticipant.type}"
+                                           th:title="#{edit.title}">
+                                            <i class="far fa-edit"></i>
+                                        </a>
+                                    </div>
+                                    <div class="pr-1 pl-1">
+                                        <div class="col form-check">
+                                            <input class="form-check-input tourParticipantDeleteCheckBox" type="checkbox" value=""
+                                                   th:data-tour-participant-id="${tourParticipant.id}"
+                                                   th:data-tour-participant-type="${tourParticipant.type}">
+                                        </div>
+                                    </div>
+                                    <div class="pr-1 pl-1">
+                                        <a href="#" class="expandCollapseRowToggle" th:data-tour-participant-id="${tourParticipant.id}">
+                                            <i class="fa-solid fa-bars-staggered"></i>
+                                        </a>
+                                    </div>
+                                </div>
+                            </td>
+                            <th:block th:replace="~{'fragments/' + ${participantFragment} + '/tourParticipantAdditionalTableChildRow' :: tourParticipantAdditionalTableChildRow}"></th:block>
+                        </tr>
+                    </th:block>
+                    </tbody>
+                </table>
             </div>
+
             <div class="card-footer text-muted">
                 <div class="d-flex">
                     <div class="mr-auto p-0">
@@ -114,9 +228,9 @@
                         </button>
                     </div>
                     <div class="p-0">
-                        <button  type="button" class="btn btn-sm btn-outline-primary tourParticipantExpCollBtn">
-                            <i class="fas fa-plus-circle tourParticipantExpCollIcon"></i>
-                            <span class="tourParticipantExpCollSpan">Expand all</span>
+                        <button  type="button" class="btn btn-sm btn-outline-primary tableExpandCollapseAllBtn">
+                            <i class="fa-solid fa-bars-staggered"></i>
+                            <span class="tableExpandCollapseAllSpan">Expand all</span>
                         </button>
                     </div>
                 </div>
@@ -136,6 +250,8 @@
 
     <script th:src="@{/webjars/select2/js/select2.min.js}"></script>
 
+    <script th:src="@{/js/datatablesUtil.js}"></script>
+
     <!--<script type="module" th:src="@{/js/AjaxUtil.js}"></script>
     <script type="module" th:src="@{/js/Observer.js}"></script>-->
 
@@ -151,9 +267,9 @@
         const tourParticipantFormSubject = new FragmentSubject()
             .subscribe(initSelect2)
             .subscribe(initAddDriverCarButton)
-            .subscribe(initResetFormButton)
             .subscribe(initDeleteDriverCarButton)
-            .subscribe(initFormSubmitButton)
+            // .subscribe(initResetFormButton)
+            // .subscribe(initFormSubmitButton)
         ;
 
         const tourParticipantsTableFragmentSubject = new FragmentSubject()
@@ -205,8 +321,13 @@
                 paging: true,
                 searching: true,
                 ordering: true,
-                fixedHeader: true
+                fixedHeader: true,
+                pageLength: [[${tablePageSize}]]
             });
+
+            initResetFormButton();
+
+            initFormSubmitButton();
 
             tourParticipantsTableFragmentSubject.notifyObservers();
             tourParticipantFormSubject.notifyObservers();
@@ -231,6 +352,14 @@
                 $('.tourParticipantDeleteBtn').show();
                 console.log('selectedTourParticipantsArray ' + selectedTourParticipantsArray)
             });
+
+            $('#tourParticipantsTable').on( 'length.dt', function ( e, settings, len ) {
+                console.log( 'New page length: '+len );
+                ajaxUtil.put(mainUrl + '/tour-participant/table/len/' + len)
+                    .catch((error) => {
+                        console.error(error.responseJSON.message);
+                    });
+            } );
 
             $('.tourParticipantDeselectAllBtn').click(function(e) {
 
@@ -267,7 +396,8 @@
                         ajaxUtil.del(url)
                             .then(() => {
                                 for (let i = 0; i < selectedTourParticipantsArray.length; i++) {
-                                    tourParticipantsTable.row('#' + selectedTourParticipantsArray[i]).remove();
+                                    let rowId = '#' + selectedTourParticipantsArray[i];
+                                    tourParticipantsTable.row(rowId).remove();
                                 }
                                 tourParticipantsTable.draw();
                                 $('.tourParticipantDeleteBtn').hide();
@@ -290,6 +420,34 @@
                             });
                     }
                 });
+            });
+
+            $('.tableExpandCollapseAllBtn').click(function(e) {
+                e.stopImmediatePropagation();
+                e.preventDefault();
+
+                $('a.expandCollapseRowToggle').each(function(i) {
+                    let btn = $(this);
+                    let tr = btn.closest('tr');
+
+                    toggleExpandCollapseRow($(tr[0]), tourParticipantsTable);
+
+                    $(this).find('[data-fa-i2svg]')
+                        .toggleClass('fa-bars-staggered')
+                        .toggleClass('fa-bars');
+                });
+
+                let span = $(this).find('span.tableExpandCollapseAllSpan');
+
+                if($(span).text() === 'Expand all') {
+                    $('.tableExpandCollapseAllSpan').text('Collapse all');
+                } else if($(span).text() === 'Collapse all') {
+                    $('.tableExpandCollapseAllSpan').text('Expand all');
+                }
+
+                $(this).find('[data-fa-i2svg]')
+                    .toggleClass('fa-bars-staggered')
+                    .toggleClass('fa-bars');
             });
         });
 
@@ -333,8 +491,8 @@
                 let formData = $('#tourParticipantForm').serialize();
 
                 ajaxUtil.post(mainUrl + '/tour-participant/driver/add-car', formData)
-                    .then((tourParticipantFormFragment) => {
-                        $('#tourParticipantForm').html(tourParticipantFormFragment);
+                    .then((tourParticipantFormContent) => {
+                        $('#tourParticipantFormContent').html(tourParticipantFormContent);
                         tourParticipantFormSubject.notifyObservers();
                     }).catch((error) => {
                     console.error('initAddDriverCarButton unable to load tourParticipant/tourParticipantForm :: tourParticipantForm fragment %s', error.responseJSON.message);
@@ -353,8 +511,8 @@
                 let carRowId = $(this).attr('data-car-row-id');
                 let formData = $('#tourParticipantForm').serialize();
                 ajaxUtil.post(mainUrl + '/tour-participant/driver/remove-car/' + carRowId, formData)
-                    .then((tourParticipantFormHTML) => {
-                        $('#tourParticipantForm').html(tourParticipantFormHTML);
+                    .then((tourParticipantFormContent) => {
+                        $('#tourParticipantFormContent').html(tourParticipantFormContent);
                         tourParticipantFormSubject.notifyObservers();
                     })
                     .catch((error) => {
@@ -381,8 +539,8 @@
             let url = mainUrl + '/tour-participant/' + tourParticipantType + '/-1';
 
             ajaxUtil.get(url)
-                .then((tourParticipantFormHTML) => {
-                    $('#tourParticipantForm').html(tourParticipantFormHTML);
+                .then((tourParticipantFormContent) => {
+                    $('#tourParticipantFormContent').html(tourParticipantFormContent);
                     tourParticipantFormSubject.notifyObservers();
                 })
                 .catch((error) => {
@@ -408,8 +566,8 @@
                 let url = mainUrl + '/tour-participant/' + tourParticipantType + '/' + tourParticipantId;
 
                 ajaxUtil.get(url)
-                    .then((tourParticipantFormHTML) => {
-                        $('#tourParticipantForm').html(tourParticipantFormHTML);
+                    .then((tourParticipantFormContent) => {
+                        $('#tourParticipantFormContent').html(tourParticipantFormContent);
                         tourParticipantFormSubject.notifyObservers();
                         $('#tourParticipantFormContainer').collapse('show');
                     })
@@ -451,51 +609,20 @@
         }
 
         function initTableRowExpand() {
-            $('#tourParticipantsTable tbody').on('click', 'td.dt-control', function(e) {
+            $('#tourParticipantsTable tbody').on('click', 'a.expandCollapseRowToggle', function(e) {
 
                 e.stopImmediatePropagation();
                 e.preventDefault();
 
-                toggleExpandCollapseRow($(this));
+                let btn = $(this);
+                let tr = btn.closest('tr');
+
+                toggleExpandCollapseRow($(tr[0]), tourParticipantsTable);
+
+                $(this).find('[data-fa-i2svg]')
+                    .toggleClass('fa-bars-staggered')
+                    .toggleClass('fa-bars');
             });
-        }
-
-        $('.tourParticipantExpCollBtn').click(function(e) {
-            e.stopImmediatePropagation();
-            e.preventDefault();
-
-            $('td.dt-control').each(function(i) {
-                toggleExpandCollapseRow($(this));
-            });
-            let span = $(this).children('span')[0];
-
-            $(this).find('[data-fa-i2svg]')
-                .toggleClass('fa-plus-circle')
-                .toggleClass('fa-minus-circle');
-
-            if($(span).text() === 'Expand all') {
-                $('.tourParticipantExpCollSpan').text('Collapse all');
-            } else if($(span).text() === 'Collapse all') {
-                $('.tourParticipantExpCollSpan').text('Expand all');
-            }
-        });
-
-        function toggleExpandCollapseRow(dtControl) {
-            let tr = dtControl.closest('tr');
-            let parentRowId = tr.attr('id');
-            let row = tourParticipantsTable.row(tr);
-
-            if (row.child.isShown()) {
-                // This row is already open - close it
-                row.child.hide();
-                tr.removeClass('shown');
-            } else {
-                // Open this row
-                let childRow = $('.child-row[data-parent-id="'+parentRowId+'"]').clone();
-                childRow.show();
-                row.child(childRow).show();
-                tr.addClass('shown');
-            }
         }
 
         function initFormSubmitButton() {

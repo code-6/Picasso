@@ -22,23 +22,16 @@
         }
     </style>
 </head>
-<body class="sb-nav-fixed">
+<body th:class="${sidenavCollapsed != null and sidenavCollapsed ? 'sb-nav-fixed sb-sidenav-toggled' : 'sb-nav-fixed'}">
 
 <!-- Page management components -->
 <div th:fragment="pageManageComponents" class="mx-auto order-0">
     <div class="btn-toolbar" role="toolbar" aria-label="Toolbar with button groups">
-        <div class="btn-group mr-2" role="group" aria-label="First group">
-            <a class="nav-link" href="#tourBindFilter"
-               data-toggle="collapse" data-target="#tourFilterDiv"
-               aria-expanded="false" aria-controls="tourFilterDiv">
-                <i class="fas fa-filter"></i>
-                <span th:text="#{filter.cap.pl}"></span>
-            </a>
-        </div>
         <div class="btn-group mr-2" role="group" aria-label="Second group">
             <a class="nav-link" id="tourFormToggleBtn" data-toggle="collapse"
                data-target="#tourFormContainer"
-               aria-expanded="false" aria-controls="tourFormContainer" href="#tourFormContainer">
+               aria-expanded="false" aria-controls="tourFormContainer"
+               href="#tourFormContainer">
                 <i id="tourFormToggleBtnIcon" class="fas fa-eye"></i>
                 <span th:text="#{tourFormToggleBtn}"></span>
             </a>
@@ -47,34 +40,374 @@
 </div>
 
 <div layout:fragment="content">
-    <!--    filter form-->
-    <div class="collapse show" id="tourFilterDiv">
-        <div class="card">
-            <div class="card-header">Tours filter form</div>
-            <div class="card-body">
-                <form th:object="${tourFilter}" id="tourFilterForm"
-                      th:replace="tour/tourFilterForm :: tourFilterForm"></form>
-            </div>
-        </div>
-    </div>
-    <!--    tours table -->
-    <div class="collapse show">
-        <div class="card">
-            <div class="card-header">Tours table</div>
-            <div id="toursTableDiv" class="card-body">
-                <table id="toursTable" class="display compact cell-border hover stripe"
-                       th:replace="tour/toursTable :: toursTable"></table>
-            </div>
-        </div>
-    </div>
-
     <!--    tour form-->
     <div class="collapse" id="tourFormContainer">
         <div class="card">
             <div class="card-header">Tour form</div>
             <div id="tourFormDiv" class="card-body">
                 <form th:object="${tour}" th:action="@{/tour}" th:method="post" id="tourForm"
-                      th:replace="tour/tourForm :: tourForm"></form>
+                      enctype="multipart/form-data">
+
+                    <div th:fragment="formContentFragment" id="formContentFragment" class="form-content-fragment">
+
+                        <input type="hidden" name="id" th:value="*{id}"/>
+
+                        <div class="row form-group">
+                            <div class="col-sm-2">
+                                <label for="tourNameForm" class="form-label" th:text="#{name.cap}"></label>
+                            </div>
+                            <div class="col">
+                                <input type="text" class="form-control" id="tourNameForm" placeholder="enter tour name"
+                                       name="name" required
+                                       th:value="*{name}">
+                            </div>
+                        </div>
+                        <div class="row form-group">
+                            <div class="col-sm-2">
+                                <label for="datepickerForm" th:text="#{date.cap.pl}"></label>
+                            </div>
+                            <div class="col">
+                                <div class="input-daterange input-group" id="datepickerForm" data-provide="datepicker">
+                                    <input type="text"
+                                           class="form-control date-picker date-picker-single date-picker-single-tour-form"
+                                           id="tourStartDate" required
+                                           th:field="*{dateTimeRange.startDate}" name="dateTimeRange.startDate">
+                                    <span class="input-group-addon from-to-date-fields-divider">to</span>
+                                    <input type="text"
+                                           class="form-control date-picker date-picker-single date-picker-single-tour-form"
+                                           id="tourEndDate" required
+                                           th:field="*{dateTimeRange.endDate}" name="dateTimeRange.endDate">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row form-group">
+                            <div class="col-sm-2">
+                                <label for="tourDescription" class="form-label" th:text="#{description.cap}"></label>
+                            </div>
+                            <div class="col">
+
+                                <textarea class="form-control" id="tourDescription" rows="3" name="description"
+                                          th:text="*{description}"></textarea>
+                            </div>
+                        </div>
+                        <div class="row form-group">
+                            <div class="col-sm-2">
+                                <label for="tourFilesInput" class="form-label" th:text="#{file.upload}"></label>
+                            </div>
+                            <div class="col">
+                                <div class="input-group mb-3">
+                                    <div class="input-group-prepend">
+                                        <button type="button" class="btn btn-sm btn-outline-secondary"
+                                                data-toggle="popover" th:title="#{file.uploaded.help.title}"
+                                                th:data-content="#{file.upload.help}">
+                                            <i class="fas fa-question-circle"></i>
+                                        </button>
+                                    </div>
+                                    <div class="custom-file">
+                                        <input id="tourFilesInput" class="form-control" type="file" multiple
+                                               name="tourFiles">
+                                    </div>
+                                </div>
+                                <small id="tourFilesInputHelp" class="form-text text-muted"
+                                       th:text="#{tourFilesInputHelp} + ${@environment.getProperty('spring.servlet.multipart.max-file-size')}"></small>
+                            </div>
+                        </div>
+
+                        <div class="row form-group">
+                            <div class="col-sm-2">
+                                <label class="form-label" th:text="#{file.uploaded}"></label>
+                            </div>
+                            <div class="col" th:if="${tour.fileNames != null and !tour.fileNames.isEmpty()}">
+                                <div th:fragment="tourFilesFragment" id="tourUploadedFilesFragment">
+                                    <table class="table">
+                                        <thead>
+                                        <tr>
+                                            <th scope="col">
+                                                <button type="button" class="btn btn-sm btn-outline-secondary"
+                                                        data-toggle="popover" th:title="#{file.uploaded.help.title}"
+                                                        th:data-content="#{file.uploaded.help}">
+                                                    <i class="fas fa-question-circle"></i>
+                                                </button>
+                                            </th>
+                                            <th scope="col" th:text="#{file.uploaded}"></th>
+                                            <th scope="col"></th>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+                                        <tr th:each="fileName, row : ${tour.fileNames}">
+                                            <th scope="row" th:text="${row.index + 1}"></th>
+                                            <td>
+                                                <input readonly th:value="${fileName}"
+                                                       th:field="${tour.fileNames[__${row.index}__]}">
+                                            </td>
+                                            <td>
+                                                <div class="btn-group" role="group"
+                                                     aria-label="Tour entries management buttons">
+                                                    <a class="btn btn-sm btn-outline-success tourDownloadFileBtn"
+                                                       th:data-tour-id="${tour.id}"
+                                                       th:data-tour-file-name="${fileName}"
+                                                       th:title="#{file.download}"
+                                                       th:href="@{/tour/{id}/file/{name}(id=${tour.id},name=${fileName})}"
+                                                       th:attr="download=${fileName}">
+                                                        <i class="fas fa-download"></i>
+                                                    </a>
+
+                                                    <button type="button"
+                                                            class="btn btn-sm btn-outline-danger tourDeleteFileBtn"
+                                                            th:data-tour-file-name="${fileName}"
+                                                            th:title="#{file.delete}">
+                                                        <i class="fas fa-trash-alt"></i>
+                                                    </button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row form-group btn-group-row" th:fragment="tourFormButtonsRowFragment">
+                        <div class="col-sm-2"></div>
+                        <div class="col">
+                            <button type="submit" class="btn btn-outline-success btn-block">
+                                <i class="fas fa-check-square"></i>
+                                <span th:text="#{submit.cap}"></span>
+                            </button>
+                        </div>
+                        <div class="col">
+                            <button type="button" class="btn btn-outline-secondary btn-block" data-toggle="collapse"
+                                    href="#tourFormContainer"
+                                    aria-expanded="true" aria-controls="tourFormContainer">
+                                <i class="fas fa-window-close"></i>
+                                <span th:text="#{close.cap}"></span>
+                            </button>
+                        </div>
+                        <div class="col">
+                            <button class="btn btn-outline-warning btn-block" id="resetTourFormBtn"
+                                    type="button"
+                                    th:title="#{clear.title}">
+                                <i class="fas fa-eraser"></i>
+                                <span th:text="#{clear.cap} + #{form}"></span>
+                            </button>
+                        </div>
+                    </div>
+
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!--    filter form-->
+    <div th:class="${showTourForm != null and showTourForm ? 'collapse show' : 'collapse'}" id="tourFilterDiv">
+        <div class="card">
+            <div class="card-body">
+                <form th:object="${tableFilter}" id="tableFilterForm">
+                    <input type="hidden" name="fragment" th:value="${true}">
+                        <div class="form-row align-items-end">
+                            <th:block th:fragment="filterFormContentFragment">
+                                <div class="form-group col-sm-2">
+                                    <label for="filterStartDate" th:text="#{start.cap} + #{date}"></label>
+                                    <input type="text" required
+                                           class="form-control date-picker date-picker-single date-picker-single-tour-filter-form"
+                                           id="filterStartDate"
+                                           th:field="*{startDate}" name="startDate">
+                                </div>
+                                <div class="form-group col-sm-2">
+                                    <label for="filterEndDate" th:text="#{end.cap} + #{date}"></label>
+                                    <input type="text" required
+                                           class="form-control date-picker date-picker-single date-picker-single-tour-filter-form"
+                                           id="filterEndDate"
+                                           th:field="*{endDate}" name="endDate">
+                                </div>
+                                <div class="form-group col">
+                                    <label for="filterTourSelect" th:text="#{tour.cap}"></label>
+                                    <select id="filterTourSelect" class="form-control selectpicker tourSelect tour-select-multiple"
+                                            th:field="*{tourIds}" multiple data-show-subtext="true" data-actions-box="true"
+                                            data-live-search="true" data-selected-text-format="count > 1"
+                                            name="tourIds">
+                                        <option th:each="tour : ${tours}"
+                                                th:value="${tour.id}"
+                                                th:text="${tour.id + '. ' + tour.name}"
+                                                th:data-subtext="${tour.dateTimeRange}"
+                                                th:selected="${tableFilter.tourIds.contains(tour.id)}">
+                                        </option>
+                                    </select>
+                                </div>
+                            </th:block>
+                            <div class="form-group col-sm-2">
+                                <button id="submitFilterBtn" type="button" class="btn btn-outline-success btn-block"
+                                        th:text="#{show.cap} + #{tour.pl}"></button>
+                            </div>
+                        </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!--    tours table -->
+    <div>
+        <div class="card">
+            <div class="card-header">
+                <div class="d-flex">
+                    <div class="mr-auto p-0">
+                        <span th:text="#{tour.cap.pl} + ' ' + #{table}"></span>
+                        <div class="btn-group mr-2" role="group" aria-label="First group">
+                            <a class="nav-link" href="#tourFilterDiv"
+                               data-toggle="collapse" data-target="#tourFilterDiv"
+                               aria-expanded="false" aria-controls="tourFilterDiv">
+                                <i class="fas fa-filter"></i>
+                                <span th:text="#{filter.cap.pl}"></span>
+                            </a>
+                        </div>
+                    </div>
+                    <div class="p-0">
+                        <button type="button" class="btn btn-sm btn-outline-danger tourDeleteBtn"
+                                th:title="#{delete.title}">
+                            <i class="fas fa-trash-alt"></i>
+                            <span class="selectedToursCountSpan">Delete</span>
+                        </button>
+                    </div>
+                    <div class="p-0">
+                        <button type="button" class="btn btn-sm btn-outline-primary tourDeselectAllBtn">
+                            <i class="fa-regular fa-square"></i>
+                            <span>Deselect all</span>
+                        </button>
+                    </div>
+                    <div class="p-0">
+                        <button type="button" class="btn btn-sm btn-outline-primary tourSelectAllBtn">
+                            <i class="fa-solid fa-square-check"></i>
+                            <span>Select all</span>
+                        </button>
+                    </div>
+                    <div class="p-0">
+                        <button type="button" class="btn btn-sm btn-outline-primary tableExpandCollapseAllBtn">
+                            <i class="fa-solid fa-bars-staggered tourExpCollIcon"></i>
+                            <!--                            <i class="fa-solid fa-bars-staggered"></i>-->
+                            <span class="tableExpandCollapseAllSpan">Expand all</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div id="toursTableDiv" class="card-body">
+                <table id="toursTable" class="display compact cell-border hover stripe"
+                       th:fragment="tableFragment">
+                    <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th th:text="#{name.cap}"></th>
+                        <th th:text="#{start.cap} + #{date}"></th>
+                        <th th:text="#{end.cap} + #{date}"></th>
+                        <th th:text="#{duration.cap}"></th>
+                        <th th:text="#{created-by}"></th>
+                        <th th:text="#{create-date}"></th>
+                        <th th:text="#{updated-by}"></th>
+                        <th th:text="#{update-date}"></th>
+                        <!--    <th th:text="#{description.cap}"></th>-->
+                        <th></th>
+                    </tr>
+                    </thead>
+                    <tfoot>
+                    <tr>
+                        <th>ID</th>
+                        <th th:text="#{name.cap}"></th>
+                        <th th:text="#{start.cap} + #{date}"></th>
+                        <th th:text="#{end.cap} + #{date}"></th>
+                        <th th:text="#{duration.cap}"></th>
+                        <th th:text="#{created-by}"></th>
+                        <th th:text="#{create-date}"></th>
+                        <th th:text="#{updated-by}"></th>
+                        <th th:text="#{update-date}"></th>
+                        <!--    <th th:text="#{description.cap}"></th>-->
+                        <th></th>
+                    </tr>
+                    </tfoot>
+                    <tbody>
+
+                    <tr th:each="tour, row : ${tours}" class="parent-row" th:id="${tour.id}"
+                        th:data-tour-id="${tour.id}">
+                        <td><span th:text="${tour.id}" class="text-end"></span></td>
+                        <td><span th:text="${tour.name}"></span></td>
+                        <td><span th:text="${tour.dateTimeRange.getStartDateAsString()}"></span></td>
+                        <td><span th:text="${tour.dateTimeRange.getEndDateAsString()}"></span></td>
+                        <td><span th:text="${tour.dateTimeRange.getDurationAsString()}"></span></td>
+                        <td><span th:text="${tour.createdBy}"></span></td>
+                        <td><span th:text="${tour.getCreateDateAsString()}"></span></td>
+                        <td><span th:text="${tour.lastUpdatedBy}"></span></td>
+                        <td><span th:text="${tour.getUpdateDateAsString()}"></span></td>
+                        <!--    <td th:title="${tour.description}"><span th:text="${tour.description}"></span></td>-->
+                        <td>
+                            <div class="d-flex flex-row align-items-center">
+                                <div class="pr-1 pl-1">
+                                    <a href="#" class="tourEditBtn" th:data-tour-id="${tour.id}"
+                                       th:title="#{edit.title}">
+                                        <i class="far fa-edit"></i>
+                                    </a>
+                                </div>
+                                <div class="pr-1 pl-1">
+                                    <div class="form-check">
+                                        <input class="form-check-input tourDeleteCheckBox" type="checkbox" value=""
+                                               th:data-tour-id="${tour.id}">
+                                    </div>
+                                </div>
+                                <div class="pr-1 pl-1">
+                                    <a href="#" class="expandCollapseRowToggle" th:data-tour-id="${tour.id}">
+                                        <i class="fa-solid fa-bars-staggered"></i>
+                                    </a>
+                                </div>
+                            </div>
+                        </td>
+                        <div class="row child-row" th:data-parent-id="${tour.id}" th:data-tour-id="${tour.id}"
+                             style="display: none">
+                            <div class="col-1"></div>
+                            <div class="col">
+                                <div class="input-group input-group-sm mb-1 mt-1">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text" id="inputGroup-sizing-sm"><span
+                                                th:text="#{description.cap} + ': '" class="fw-bolder"></span></span>
+                                    </div>
+                                    <input readonly type="text" class="form-control" aria-label="Small"
+                                           aria-describedby="inputGroup-sizing-sm" th:value="${tour.description}">
+                                </div>
+                            </div>
+                        </div>
+                    </tr>
+
+                    </tbody>
+                </table>
+            </div>
+            <div class="card-footer text-muted">
+                <div class="d-flex">
+                    <div class="mr-auto p-0">
+                        <span th:text="#{tour.cap.pl} + ' ' + #{table}"></span>
+                    </div>
+                    <div class="p-0">
+                        <button type="button" class="btn btn-sm btn-outline-danger tourDeleteBtn"
+                                th:title="#{delete.title}">
+                            <i class="fas fa-trash-alt"></i>
+                            <span class="selectedToursCountSpan">Delete</span>
+                        </button>
+                    </div>
+                    <div class="p-0">
+                        <button type="button" class="btn btn-sm btn-outline-primary tourDeselectAllBtn">
+                            <i class="fa-regular fa-square"></i>
+                            <span>Deselect all</span>
+                        </button>
+                    </div>
+                    <div class="p-0">
+                        <button type="button" class="btn btn-sm btn-outline-primary tourSelectAllBtn">
+                            <i class="fa-solid fa-square-check"></i>
+                            <span>Select all</span>
+                        </button>
+                    </div>
+                    <div class="p-0">
+                        <button type="button" class="btn btn-sm btn-outline-primary tableExpandCollapseAllBtn">
+                            <i class="fa-solid fa-bars-staggered"></i>
+                            <span class="tableExpandCollapseAllSpan">Expand all</span>
+                        </button>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -91,7 +424,356 @@
 
     <script th:src="@{/webjars/bootstrap-select/dist/js/bootstrap-select.js}"></script>
 
-    <script type="module" th:src="@{/js/tourPage.js}"></script>
+    <script th:src="@{/js/datatablesUtil.js}"></script>
+
+    <script type="module" th:inline="javascript">
+        const ctx = $("meta[name='ctxPath']").attr("content");
+
+        import {FragmentSubject} from "../picasso/js/Observer.js";
+        import * as ajaxUtil from "../picasso/js/AjaxUtil.js";
+
+        const mainUrl = $("meta[name='mainUrl']").attr("content");
+
+        const userLocale = $("meta[name='userLocale']").attr('content');
+
+        const dateRangePickerDateFormat = $("meta[name='dateRangePickerDateFormat']").attr('content');
+
+        const toursTableFragmentSubject = new FragmentSubject()
+            .subscribe(initEditTourButtons)
+            .subscribe(initTourTableCheckBoxes)
+            .subscribe(initTableRowExpand)
+        ;
+
+        const tourFormFragmentSubject = new FragmentSubject()
+            .subscribe(initSingleDatePickers) // reinitialize tour form date pickers
+        // .subscribe(initTourFormButtons); // reinitialize tour form buttons
+
+        const tourFormFilesFragmentSubject = new FragmentSubject()
+            .subscribe(initTourFormButtons);
+
+        let toursTable;
+
+        let selectedToursArray = [];
+
+        // page load initialization
+        moment.locale(userLocale); // to fix different locale issue in date-range picker
+
+        $.fn.dataTable.moment(dateRangePickerDateFormat, userLocale); // to fix sort by date columns
+
+        toursTable = initTable($('#toursTable'));
+
+        console.debug('dataTables initialized');
+
+        $('.tourDeleteBtn').hide();
+
+        $(document).ready(function () {
+
+            $('#toursTable').on('length.dt', function (e, settings, len) {
+                console.log('New page length: ' + len);
+                ajaxUtil.put(mainUrl + '/tour/table/len/' + len)
+                    .catch((error) => {
+                        console.error(error.responseJSON.message);
+                    });
+            });
+
+            $('#submitFilterBtn').on('click', function (e) {
+                e.stopImmediatePropagation();
+                e.preventDefault();
+                let btn = $(this);
+
+                let submitUrl = mainUrl + '/tour';
+
+                let formData = $('#tableFilterForm').serialize();
+
+                btn.prop('disabled', true);
+
+                ajaxUtil.get(submitUrl, formData)
+                    .then((toursTableHTMLFragment) => {
+                        console.debug('initialize datatables after filter submit');
+                        let table = $('#toursTable');
+                        table.DataTable().destroy();
+                        table.html(toursTableHTMLFragment);
+                        toursTable = initTable(table).draw();
+                        console.debug('tours table DOM structure changed. Notify observers');
+
+                        toursTableFragmentSubject.notifyObservers();
+                    })
+                    .catch((error) => {
+                        console.error('unable to filter tours %s', error);
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'unable to filter tours'
+                        });
+                    })
+                    .finally(btn.prop('disabled', false));
+            });
+            console.debug('tours filter submit button initialized');
+
+            // initSingleDatePickers();
+            // initTourFormButtons();
+
+            $('.tableExpandCollapseAllBtn').click(function (e) {
+                e.stopImmediatePropagation();
+                e.preventDefault();
+
+                $('a.expandCollapseRowToggle').each(function (i) {
+                    let btn = $(this);
+                    let tr = btn.closest('tr');
+                    toggleExpandCollapseRow($(tr[0]), toursTable);
+                    $(this).find('[data-fa-i2svg]')
+                        .toggleClass('fa-bars-staggered')
+                        .toggleClass('fa-bars');
+                });
+
+                let span = $(this).find('span.tableExpandCollapseAllSpan');
+
+                if ($(span).text() === 'Expand all') {
+                    $('.tableExpandCollapseAllSpan').text('Collapse all');
+                } else if ($(span).text() === 'Collapse all') {
+                    $('.tableExpandCollapseAllSpan').text('Expand all');
+                }
+
+                $(this).find('[data-fa-i2svg]')
+                    .toggleClass('fa-bars-staggered')
+                    .toggleClass('fa-bars');
+            });
+
+            $('.tourSelectAllBtn').click(function (e) {
+
+                e.stopImmediatePropagation();
+                e.preventDefault();
+
+                // $('.tourParticipantDeleteCheckBox').attr('checked', 'checked');
+
+                $('.tourDeleteCheckBox').each(function (idx) {
+
+                    let tourId = $(this).attr('data-tour-id');
+
+                    $(this).prop("checked", true);
+                    selectedToursArray[idx] = tourId;
+                });
+                $('.selectedToursCountSpan').text('Delete (' + selectedToursArray.length + ') items');
+                $('.tourDeleteBtn').show();
+                console.log('selectedToursArray ' + selectedToursArray)
+            });
+
+            $('.tourDeselectAllBtn').click(function (e) {
+
+                e.stopImmediatePropagation();
+                e.preventDefault();
+
+                $('.tourDeleteCheckBox').prop('checked', false);
+
+                selectedToursArray = [];
+
+                $('.selectedToursCountSpan').text('Delete (' + selectedToursArray.length + ') items');
+                $('.tourDeleteBtn').hide();
+
+                console.log('selectedTourParticipantsArray ' + selectedToursArray)
+            });
+
+            $('.tourDeleteBtn').click(function (event) {
+
+                event.stopImmediatePropagation();
+                event.preventDefault();
+
+                Swal.fire({
+                    title: 'Are you sure?',
+                    text: "You won't be able to revert this!",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#3085d6',
+                    cancelButtonColor: '#d33',
+                    confirmButtonText: 'Yes, delete it!'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        let url = mainUrl + '/api/tour/' + selectedToursArray;
+
+                        ajaxUtil.del(url)
+                            .then(() => {
+                                for (let i = 0; i < selectedToursArray.length; i++) {
+                                    toursTable.row('#' + selectedToursArray[i]).remove();
+                                }
+                                toursTable.draw();
+                                $('.tourDeleteBtn').hide();
+                                console.log('deleted tour participants %s', selectedToursArray)
+                                Swal.fire({
+                                    toast: true,
+                                    position: 'top-end',
+                                    icon: 'success',
+                                    title: 'Tours ' + selectedToursArray + ' successfully deleted',
+                                    showConfirmButton: false,
+                                    timer: DEFAULT_TOAST_TIME_OUT
+                                });
+                            })
+                            .catch((error) => {
+                                console.error('unable to delete tours %s %s', selectedToursArray, error);
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'unable to delete tours'
+                                });
+                            });
+                    }
+                });
+            });
+
+            toursTableFragmentSubject.notifyObservers();
+            tourFormFragmentSubject.notifyObservers();
+            tourFormFilesFragmentSubject.notifyObservers();
+        });
+
+        function initTable(table) {
+            return $(table).DataTable({
+                "drawCallback": function (settings) {
+                    console.debug('datatables draw callback fired');
+                    toursTableFragmentSubject.notifyObservers(); // to fix edit/delete tour buttons when search in tours table
+                },
+                paging: true,
+                searching: true,
+                ordering: true,
+                fixedHeader: true,
+                pageLength: [[${tablePageSize}]]
+            });
+        }
+
+        function initTourTableCheckBoxes() {
+            $('.tourDeleteCheckBox').change(function (e) {
+                e.stopImmediatePropagation();
+                e.preventDefault();
+                let tourId = $(this).attr('data-tour-id');
+
+                if ($(this).is(':checked')) {
+                    let length = selectedToursArray.length;
+
+                    selectedToursArray[length] = tourId;
+                } else {
+                    selectedToursArray = jQuery.grep(selectedToursArray, function (value) {
+                        return value !== tourId;
+                    });
+                }
+
+                if (selectedToursArray.length === 0) {
+                    $('.tourDeleteBtn').hide();
+                } else {
+                    $('.tourDeleteBtn').show();
+                    $('.selectedToursCountSpan').text('Delete (' + selectedToursArray.length + ') items');
+                }
+                console.log('selectedToursArray ' + selectedToursArray);
+            });
+        }
+
+        function initTableRowExpand() {
+            $('#toursTable tbody').on('click', 'a.expandCollapseRowToggle', function (e) {
+
+                // e.stopImmediatePropagation();
+                // e.preventDefault();
+
+                let btn = $(this);
+                let tr = btn.closest('tr');
+
+                toggleExpandCollapseRow($(tr[0]), toursTable);
+
+                $(this).find('[data-fa-i2svg]')
+                    .toggleClass('fa-bars-staggered')
+                    .toggleClass('fa-bars');
+            });
+        }
+
+        function initEditTourButtons() {
+            console.debug('initEditTourButtons initialize tours table buttons (edit/delete)');
+            $('.tourEditBtn').on('click', function (e) {
+                e.preventDefault();
+                let btn = $(this);
+                btn.prop('disabled', true);
+
+                let tourId = btn.attr('data-tour-id');
+
+                let url = mainUrl + '/tour/' + tourId;
+
+                ajaxUtil.get(url)
+                    .then((tourFormHTML) => {
+                        $('#formContentFragment').html(tourFormHTML);
+                        console.debug('after get tour form');
+                        tourFormFragmentSubject.notifyObservers();
+                        $('#tourFormContainer').collapse('show');
+                    })
+                    .catch((error) => {
+                        console.error('unable to load tour form HTML for tour %d %s', tourId, error);
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'unable to open tour form'
+                        });
+                    })
+                    .finally(btn.prop('disabled', false));
+            });
+        }
+
+        function initSingleDatePickers() {
+            console.debug('initSingleDatePickers initialize tour form date pickers');
+            $('.date-picker-single').daterangepicker({
+                singleDatePicker: true,
+                showDropdowns: true,
+                timePicker: true,
+                timePicker24Hour: true,
+                timePickerIncrement: 5,
+                autoApply: true,
+                autoUpdateInput: true,
+                locale: {
+                    format: dateRangePickerDateFormat,
+                }
+            });
+        }
+
+        function initTourFormButtons() {
+            console.debug('initTourFormButtons initialize tour form buttons (delete files/clear form)');
+            $('.tourDeleteFileBtn').on('click', function (e) {
+                e.preventDefault();
+                let btn = $(this);
+                btn.prop('disabled', true);
+
+                let fileName = $(btn).attr('data-tour-file-name');
+                let url = mainUrl + '/tour/file/' + fileName;
+                let tourFormData = $('#tourForm').serialize();
+
+                ajaxUtil.del(url, tourFormData)
+                    .then((tourFormFilesTableHtml) => {
+                        $('#uploadedFilesTable').html(tourFormFilesTableHtml);
+                        tourFormFilesFragmentSubject.notifyObservers();
+                    }).catch((error) => {
+                    console.error('unable to delete file %s %s', fileName, error);
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'unable to delete tour file'
+                    });
+                }).finally(btn.prop('disabled', false));
+            });
+
+            $('#resetTourFormBtn').on('click', function (e) {
+                e.preventDefault();
+                let btn = $(this);
+
+                $(btn).prop('disabled', true);
+
+                let url = mainUrl + '/tour/-1';
+
+                ajaxUtil.get(url)
+                    .then((tourFormHTML) => {
+                        $('#formContentFragment').html(tourFormHTML);
+                        console.debug('tour form DOM structure changed. Notify observers');
+                        tourFormFragmentSubject.notifyObservers();
+                    })
+                    .catch((error) => {
+                        console.error('unable to clear and load tour form HTML %s', error);
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'unable to clear tour form'
+                        });
+                    })
+                    .finally(btn.prop('disabled', false));
+            });
+        }
+    </script>
+    <!--    <script type="module" th:src="@{/js/tourPage.js}"></script>-->
 </div>
 </body>
 </html>

@@ -12,28 +12,33 @@ import org.novinomad.picasso.domain.dto.permissions.VisJsDataSet;
 import org.novinomad.picasso.domain.erm.entities.auth.IPermission;
 import org.novinomad.picasso.domain.erm.entities.auth.Permission;
 import org.novinomad.picasso.repositories.jpa.PermissionRepository;
+import org.novinomad.picasso.services.AbstractCrudCacheService;
 import org.slf4j.event.Level;
 import org.springframework.context.annotation.DependsOn;
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
+import javax.transaction.Transactional;
 import java.util.*;
 
 @Service
 @Slf4j
-@RequiredArgsConstructor
 @DependsOn("springContextUtil")
-public class PermissionServiceImpl implements PermissionService {
+public class PermissionServiceImpl extends AbstractCrudCacheService<Long, Permission> implements PermissionService {
 
     private final PermissionRepository permissionRepository;
+
+    protected PermissionServiceImpl(PermissionRepository permissionRepository) {
+        super(permissionRepository);
+        this.permissionRepository = permissionRepository;
+    }
 
     @PostConstruct
     void buildBasePermissionGraph() {
 
         Permission rootPermission = permissionRepository.findByName(ROOT_PERMISSION_NAME)
-                .orElse(permissionRepository.save(new Permission(ROOT_PERMISSION_NAME, "allowed to do everything in the system")));
-
-        log.info("ROOT permission initialized {}", rootPermission);
+                .orElseGet(() -> save(new Permission(ROOT_PERMISSION_NAME, "allowed to do everything in the system")));
 
         if(rootPermission.getChildren().isEmpty()) {
 
@@ -143,36 +148,15 @@ public class PermissionServiceImpl implements PermissionService {
 //                                    .addChild("delete permissions", "allowed to delete permissions")
 //                    );
         }
+
+        log.info("ROOT permission initialized {}", rootPermission);
     }
 
     @Override
-    public Permission save(Permission permission) {
-        return permissionRepository.save(permission);
-    }
-
-    @Override
-    public void deleteById(Long permissionId) {
-        permissionRepository.deleteById(permissionId);
-    }
-
-    @Override
-    public List<Permission> getById(Collection<Long> permissionIds) {
-        return permissionRepository.findAllById(permissionIds);
-    }
-
-    @Override
-    public List<Permission> get() {
-        return permissionRepository.findAll();
-    }
-
-    @Override
-    public Optional<Permission> getById(Long permissionId) {
-        return permissionRepository.findById(permissionId);
-    }
-
-    @Override
+    @Transactional
     public Optional<Permission> get(String permissionName) {
-        return permissionRepository.findByName(permissionName);
+        return CACHE.asMap().values().parallelStream()
+                .filter(p -> permissionName.equalsIgnoreCase(p.getName())).findAny();
     }
 
 

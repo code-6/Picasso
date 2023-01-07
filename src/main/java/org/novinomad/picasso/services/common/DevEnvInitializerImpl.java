@@ -89,19 +89,19 @@ public class DevEnvInitializerImpl implements DevEnvInitializer {
                 try {
                     tourParticipants = createTourParticipants();
                 } catch (Exception e) {
-                    log.error("unable to create tour participants");
+                    log.error("unable to create tour participants because {}", e.getMessage(), e);
                 }
                 List<Tour> tours = null;
                 try {
                     tours = createTours();
                 } catch (Exception e) {
-                    log.error("unable to create tours");
+                    log.error("unable to create tours because {}", e.getMessage(), e);
                 }
                 if(!CollectionUtils.isEmpty(tourParticipants) && !CollectionUtils.isEmpty(tours)) {
                     try {
                         createTourBindings(tours, tourParticipants);
                     } catch (Exception e) {
-                        log.error("unable to create bindings");
+                        log.error("unable to create bindings because {}", e.getMessage(), e);
                     }
                 }
                 try {

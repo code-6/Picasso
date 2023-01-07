@@ -8,8 +8,10 @@ import org.novinomad.picasso.commons.exceptions.base.CommonException;
 import org.springframework.core.io.Resource;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.transaction.Transactional;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.Collection;
 import java.util.List;
 
 public interface TourService extends Crud<Long, Tour> {
@@ -22,4 +24,9 @@ public interface TourService extends Crud<Long, Tour> {
     void deleteTourFile(Tour tour, String fileName) throws StorageException;
 
     Resource getTourFile(Long tourId, String fileName) throws FileNotFoundException, StorageException;
+
+    void deleteSoft(Long id);
+
+    @Transactional
+    void deleteSoft(Collection<Long> ids);
 }

@@ -8,7 +8,6 @@ import org.novinomad.picasso.aop.annotations.logging.LogIgnore;
 import org.novinomad.picasso.aop.annotations.logging.Loggable;
 import org.novinomad.picasso.domain.erm.entities.tour.Tour;
 import org.novinomad.picasso.domain.dto.tour.filters.TourFilter;
-import org.novinomad.picasso.commons.exceptions.base.CommonException;
 import org.novinomad.picasso.services.tour.TourService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
@@ -19,70 +18,86 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.ModelAndView;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.io.FileNotFoundException;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
 
 @Slf4j
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @RequiredArgsConstructor
 @Controller
 @RequestMapping("/tour")
+@Loggable
+@SessionAttributes(value = {"tablePageSize", "tableFilter"})
 public class TourController {
     final TourService tourService;
 
     static final String TOUR_PAGE = "tour/tourPage";
 
-    @Value("${app.tour-files-folder}")
-    private String tourFolder;
+    @Value("${app.default-table-page-size}")
+    Integer tablePageSize;
 
-    @ModelAttribute("allTours")
-    public List<Tour> getAllTours() {
-        return tourService.get();
+    @LogIgnore
+    @ModelAttribute("tableFilter")
+    public TourFilter tableFilter() {
+        return new TourFilter();
+    }
+
+    @ModelAttribute("tablePageSize")
+    public Integer tablePageSize() {
+        return tablePageSize;
     }
 
     @GetMapping("/{tourId}")
-    public String getTourFormFragment(@PathVariable Long tourId, Model model) {
+    public ModelAndView getTourFormFragment(@PathVariable Long tourId) {
+        ModelAndView modelAndView = new ModelAndView("tour/tourPage :: formContentFragment");
         if(tourId != null) {
             tourService.getById(tourId)
-                    .ifPresentOrElse(tour -> model.addAttribute("tour", tour),
-                            () -> model.addAttribute("tour", new Tour()));
+                    .ifPresentOrElse(tour -> modelAndView.addObject("tour", tour),
+                            () -> modelAndView.addObject("tour", new Tour()));
         }
-        return "tour/tourForm :: tourForm";
+        return modelAndView;
     }
 
     @DeleteMapping
     public String deleteTour(Long tourId) {
         tourService.deleteById(tourId);
-        return "tour/toursTable :: toursTable";
+        return "tour/tourPage :: tableFragment";
     }
 
     @GetMapping
-    public String list(@ModelAttribute("tourFilter") TourFilter tourFilter, Boolean fragment, Model model) {
+    public ModelAndView showToursPage(@ModelAttribute("tableFilter") TourFilter tourFilter, Boolean fragment) {
 
         if(fragment == null) fragment = false;
 
-        tourFilter = Optional.ofNullable(tourFilter).orElse(new TourFilter());
+        ModelAndView modelAndView = new ModelAndView( fragment ? "tour/tourPage :: tableFragment" : TOUR_PAGE);
 
-        model.addAttribute("tour", new Tour());
-        model.addAttribute("tours", tourService.get(tourFilter));
-        model.addAttribute("tourFilter", tourFilter);
-
-        return fragment ? "tour/toursTable :: toursTable" : TOUR_PAGE;
+        modelAndView.addObject("tour", new Tour());
+        try {
+            List<Tour> tours = tourService.get(tourFilter);
+            modelAndView.addObject("tours", tours);
+        } catch (Exception e) {
+            modelAndView.addObject("exception", "unable to load tours because " + e.getMessage());
+        }
+        return modelAndView;
     }
 
     @PostMapping
-    public String save(Tour tour, @RequestParam("tourFiles") MultipartFile[] tourFiles, Model model) {
-
+    public ModelAndView save(Tour tour,
+                             @RequestParam("tourFiles") MultipartFile[] tourFiles,
+                             RedirectAttributes redirectAttributes) {
         try {
-            tourService.save(tour, Arrays.asList(tourFiles));
-        } catch (CommonException e) {
-            model.addAttribute("exception", e.getMessage());
+            Tour save = tourService.save(tour, Arrays.asList(tourFiles));
+            redirectAttributes.addFlashAttribute("success", "Tour successfully saved. ID = " + save.getId());
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("showTourForm", true);
+            redirectAttributes.addFlashAttribute("tour", tour);
+            redirectAttributes.addFlashAttribute("exception", "Failed to save tour because " + e.getMessage());
         }
-
-        return "redirect:/tour";
+        return new ModelAndView("redirect:/tour");
     }
 
     @GetMapping("/{tourId}/file/{fileName}")
@@ -104,12 +119,19 @@ public class TourController {
     }
 
     @DeleteMapping("/file/{fileName}")
-    public String deleteTourFile(Tour tour,
-                                 @PathVariable("fileName") String fileName,
-                                 Model model) {
-        tour.deleteFile(fileName);
-        model.addAttribute(tour);
+    public ModelAndView deleteTourFile(Tour tour,
+                                 @PathVariable("fileName") String fileName) {
+        ModelAndView modelAndView = new ModelAndView("tour/tourPage :: tourUploadedFilesFragment");
 
-        return "tour/tourFilesFragment :: tourFilesFragment";
+        tour.deleteFile(fileName);
+        modelAndView.addObject(tour);
+
+        return modelAndView;
+    }
+
+    @PutMapping("/table/len/{tablePageSize}")
+    @ResponseStatus(value = HttpStatus.OK)
+    public void changeTablePageSize(@PathVariable Integer tablePageSize, Model model) {
+        model.addAttribute("tablePageSize", tablePageSize);
     }
 }

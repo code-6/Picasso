@@ -23,6 +23,7 @@
       <option th:each="tour : ${allTours}"
               th:value="${tour.id}"
               th:text="${tour.id + '. ' + tour.name}"
+              th:data-subtext="${tour.dateTimeRange}"
               th:selected="${tourBindFilter.tourIds.contains(tour.id)}">
       </option>
     </select>

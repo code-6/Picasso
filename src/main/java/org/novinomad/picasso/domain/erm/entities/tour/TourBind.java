@@ -15,6 +15,7 @@ import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Comparator;
 import java.util.Locale;
 import java.util.Objects;
 
@@ -28,12 +29,12 @@ import static org.novinomad.picasso.commons.utils.CommonDateUtils.UI_DATE_TIME_N
 @Table(indexes = {@Index(columnList = "tour_id,tour_participant_id,start_date,end_date", unique = true),
         @Index(columnList = "CREATE_DATE,CREATED_BY,LAST_UPDATE_DATE,LAST_UPDATED_BY", unique = true)
 })
-public class TourBind extends AbstractAuditableEntity {
+public class TourBind extends AbstractAuditableEntity implements Comparable<TourBind> {
 
-    @OneToOne
+    @OneToOne()
     TourParticipant tourParticipant;
 
-    @OneToOne
+    @OneToOne()
     Tour tour;
 
     @Embedded
@@ -120,6 +121,21 @@ public class TourBind extends AbstractAuditableEntity {
 
     public LocalDateTime getEndDate() {
         return dateTimeRange.getEndDate();
+    }
+
+    public void setStartDate(LocalDateTime startDate) {
+        dateTimeRange.setStartDate(startDate);
+    }
+
+    public void setEndDate(LocalDateTime endDate) {
+        dateTimeRange.setEndDate(endDate);
+    }
+
+    @Override
+    public int compareTo(TourBind o) {
+        return Comparator.comparing(TourBind::getStartDate)
+                .thenComparing(TourBind::getEndDate)
+                .compare(this, o);
     }
 
     //endregion
