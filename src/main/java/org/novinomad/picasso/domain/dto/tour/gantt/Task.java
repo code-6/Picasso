@@ -75,6 +75,64 @@ public class Task implements ITask, Comparable<Task> {
     @JsonProperty("pBarText")
     String barText;
 
+    @JsonProperty("tourId")
+    Long tourId;
+
+    public Task tourId(Long tourId) {
+        this.tourId = tourId;
+        return this;
+    }
+
+    @JsonProperty("participantIds")
+    Set<Long> participantIds = new HashSet<>();
+
+    public Task participantId(Long participantId) {
+        participantIds.add(participantId);
+        return this;
+    }
+
+    public Task participantId(TourParticipant tourParticipant) {
+        participantIds.add(tourParticipant.getId());
+        return this;
+    }
+
+    public Task participantIds(List<Long> tourParticipantIds) {
+        this.participantIds.clear();
+        this.participantIds.addAll(tourParticipantIds);
+        return this;
+    }
+
+    public Task participantIds2(List<TourParticipant> tourParticipants) {
+        this.participantIds.clear();
+        this.participantIds.addAll(tourParticipants.stream().map(TourParticipant::getId).collect(Collectors.toSet()));
+        return this;
+    }
+
+    @JsonProperty("bindIds")
+    Set<Long> bindIds = new HashSet<>();
+
+    public Task bindId(Long bindId) {
+        bindIds.add(bindId);
+        return this;
+    }
+
+    public Task bindId(TourBind tourBind) {
+        bindIds.add(tourBind.getId());
+        return this;
+    }
+
+    public Task bindIds(List<Long> bindIds) {
+        this.bindIds.clear();
+        this.bindIds.addAll(bindIds);
+        return this;
+    }
+
+    public Task bindIds2(List<TourBind> bindIds) {
+        this.bindIds.clear();
+        this.bindIds.addAll(bindIds.stream().map(TourBind::getId).collect(Collectors.toSet()));
+        return this;
+    }
+
     @JsonIgnore
     Task parent;
     @JsonIgnore
@@ -115,7 +173,7 @@ public class Task implements ITask, Comparable<Task> {
     public static List<Task> fromBindsWithChildrenInList(List<TourBind> binds) {
         List<Task> tasks = new ArrayList<>();
         deTree(fromBinds(binds), tasks);
-        return new ArrayList<>(tasks);
+        return tasks;
     }
 
     private static void deTree(Collection<Task> tasks, List<Task> container) {
@@ -132,23 +190,47 @@ public class Task implements ITask, Comparable<Task> {
             """;
 
     private static Task build(Tour tour, List<TourBind> binds) {
-        Task ganttTourTask = buildTourTask(tour);
 
-        binds.stream().filter(tb -> tb.getTourParticipant() != null).collect(Collectors.groupingBy(TourBind::getTourParticipant))
+        Task ganttTourTask = buildTourTask(tour).bindIds2(binds);
+
+        binds.stream()
+                .filter(tb -> tb.getTourParticipant() != null)
+                .collect(Collectors.groupingBy(TourBind::getTourParticipant))
                 .forEach((tourParticipant, tourParticipantBinds) -> {
+
+                    ganttTourTask.participantId(tourParticipant);
+
                     if (!CollectionUtils.isEmpty(tourParticipantBinds) && tourParticipantBinds.get(0) != null) {
+
                         TourBind firstBind = tourParticipantBinds.get(0);
+
                         if (tourParticipantBinds.size() > 1) {
+
                             long combinedTaskId = Long.parseLong("838466" + firstBind.getId());
-                            Task tourParticipantCombinedTask = buildTourParticipantTask(ganttTourTask, tourParticipant, combinedTaskId, tour.getDateTimeRange(), Type.COMBINED);
+
+                            Task tourParticipantCombinedTask = buildTourParticipantTask(ganttTourTask, tourParticipant, combinedTaskId, tour.getDateTimeRange(), Type.COMBINED)
+                                    .bindIds2(tourParticipantBinds)
+                                    .tourId(tour.getId())
+                                    .participantId(tourParticipant);
+
                             Task tourParticipantTask = null;
+
                             for (TourBind bind : tourParticipantBinds) {
+
                                 long tourParticipantTaskId = Long.parseLong("66" + bind.getId());
-                                tourParticipantTask = buildTourParticipantTask(tourParticipantCombinedTask, tourParticipant, tourParticipantTaskId, bind.getDateTimeRange(), Type.SINGLE, tourParticipantTask);
+
+                                tourParticipantTask = buildTourParticipantTask(tourParticipantCombinedTask, tourParticipant, tourParticipantTaskId, bind.getDateTimeRange(), Type.SINGLE, tourParticipantTask)
+                                        .bindId(bind)
+                                        .tourId(tour.getId())
+                                        .participantId(tourParticipant.getId());
                             }
                         } else {
                             long tourParticipantTaskId = Long.parseLong("66" + firstBind.getId());
-                            buildTourParticipantTask(ganttTourTask, tourParticipant, tourParticipantTaskId, firstBind.getDateTimeRange(), Type.SINGLE);
+
+                            buildTourParticipantTask(ganttTourTask, tourParticipant, tourParticipantTaskId, firstBind.getDateTimeRange(), Type.SINGLE)
+                                    .bindIds2(tourParticipantBinds)
+                                    .tourId(tour.getId())
+                                    .participantId(tourParticipant.getId());
                         }
                     }
                 });
@@ -161,7 +243,8 @@ public class Task implements ITask, Comparable<Task> {
         Task ganttTourTask = new Task(ganttTourTaskId, tour.getId() + ". " + tour.getName(), tour.getDateTimeRange())
                 .notes(tour.getDescription())
                 .completionPercent(tour.getDateTimeRange().getCompletenessPercent())
-                .type(Task.Type.PARENT);
+                .type(Type.PARENT)
+                .tourId(tour.getId());
 
         if (tour.getDateTimeRange().inPast())
             ganttTourTask.cssClass(Task.CssClass.GREY.getCssName());
@@ -180,7 +263,8 @@ public class Task implements ITask, Comparable<Task> {
         String tourParticipantName = tourParticipant.getName();
 
         Task ganttTourParticipantTask = new Task(taskId, tourParticipantType + " " + tourParticipantId + ". " + tourParticipantName, taskDates)
-                .parent(parentTask).type(type);
+                .parent(parentTask).type(type)
+                .participantId(tourParticipantId);
 
         if (dependencies != null && dependencies.length > 0) {
             ArrayList<Task> dependencyTasks = new ArrayList<>();

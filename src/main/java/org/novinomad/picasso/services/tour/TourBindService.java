@@ -15,6 +15,7 @@ import org.novinomad.picasso.domain.dto.tour.gantt.Task;
 import org.novinomad.picasso.commons.exceptions.BindException;
 import org.novinomad.picasso.commons.exceptions.base.CommonRuntimeException;
 
+import javax.transaction.Transactional;
 import java.util.Collection;
 import java.util.List;
 
@@ -52,4 +53,9 @@ public interface TourBindService extends Crud<Long, TourBind> {
     List<TourBind> get(TourBindFilter tourBindFilter);
 
     List<Task> getForGanttChart(TourBindFilter tourBindFilter);
+
+    void deleteSoft(Long id);
+
+    @Transactional
+    void deleteSoft(Collection<Long> ids);
 }

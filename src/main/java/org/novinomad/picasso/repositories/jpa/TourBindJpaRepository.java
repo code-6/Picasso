@@ -2,9 +2,11 @@ package org.novinomad.picasso.repositories.jpa;
 
 import org.novinomad.picasso.domain.erm.entities.tour.TourBind;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 
 import java.time.LocalDateTime;
+import java.util.Collection;
 import java.util.List;
 
 public interface TourBindJpaRepository extends JpaRepository<TourBind, Long> {
@@ -18,4 +20,12 @@ public interface TourBindJpaRepository extends JpaRepository<TourBind, Long> {
                                        Long tourParticipantId,
                                        LocalDateTime newBindStartDate,
                                        LocalDateTime newBindEndDate);
+
+    @Query("update TourBind set deleted = true where id = :id")
+    @Modifying
+    int softDeleteById(Long id);
+
+    @Query("update TourBind  set deleted = true where id in(:ids)")
+    @Modifying
+    int softDeleteById(Collection<Long> ids);
 }

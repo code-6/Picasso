@@ -14,8 +14,9 @@ import org.novinomad.picasso.services.AbstractCrudCacheService;
 import org.novinomad.picasso.services.tour_participants.TourParticipantService;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Service;
-import org.springframework.util.CollectionUtils;
 
+import javax.transaction.Transactional;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -110,20 +111,12 @@ public class TourBindServiceImpl extends AbstractCrudCacheService<Long, TourBind
     @Override
     public List<TourBind> get(TourBindFilter tourBindFilter) {
         return get().parallelStream()
-                .filter(tourBindFilter.getStartDate() != null
-                        ? t -> t.getStartDate().isAfter(tourBindFilter.getStartDate()) || t.getStartDate().isEqual(tourBindFilter.getStartDate())
-                        : t -> true)
-                .filter(tourBindFilter.getEndDate() != null
-                        ? t -> t.getEndDate().isBefore(tourBindFilter.getEndDate()) || t.getEndDate().isEqual(tourBindFilter.getEndDate())
-                        : t -> true)
-                .filter(!CollectionUtils.isEmpty(tourBindFilter.getTourIds())
-                        ? t -> tourBindFilter.getTourIds().contains(t.getId())
-                        : t -> true)
-                .filter(!CollectionUtils.isEmpty(tourBindFilter.getTourParticipantIds())
-                        ? t -> t.getTourParticipant() == null || tourBindFilter.getTourParticipantIds().contains(t.getTourParticipant().getId())
-                        : t -> true)
-                .filter(tb -> !tb.getDeleted())
-                .sorted()
+                .filter(t -> !t.getDeleted()
+                        && t.getDateTimeRange().between(tourBindFilter.getLocalDateTimeRange())
+                        && (tourBindFilter.getTourIds().isEmpty() || tourBindFilter.getTourIds().contains(t.getId()))
+                        && (tourBindFilter.getTourParticipantIds().isEmpty() || (t.getTourParticipant() != null && t.getTourParticipant().getId() != null && tourBindFilter.getTourParticipantIds().contains(t.getTourParticipant().getId())))
+                )
+//                .sorted()
                 .toList();
 
 //        StringBuilder sql = new StringBuilder("""
@@ -162,6 +155,21 @@ public class TourBindServiceImpl extends AbstractCrudCacheService<Long, TourBind
         if (tourBindFilter == null)
             tourBindFilter = new TourBindFilter();
 
-        return Task.fromBindsWithChildrenInList(get(tourBindFilter));
+        List<TourBind> tourBinds = get(tourBindFilter);
+        return Task.fromBindsWithChildrenInList(tourBinds);
+    }
+
+    @Override
+    @Transactional
+    public void deleteSoft(Long id) {
+        tourBindRepository.softDeleteById(id);
+        CACHE.invalidate(id);
+    }
+
+    @Override
+    @Transactional
+    public void deleteSoft(Collection<Long> ids) {
+        tourBindRepository.softDeleteById(ids);
+        CACHE.invalidateAll(ids);
     }
 }

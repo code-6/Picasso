@@ -3,6 +3,14 @@
         <div class="sb-sidenav-menu">
             <div class="nav">
                 <div class="sb-sidenav-menu-heading">Management</div>
+
+                <a class="nav-link" th:href="@{/bind}">
+                    <div class="sb-nav-link-icon">
+                        <i class="fa-solid fa-chart-gantt"></i>
+                    </div>
+                    <span th:text="#{bind.cap.pl}"></span>
+                </a>
+
                 <a class="nav-link" th:href="@{/tour}">
                     <div class="sb-nav-link-icon"><i class="fa-solid fa-earth-asia"></i></div>
                     <span th:text="#{tour.cap.pl}"></span>
@@ -24,6 +32,8 @@
                         </a>
                     </nav>
                 </div>
+
+                <div class="sb-sidenav-menu-heading">Auth management</div>
 
                 <a class="nav-link" th:href="@{/user}">
                     <div class="sb-nav-link-icon"><i class="fas fa-users"></i></div>

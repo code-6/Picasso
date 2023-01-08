@@ -110,7 +110,7 @@ public class TourServiceImpl extends AbstractCrudCacheService<Long, Tour> implem
 
     @Override
     public List<Tour> get(TourFilter tourFilter) {
-        return get().stream()
+        return get().parallelStream()
                 .filter(t -> !t.getDeleted()
                         && t.getDateTimeRange().between(tourFilter.getLocalDateTimeRange())
                         && (tourFilter.getTourIds().isEmpty() || tourFilter.getTourIds().contains(t.getId())))

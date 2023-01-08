@@ -1,6 +1,7 @@
 package org.novinomad.picasso.controllers.rest.impl;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.novinomad.picasso.aop.annotations.logging.Loggable;
 import org.novinomad.picasso.commons.LocalDateTimeRange;
 import org.novinomad.picasso.commons.exceptions.BindException;
@@ -18,10 +19,13 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 @RequiredArgsConstructor
 @RestController
+@Slf4j
 @RequestMapping("/api/bind")
+@Loggable
 public class TourBindRestController {
 
     final TourParticipantService tourParticipantService;
@@ -41,9 +45,16 @@ public class TourBindRestController {
         return tourBindService.save(tourBind);
     }
 
-    @DeleteMapping("/{id}")
-    public void deleteById(@PathVariable Long id) {
-        tourBindService.deleteById(id);
+    @DeleteMapping("/{ids}")
+    public void deleteByIds(@PathVariable Set<Long> ids) {
+        for (Long id : ids) {
+            try {
+                tourBindService.deleteById(id);
+            } catch (Exception e) {
+                log.warn("unable to delete physically {} because {} items will be soft deleted.", id, e.getMessage());
+                tourBindService.deleteSoft(id);
+            }
+        }
     }
 
     @PostMapping(value = "/gantt-tasks", produces = MediaType.APPLICATION_JSON_VALUE)
