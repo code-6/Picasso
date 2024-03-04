@@ -51,10 +51,14 @@ public class PermissionUtil {
     }
 
     /**
-     * Traverse using Breadth First Search from provided permission until last lower permission.
+     * Traverse using Breadth First Search from provided permission until last permission in a tree.
      *
      * @param permission permission where from to start traverse.
-     * @return visited child permissions including initial permission as map where key is permission id and value is permission name.
+     *
+     * @return visited child permissions including initial permission as a map,
+     *          where key is permission id and value is permission name.
+     *
+     * @implSpec uses iterative approach instead of recursion to prevent an excess performance load.
      */
     public static LinkedHashMap<Long, String> traverseBFS(IPermission permission) {
         Queue<IPermission> permissionQueue = new LinkedList<>();
@@ -77,10 +81,14 @@ public class PermissionUtil {
     }
 
     /**
-     * Traverse using Deep First Search from provided permission until last lower permission.
+     * Traverse using Deep First Search from provided permission until last permission in a tree.
      *
      * @param permission permission where from to start traverse.
-     * @return visited child permissions including initial permission as map where key is permission id and value is permission name.
+     *
+     * @return visited child permissions including initial permission as a map,
+     *          where key is permission id and value is permission name.
+     *
+     * @implSpec uses iterative approach instead of recursion to prevent an excess performance load.
      */
     public static LinkedHashMap<Long, String> traverseDFS(IPermission permission) {
         Stack<IPermission> permissionStack = new Stack<>();
@@ -126,7 +134,13 @@ public class PermissionUtil {
         throw new NotImplementedException();
     }
 
-    public static boolean hasCycle(IPermission permission, Map<String, Boolean> beingVisitedPermissions, Map<String, Boolean> visitedPermissions) {
+    public static boolean hasCycle(IPermission permission) {
+        return hasCycle(permission, null, null);
+    }
+
+    private static boolean hasCycle(IPermission permission,
+                                   Map<String, Boolean> beingVisitedPermissions,
+                                   Map<String, Boolean> visitedPermissions) {
 
         if(beingVisitedPermissions == null) {
             beingVisitedPermissions = new HashMap<>();

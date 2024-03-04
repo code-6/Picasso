@@ -257,14 +257,14 @@
 
     <script type="module" th:inline="javascript">
         // main url stored in head tag of layout.html
-        import {FragmentSubject} from "../js/Observer.js";
+        import {FragmentInitializer} from "../js/Observer.js";
         import * as ajaxUtil from "../js/AjaxUtil.js";
 
         const mainUrl = $("meta[name='mainUrl']").attr("content");
         const userLocale = $("meta[name='userLocale']").attr('content');
         const dateRangePickerDateFormat = $("meta[name='dateRangePickerDateFormat']").attr('content');
 
-        const tourParticipantFormSubject = new FragmentSubject()
+        const tourParticipantFormSubject = new FragmentInitializer()
             .subscribe(initSelect2)
             .subscribe(initAddDriverCarButton)
             .subscribe(initDeleteDriverCarButton)
@@ -272,7 +272,7 @@
             // .subscribe(initFormSubmitButton)
         ;
 
-        const tourParticipantsTableFragmentSubject = new FragmentSubject()
+        const tourParticipantsTableFragmentSubject = new FragmentInitializer()
             .subscribe(initTableParticipantEditButtons)
             .subscribe(initTableParticipantSelectCheckBoxes)
             .subscribe(initTableRowExpand)
@@ -316,7 +316,7 @@
             tourParticipantsTable = $('#tourParticipantsTable').DataTable({
                 "drawCallback": function( settings ) {
                     console.debug('datatables draw callback fired');
-                    tourParticipantsTableFragmentSubject.notifyObservers(); // to fix edit/delete tour buttons when search in tours table
+                    tourParticipantsTableFragmentSubject.initialize() // to fix edit/delete tour buttons when search in tours table
                 },
                 paging: true,
                 searching: true,
@@ -329,8 +329,8 @@
 
             initFormSubmitButton();
 
-            tourParticipantsTableFragmentSubject.notifyObservers();
-            tourParticipantFormSubject.notifyObservers();
+            tourParticipantsTableFragmentSubject.initialize()
+            tourParticipantFormSubject.initialize()
 
             $('.tourParticipantDeleteBtn').hide();
 
@@ -493,7 +493,7 @@
                 ajaxUtil.post(mainUrl + '/tour-participant/driver/add-car', formData)
                     .then((tourParticipantFormContent) => {
                         $('#tourParticipantFormContent').html(tourParticipantFormContent);
-                        tourParticipantFormSubject.notifyObservers();
+                        tourParticipantFormSubject.initialize()
                     }).catch((error) => {
                     console.error('initAddDriverCarButton unable to load tourParticipant/tourParticipantForm :: tourParticipantForm fragment %s', error.responseJSON.message);
                     Swal.fire({
@@ -513,7 +513,7 @@
                 ajaxUtil.post(mainUrl + '/tour-participant/driver/remove-car/' + carRowId, formData)
                     .then((tourParticipantFormContent) => {
                         $('#tourParticipantFormContent').html(tourParticipantFormContent);
-                        tourParticipantFormSubject.notifyObservers();
+                        tourParticipantFormSubject.initialize()
                     })
                     .catch((error) => {
                         Swal.fire({
@@ -541,7 +541,7 @@
             ajaxUtil.get(url)
                 .then((tourParticipantFormContent) => {
                     $('#tourParticipantFormContent').html(tourParticipantFormContent);
-                    tourParticipantFormSubject.notifyObservers();
+                    tourParticipantFormSubject.initialize()
                 })
                 .catch((error) => {
                     console.error('unable to load tour participant form HTML for participant %s %s',tourParticipantType, error);
@@ -568,7 +568,7 @@
                 ajaxUtil.get(url)
                     .then((tourParticipantFormContent) => {
                         $('#tourParticipantFormContent').html(tourParticipantFormContent);
-                        tourParticipantFormSubject.notifyObservers();
+                        tourParticipantFormSubject.initialize()
                         $('#tourParticipantFormContainer').collapse('show');
                     })
                     .catch((error) => {
@@ -647,7 +647,7 @@
                         ajaxUtil.get(url)
                             .then((tourParticipantsTableFragment) => {
                                 $('#tourParticipantsTable').html(tourParticipantsTableFragment);
-                                tourParticipantsTableFragmentSubject.notifyObservers();
+                                tourParticipantsTableFragmentSubject.initialize()
                             })
                             .catch((error) => {
                                 Swal.fire({

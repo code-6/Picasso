@@ -24,8 +24,6 @@ import java.util.Objects;
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @Table(indexes = {
-//        @Index(columnList = "start_date, end_date", name = "tour_date_range_idx"),
-//        @Index(columnList = "name", name = "tour_name_idx"),
         @Index(columnList = "name, start_date, end_date", name = "tour_date_name_idx", unique = true)
 })
 public class Tour extends AbstractAuditableEntity implements ITour, Comparable<Tour> {
@@ -121,6 +119,11 @@ public class Tour extends AbstractAuditableEntity implements ITour, Comparable<T
         return Comparator.comparing(Tour::getStartDate)
                 .thenComparing(Tour::getEndDate)
                 .compare(this, o);
+    }
+
+    @Override
+    public void preDelete() {
+
     }
     //endregion
 

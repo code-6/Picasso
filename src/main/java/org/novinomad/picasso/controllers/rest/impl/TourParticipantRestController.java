@@ -50,12 +50,7 @@ public class TourParticipantRestController {
     @DeleteMapping("/{ids}")
     public void delete(@PathVariable("ids") Collection<Long> ids) throws CommonException {
         for (Long id : ids) {
-            try {
-                tourParticipantService.deleteById(id);
-            } catch (Exception e) {
-                log.warn("unable to delete physically {} because {} items will be soft deleted.", id, e.getMessage());
-                tourParticipantService.deleteSoft(id);
-            }
+            tourParticipantService.deleteById(id);
         }
     }
 

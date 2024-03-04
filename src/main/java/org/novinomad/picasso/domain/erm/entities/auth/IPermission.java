@@ -65,7 +65,7 @@ public interface IPermission extends IdAware<Long>, Comparable<IPermission> {
     }
 
     default boolean hasCycle() {
-        return PermissionUtil.hasCycle(this, null, null);
+        return PermissionUtil.hasCycle(this);
     }
 
     default boolean contains(IPermission permission) {

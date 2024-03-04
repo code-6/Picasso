@@ -13,9 +13,12 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
-public interface TourService extends Crud<Long, Tour> {
+public interface TourService extends Crud<Long, Tour>{
     List<Tour> get(TourFilter tourFilter);
+
+    Map<Long, Tour> getMap();
 
     Tour save(Tour tour, List<MultipartFile> files) throws CommonException;
 
@@ -25,8 +28,4 @@ public interface TourService extends Crud<Long, Tour> {
 
     Resource getTourFile(Long tourId, String fileName) throws FileNotFoundException, StorageException;
 
-    void deleteSoft(Long id);
-
-    @Transactional
-    void deleteSoft(Collection<Long> ids);
 }

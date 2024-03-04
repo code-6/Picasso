@@ -11,56 +11,47 @@ import javax.persistence.*;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
+@Getter
+@Setter
 @MappedSuperclass
 @FieldDefaults(level = AccessLevel.PROTECTED)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
-public abstract class AbstractAuditableEntity extends AbstractEntity {
-    @Getter
-    @Setter
+public abstract class AbstractAuditableEntity extends AbstractEntity implements AuditableEntity {
     @Column(name = "CREATE_DATE")
     @DateTimeFormat(pattern = CommonDateUtils.UI_DATE_TIME)
     LocalDateTime createDate;
 
-    @Getter
-    @Setter
     @Column(name = "CREATED_BY")
     String createdBy;
 
-    @Getter
-    @Setter
     @Column(name = "LAST_UPDATE_DATE")
     @DateTimeFormat(pattern = CommonDateUtils.UI_DATE_TIME)
     LocalDateTime lastUpdateDate;
 
-    @Getter
-    @Setter
     @Column(name = "LAST_UPDATED_BY")
     String lastUpdatedBy;
 
-    @Getter
-    @Setter
-    @Column(nullable = false, name = "DELETED")
-    Boolean deleted = false;
-
     @PrePersist
-    void prePersist() {
-        createDate = LocalDateTime.now();
+    public void prePersist() {
+        if(createDate == null) {
+            createDate = LocalDateTime.now();
+        }
         if(createdBy == null) {
             createdBy = SpringContextUtil.getBean(UserService.class).getCurrentUserName();
         }
     }
 
     @PreUpdate
-    void preUpdate() {
+    public void preUpdate() {
         lastUpdateDate = LocalDateTime.now();
         lastUpdatedBy = SpringContextUtil.getBean(UserService.class).getCurrentUserName();
     }
 
     @PreRemove
-    void preDelete() {
-        preUpdate();
-        deleted = true;
+    @Override
+    public void preDelete() {
+
     }
 
     public String getCreateDateAsString() {

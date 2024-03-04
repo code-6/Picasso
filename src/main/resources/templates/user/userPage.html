@@ -79,18 +79,18 @@
 
     <script type="module" th:inline="javascript">
         // main url stored in head tag of layout.html
-        import {FragmentSubject} from "../picasso/js/Observer.js";
+        import {FragmentInitializer} from "../picasso/js/Observer.js";
         import * as ajaxUtil from "../picasso/js/AjaxUtil.js";
 
         const mainUrl = $("meta[name='mainUrl']").attr("content");
         const userLocale = $("meta[name='userLocale']").attr('content');
         const dateRangePickerDateFormat = $("meta[name='dateRangePickerDateFormat']").attr('content');
 
-        const userFormSubject = new FragmentSubject()
+        const userFormSubject = new FragmentInitializer()
             .subscribe(initResetUserFormButton)
         ;
 
-        const usersTableFragmentSubject = new FragmentSubject()
+        const usersTableFragmentSubject = new FragmentInitializer()
             .subscribe(initTableUserEditTourButtons)
         ;
 
@@ -103,7 +103,7 @@
             $('#usersTable').DataTable({
                 "drawCallback": function( settings ) {
                     console.debug('datatables draw callback fired');
-                    usersTableFragmentSubject.notifyObservers(); // to fix edit/delete tour buttons when search in tours table
+                    usersTableFragmentSubject.initialize() // to fix edit/delete tour buttons when search in tours table
                 },
                 paging: true,
                 searching: true,
@@ -111,8 +111,8 @@
                 fixedHeader: true
             });
 
-            usersTableFragmentSubject.notifyObservers();
-            userFormSubject.notifyObservers();
+            usersTableFragmentSubject.initialize()
+            userFormSubject.initialize()
         });
 
         function initResetUserFormButton() {
@@ -125,7 +125,7 @@
                 ajaxUtil.get(url)
                     .then((userFormHTML) => {
                         $('#userForm').html(userFormHTML);
-                        userFormSubject.notifyObservers();
+                        userFormSubject.initialize()
                     })
                     .catch((error) => {
                         console.error('unable to reset user form HTML %s', error);
@@ -151,7 +151,7 @@
                 ajaxUtil.get(url)
                     .then((userFormHTML) => {
                         $('#userForm').html(userFormHTML);
-                        userFormSubject.notifyObservers();
+                        userFormSubject.initialize()
                         $('#userFormContainer').collapse('show');
                     })
                     .catch((error) => {

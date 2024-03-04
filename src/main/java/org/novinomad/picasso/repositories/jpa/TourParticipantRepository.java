@@ -20,12 +20,4 @@ public interface TourParticipantRepository extends JpaRepository<TourParticipant
 
     @Query("from TourParticipant tp where TYPE(tp) = :entityClass")
     List<TourParticipant> findAllByClass(String entityClass);
-
-    @Query("update TourParticipant set deleted = true where id = :id")
-    @Modifying
-    int softDeleteById(Long id);
-
-    @Query("update TourParticipant set deleted = true where id in(:ids)")
-    @Modifying
-    int softDeleteById(Collection<Long> ids);
 }

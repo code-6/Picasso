@@ -38,7 +38,6 @@ public class TourBindRowMapper implements RowMapper<TourBind> {
         tourBind.setLastUpdateDate(lastUpdateDate != null ? lastUpdateDate.toLocalDateTime() : null);
         tourBind.setCreatedBy(rs.getString("created_by"));
         tourBind.setLastUpdatedBy(rs.getString("last_updated_by"));
-        tourBind.setDeleted(rs.getBoolean("deleted"));
         try {
             tourBind.setTour(tourService.getById(rs.getLong("tour_id")).orElseThrow(NoSuchElementException::new));
             tourBind.setTourParticipant(tourParticipantService.getById(rs.getLong("tour_participant_id")).orElse(null));

@@ -16,10 +16,4 @@ public interface TourParticipantService extends Crud<Long, TourParticipant> {
 
         return get(Arrays.asList(types));
     }
-
-    @Transactional
-    void deleteSoft(Long id);
-
-    @Transactional
-    void deleteSoft(Collection<Long> ids);
 }

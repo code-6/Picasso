@@ -31,21 +31,30 @@ import java.util.List;
 @Controller
 @RequestMapping("/tour")
 @Loggable
-@SessionAttributes(value = {"tablePageSize", "tableFilter"})
+@SessionAttributes(value = {"tablePageSize", "toursTableFilter"})
 public class TourController {
     final TourService tourService;
 
     static final String TOUR_PAGE = "tour/tourPage";
+    static final String FORM_CONTENT_FRAGMENT = TOUR_PAGE + " :: formContentFragment";
+    static final String TABLE_FRAGMENT = TOUR_PAGE + " :: tableFragment";
+    static final String UPLOADED_FILES_FRAGMENT = TOUR_PAGE + " :: tourUploadedFilesFragment";
 
+    /**
+     * Default table page size
+     * */
     @Value("${app.default-table-page-size}")
     Integer tablePageSize;
 
     @LogIgnore
-    @ModelAttribute("tableFilter")
-    public TourFilter tableFilter() {
+    @ModelAttribute("toursTableFilter")
+    public TourFilter toursTableFilter() {
         return new TourFilter();
     }
 
+    /**
+     * Defines how many entries to show in table per page. Moved to session attribute to remember chosen count when user navigates between pages.
+     * */
     @ModelAttribute("tablePageSize")
     public Integer tablePageSize() {
         return tablePageSize;
@@ -53,7 +62,7 @@ public class TourController {
 
     @GetMapping("/{tourId}")
     public ModelAndView getTourFormFragment(@PathVariable Long tourId) {
-        ModelAndView modelAndView = new ModelAndView("tour/tourPage :: formContentFragment");
+        ModelAndView modelAndView = new ModelAndView(FORM_CONTENT_FRAGMENT);
         if(tourId != null) {
             tourService.getById(tourId)
                     .ifPresentOrElse(tour -> modelAndView.addObject("tour", tour),
@@ -65,15 +74,15 @@ public class TourController {
     @DeleteMapping
     public String deleteTour(Long tourId) {
         tourService.deleteById(tourId);
-        return "tour/tourPage :: tableFragment";
+        return TABLE_FRAGMENT;
     }
 
     @GetMapping
-    public ModelAndView showToursPage(@ModelAttribute("tableFilter") TourFilter tourFilter, Boolean fragment) {
+    public ModelAndView showToursPage(@ModelAttribute("toursTableFilter") TourFilter tourFilter, Boolean fragment) {
 
         if(fragment == null) fragment = false;
 
-        ModelAndView modelAndView = new ModelAndView( fragment ? "tour/tourPage :: tableFragment" : TOUR_PAGE);
+        ModelAndView modelAndView = new ModelAndView( fragment ? TABLE_FRAGMENT : TOUR_PAGE);
 
         modelAndView.addObject("tour", new Tour());
         try {
@@ -121,7 +130,7 @@ public class TourController {
     @DeleteMapping("/file/{fileName}")
     public ModelAndView deleteTourFile(Tour tour,
                                  @PathVariable("fileName") String fileName) {
-        ModelAndView modelAndView = new ModelAndView("tour/tourPage :: tourUploadedFilesFragment");
+        ModelAndView modelAndView = new ModelAndView(UPLOADED_FILES_FRAGMENT);
 
         tour.deleteFile(fileName);
         modelAndView.addObject(tour);

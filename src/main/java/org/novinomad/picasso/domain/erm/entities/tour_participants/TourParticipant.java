@@ -5,16 +5,15 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 import org.hibernate.annotations.Nationalized;
-import org.hibernate.annotations.SQLDelete;
-import org.hibernate.annotations.Where;
 import org.novinomad.picasso.domain.dto.tour.gantt.Task;
 import org.novinomad.picasso.domain.erm.entities.AbstractAuditableEntity;
-import org.novinomad.picasso.domain.erm.entities.AbstractEntity;
+import org.novinomad.picasso.domain.erm.entities.tour.TourBind;
+import org.springframework.data.util.Pair;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
-import java.util.Objects;
+import java.util.*;
 
 
 @FieldDefaults(level = AccessLevel.PROTECTED)
@@ -32,7 +31,7 @@ import java.util.Objects;
         @JsonSubTypes.Type(value = Guide.class, name = "GUIDE"),
         @JsonSubTypes.Type(value = Driver.class, name = "DRIVER")
 })
-public class TourParticipant extends AbstractAuditableEntity {
+public class TourParticipant extends AbstractAuditableEntity implements Comparable<TourParticipant> {
 
     @Nationalized
     @Column(nullable = false)
@@ -66,10 +65,20 @@ public class TourParticipant extends AbstractAuditableEntity {
         return Objects.hash(super.hashCode(), name, type);
     }
 
-    @RequiredArgsConstructor
+    @Override
+    public int compareTo(TourParticipant o) {
+        return Comparator.comparing(TourParticipant::getType)
+                .thenComparing(TourParticipant::getName)
+                .compare(this, o);
+    }
+
     public enum Type {
-        DRIVER("fas fa-user-tie", Task.CssClass.PINK, Driver.class, "driver"),
-        GUIDE("fas fa-hiking", Task.CssClass.YELLOW, Guide.class, "guide");
+        DRIVER("fas fa-user-tie", Task.CssClass.PINK, Driver.class, "driver",
+                Pair.of(Locale.US, "Driver"),
+                Pair.of(new Locale("RU"), "Водитель")),
+        GUIDE("fas fa-hiking", Task.CssClass.YELLOW, Guide.class, "guide",
+                Pair.of(Locale.US, "Guide"),
+                Pair.of(new Locale("RU"), "Гид"));
 
         private final String ICON_CSS_CLASS;
 
@@ -77,6 +86,18 @@ public class TourParticipant extends AbstractAuditableEntity {
         private final Class<? extends TourParticipant> TOUR_PARTICIPANT_CLASS;
 
         private final String THYMELEAF_FRAGMENT;
+
+        private final Map<Locale, String> INTERNATIONALIZED_CONSTANT_NAMES = new HashMap<>();
+
+        Type(String ICON_CSS_CLASS, Task.CssClass GANT_TASK_COLOR, Class<? extends TourParticipant> TOUR_PARTICIPANT_CLASS, String THYMELEAF_FRAGMENT, Pair<Locale, String> ... internationalizedNames) {
+            this.ICON_CSS_CLASS = ICON_CSS_CLASS;
+            this.GANT_TASK_COLOR = GANT_TASK_COLOR;
+            this.TOUR_PARTICIPANT_CLASS = TOUR_PARTICIPANT_CLASS;
+            this.THYMELEAF_FRAGMENT = THYMELEAF_FRAGMENT;
+            for (Pair<Locale, String> internationalizedName : internationalizedNames) {
+                INTERNATIONALIZED_CONSTANT_NAMES.put(internationalizedName.getFirst(), internationalizedName.getSecond());
+            }
+        }
 
         public Class<? extends TourParticipant> getTourParticipantClass() {
             return TOUR_PARTICIPANT_CLASS;
@@ -92,6 +113,15 @@ public class TourParticipant extends AbstractAuditableEntity {
 
         public String getThymeleafFragment() {
             return THYMELEAF_FRAGMENT;
+        }
+
+        public Type addInternationalizedName(Locale locale, String name) {
+            INTERNATIONALIZED_CONSTANT_NAMES.put(locale, name);
+            return this;
+        }
+
+        public String getInternationalizedName(Locale locale) {
+            return INTERNATIONALIZED_CONSTANT_NAMES.get(locale);
         }
     }
 }

@@ -189,6 +189,8 @@ public class Task implements ITask, Comparable<Task> {
             <a id="taskId_${id}" class="${entityType}-task" data-type="${entityType}" data-${entityType}-id="${entityId}">${taskName}</a>
             """;
 
+    private static final String SPAN_WITH_ICON_HTML_TEMPLATE = "<span><i class=\"%s\"></i>%s</span>";
+
     private static Task build(Tour tour, List<TourBind> binds) {
 
         Task ganttTourTask = buildTourTask(tour).bindIds2(binds);

@@ -15,7 +15,7 @@
   </div>
 
   <div class="col-md align-items-end">
-    <label for="filterTourSelect" th:text="#{tour.cap}"></label>
+    <label for="filterTourSelect" th:text="#{Tour}"></label>
     <select id="filterTourSelect" class="form-control selectpicker tourSelect"
             th:field="*{tourIds}" multiple
             data-live-search="true" data-selected-text-format="count > 1"
@@ -44,7 +44,7 @@
   </div>
 
   <div class="col-md align-items-end">
-    <label for="filterTourParticipantSelect" th:text="#{tour.participant.cap}"></label>
+    <label for="filterTourParticipantSelect" th:text="#{Tour.participant}"></label>
     <select id="filterTourParticipantSelect" class="form-control selectpicker tourParticipantSelect"
             th:field="*{tourParticipantIds}" name="tourParticipantIds"
             multiple data-live-search="true" data-selected-text-format="count > 2">
@@ -55,7 +55,7 @@
     <button id="submitFilterBtn" type="button"
             title="Press to see filtered tours and tourParticipants"
             class="btn btn-outline-success btn-block form-control"
-            th:text="#{show.cap} + #{tour.pl}">
+            th:text="#{show.cap} + #{tours}">
     </button>
   </div>
 </div>

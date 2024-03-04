@@ -1,8 +1,8 @@
-export function FragmentSubject() {
+export function FragmentInitializer() {
     this.observers = [];
 }
 
-FragmentSubject.prototype = {
+FragmentInitializer.prototype = {
     subscribe: function (fn) {
         this.observers.push(fn);
         return this;
@@ -18,7 +18,7 @@ FragmentSubject.prototype = {
         );
     },
 
-    notifyObservers: function (o, thisObj) {
+    initialize: function (o, thisObj) {
         console.debug('notify observers');
         let scope = thisObj || window;
         this.observers.forEach(function (item) {

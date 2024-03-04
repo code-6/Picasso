@@ -12,17 +12,17 @@ public class CommonDurationUtils extends DurationFormatUtils {
         // This method is generally replaceable by the format method, but
         // there are a series of tweaks and special cases that require
         // trickery to replicate.
-        String duration = formatDuration(durationMillis, "d' days 'H' hours 'm' minutes'");
+        String duration = formatDuration(durationMillis, "d'd 'H'h 'm'm'");
         if (suppressLeadingZeroElements) {
             // this is a temporary marker on the front. Like ^ in regexp.
             duration = " " + duration;
-            String tmp = StringUtils.replaceOnce(duration, " 0 days", StringUtils.EMPTY);
+            String tmp = StringUtils.replaceOnce(duration, " 0 d", StringUtils.EMPTY);
             if (tmp.length() != duration.length()) {
                 duration = tmp;
-                tmp = StringUtils.replaceOnce(duration, " 0 hours", StringUtils.EMPTY);
+                tmp = StringUtils.replaceOnce(duration, " 0 h", StringUtils.EMPTY);
                 if (tmp.length() != duration.length()) {
                     duration = tmp;
-                    tmp = StringUtils.replaceOnce(duration, " 0 minutes", StringUtils.EMPTY);
+                    tmp = StringUtils.replaceOnce(duration, " 0 m", StringUtils.EMPTY);
                     duration = tmp;
 
                 }
@@ -33,20 +33,20 @@ public class CommonDurationUtils extends DurationFormatUtils {
             }
         }
         if (suppressTrailingZeroElements) {
-            String tmp = StringUtils.replaceOnce(duration, " 0 minutes", StringUtils.EMPTY);
+            String tmp = StringUtils.replaceOnce(duration, " 0 m", StringUtils.EMPTY);
             if (tmp.length() != duration.length()) {
                 duration = tmp;
-                tmp = StringUtils.replaceOnce(duration, " 0 hours", StringUtils.EMPTY);
+                tmp = StringUtils.replaceOnce(duration, " 0 h", StringUtils.EMPTY);
                 if (tmp.length() != duration.length()) {
-                    duration = StringUtils.replaceOnce(tmp, " 0 days", StringUtils.EMPTY);
+                    duration = StringUtils.replaceOnce(tmp, " 0 d", StringUtils.EMPTY);
                 }
             }
         }
         // handle plurals
         duration = " " + duration;
-        duration = StringUtils.replaceOnce(duration, " 1 minutes", " 1 minute");
-        duration = StringUtils.replaceOnce(duration, " 1 hours", " 1 hour");
-        duration = StringUtils.replaceOnce(duration, " 1 days", " 1 day");
+//        duration = StringUtils.replaceOnce(duration, " 1 minutes", " 1 minute");
+//        duration = StringUtils.replaceOnce(duration, " 1 hours", " 1 hour");
+//        duration = StringUtils.replaceOnce(duration, " 1 days", " 1 day");
         return duration.trim();
     }
 }

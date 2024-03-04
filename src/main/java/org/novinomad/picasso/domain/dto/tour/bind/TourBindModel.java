@@ -2,6 +2,7 @@ package org.novinomad.picasso.domain.dto.tour.bind;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.novinomad.picasso.commons.ILocalDateTimeRange;
 import org.novinomad.picasso.commons.LocalDateTimeRange;
 import org.novinomad.picasso.domain.erm.entities.tour_participants.TourParticipant;
@@ -13,8 +14,9 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @Data
+@Slf4j
 @NoArgsConstructor
-public class TourBindModel{
+public class TourBindModel {
 
     private Tour tour = new Tour();
 
@@ -22,6 +24,34 @@ public class TourBindModel{
 
     public TourBindModel(Tour tour) {
         this.tour = tour;
+    }
+
+    public Map<TourParticipant.Type, List<TourParticipantBindModel>> getTourParticipantsMap() {
+        return tourParticipants.stream().collect(Collectors.groupingBy(t -> t.getTourParticipant().getType()));
+    }
+
+    public boolean containsParticipant(Long tourParticipantId) {
+        return tourParticipants.stream()
+                .filter(e -> e.getTourParticipant() != null)
+                .map(e -> e.getTourParticipant().getId())
+                .toList()
+                .contains(tourParticipantId);
+    }
+
+    public List<Long> getBoundParticipantIds() {
+        return tourParticipants.stream()
+                .filter(e -> e.getTourParticipant() != null && e.getTourParticipant().getId() != null)
+                .map(e -> e.getTourParticipant().getId())
+                .toList();
+    }
+
+    public int getContainingParticipantIndex(TourParticipant tourParticipant) {
+        for (int i = 0; i < tourParticipants.size(); i++) {
+            if(Objects.equals(tourParticipants.get(i).getTourParticipant(), tourParticipant)) {
+                return i;
+            }
+        }
+        return -1;
     }
 
     public TourBindModel bindTourParticipant(TourParticipant tourParticipant) {

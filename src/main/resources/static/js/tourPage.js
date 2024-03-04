@@ -1,5 +1,5 @@
 import * as ajaxUtil from './AjaxUtil.js';
-import {FragmentSubject} from "./Observer.js";
+import {FragmentInitializer} from "./Observer.js";
 
 const mainUrl = $("meta[name='mainUrl']").attr("content");
 
@@ -7,14 +7,14 @@ const userLocale = $("meta[name='userLocale']").attr('content');
 
 const dateRangePickerDateFormat = $("meta[name='dateRangePickerDateFormat']").attr('content');
 
-const toursTableFragmentSubject = new FragmentSubject()
+const toursTableFragmentSubject = new FragmentInitializer()
     .subscribe(initEditTourButtons);
 
-const tourFormFragmentSubject = new FragmentSubject()
+const tourFormFragmentSubject = new FragmentInitializer()
     .subscribe(initSingleDatePickers) // reinitialize tour form date pickers
     .subscribe(initTourFormButtons); // reinitialize tour form buttons
 
-const tourFormFilesFragmentSubject = new FragmentSubject()
+const tourFormFilesFragmentSubject = new FragmentInitializer()
     .subscribe(initTourFormButtons);
 
 // page load initialization
@@ -25,7 +25,7 @@ $.fn.dataTable.moment(dateRangePickerDateFormat, userLocale); // to fix sort by 
 $('#toursTable').DataTable({
     "drawCallback": function( settings ) {
         console.debug('datatables draw callback fired');
-        toursTableFragmentSubject.notifyObservers(); // to fix edit/delete tour buttons when search in tours table
+        toursTableFragmentSubject.initialize(); // to fix edit/delete tour buttons when search in tours table
     },
     paging: true,
     searching: true,
@@ -71,7 +71,7 @@ $('#submitFilterBtn').on('click', function (e) {
                 }]
             }).draw();
             console.debug('tours table DOM structure changed. Notify observers');
-            toursTableFragmentSubject.notifyObservers();
+            toursTableFragmentSubject.initialize();
         })
         .catch((error) => {
             console.error('unable to filter tours %s', error);
@@ -103,7 +103,7 @@ function initEditTourButtons() {
             .then((tourFormHTML) => {
                 $('#tourForm').html(tourFormHTML);
                 console.debug('after get tour form');
-                tourFormFragmentSubject.notifyObservers();
+                tourFormFragmentSubject.initialize()
                 $('#tourFormContainer').collapse('show');
             })
             .catch((error) => {
@@ -147,7 +147,7 @@ function initTourFormButtons () {
         ajaxUtil.del(url, tourFormData)
             .then((tourFormFilesTableHtml) => {
                 $('#uploadedFilesTable').html(tourFormFilesTableHtml);
-                tourFormFilesFragmentSubject.notifyObservers();
+                tourFormFilesFragmentSubject.initialize();
             }).catch((error) => {
                 console.error('unable to delete file %s %s',fileName, error);
                 Swal.fire({
@@ -169,7 +169,7 @@ function initTourFormButtons () {
             .then((tourFormHTML) => {
                 $('#tourForm').html(tourFormHTML);
                 console.debug('tour form DOM structure changed. Notify observers');
-                tourFormFragmentSubject.notifyObservers();
+                tourFormFragmentSubject.initialize();
             })
             .catch((error) => {
                 console.error('unable to clear and load tour form HTML %s', error);

@@ -31,10 +31,10 @@ import static org.novinomad.picasso.commons.utils.CommonDateUtils.UI_DATE_TIME_N
 })
 public class TourBind extends AbstractAuditableEntity implements Comparable<TourBind> {
 
-    @OneToOne()
+    @ManyToOne()
     TourParticipant tourParticipant;
 
-    @OneToOne()
+    @ManyToOne()
     Tour tour;
 
     @Embedded

@@ -72,7 +72,7 @@
                               th:fragment="tourBindForm">
                             <div class="row form-group">
                                 <div class="col-sm-2">
-                                    <label for="bindFormTourSelect" th:text="#{tour.cap}"></label>
+                                    <label for="bindFormTourSelect" th:text="#{Tour}"></label>
                                 </div>
                                 <div class="col">
                                     <select id="bindFormTourSelect"
@@ -288,7 +288,7 @@
 
     <script type="module" th:inline="javascript">
         import * as ajaxUtil from "./js/AjaxUtil.js";
-        import {FragmentSubject} from "./js/Observer.js";
+        import {FragmentInitializer} from "./js/Observer.js";
 
         // main url stored in head tag of layout.html
         const mainUrl = $("meta[name='mainUrl']").attr("content");
@@ -302,7 +302,7 @@
         /**
          * When bind form tourParticipants fragment updated notify related observers.
          * */
-        const bindFormTourParticipantsFragmentSubject = new FragmentSubject()
+        const bindFormTourParticipantsFragmentSubject = new FragmentInitializer()
             .subscribe(initTourParticipantTypeSelectChangeListener)
             .subscribe(initBindFormDatePickers)
             .subscribe(refreshBootstrapSelects)
@@ -311,7 +311,7 @@
             .subscribe(initTourParticipantSelectChangeListener)
             .subscribe(initUnbindTourParticipantDateRangeButtons);
 
-        const bindFormFragmentSubject = new FragmentSubject()
+        const bindFormFragmentSubject = new FragmentInitializer()
             .subscribe(initBindTourParticipantButton)
             .subscribe(initBindFormTourSelect)
             .subscribe(initBindFormResetButton)
@@ -327,9 +327,9 @@
 
             initFilterSubmitButton();
 
-            bindFormTourParticipantsFragmentSubject.notifyObservers();
+            bindFormTourParticipantsFragmentSubject.initialize()
 
-            bindFormFragmentSubject.notifyObservers();
+            bindFormFragmentSubject.initialize()
 
             initGanttChart();
 
@@ -646,8 +646,8 @@
                 ajaxUtil.get(mainUrl + '/-1').then((bindFormFragment) => {
                     $('#tourBindForm').html(bindFormFragment);
                     $('#tourBind').collapse('show');
-                    bindFormFragmentSubject.notifyObservers();
-                    bindFormTourParticipantsFragmentSubject.notifyObservers();
+                    bindFormFragmentSubject.initialize()
+                    bindFormTourParticipantsFragmentSubject.initialize()
                 }).catch((error) => {
                     console.error('initBindFormResetButton unable to load bind form fragment %s', error.responseJSON.message);
                     Swal.fire({
@@ -681,8 +681,8 @@
                     $('#tourBind').collapse('show');
                     // window.scrollTo({ top: 0, behavior: 'smooth' });
                     changeTourParticipantBindFormCollapseElementsVisibility('show');
-                    bindFormFragmentSubject.notifyObservers();
-                    bindFormTourParticipantsFragmentSubject.notifyObservers();
+                    bindFormFragmentSubject.initialize()
+                    bindFormTourParticipantsFragmentSubject.initialize()
                 })
                 .catch((error) => {
                     console.error('initEditEntityButton unable to load bind form fragment for edit bind %s', error.responseJSON.message);
@@ -826,7 +826,7 @@
             return ajaxUtil.post(url, $('#tourBindForm').serialize())
                 .then((bindResultTourParticipantsFragment) => {
                     $('#bindResultTourParticipants').html(bindResultTourParticipantsFragment);
-                    bindFormTourParticipantsFragmentSubject.notifyObservers();
+                    bindFormTourParticipantsFragmentSubject.initialize()
                 })
                 .catch((error) => {
                     console.error('updateBindResultTourParticipantsFragment unable to load tourBind/tourBind :: bindResultTourParticipants fragment %s', error.responseJSON.message);

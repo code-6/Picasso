@@ -9,10 +9,7 @@ import org.slf4j.event.Level;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import javax.transaction.Transactional;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 public abstract class AbstractCrudCacheService<ID, ENTITY extends IdAware<ID>> implements Crud<ID, ENTITY> {
 
@@ -86,6 +83,13 @@ public abstract class AbstractCrudCacheService<ID, ENTITY extends IdAware<ID>> i
             repository.findAll().forEach(e -> CACHE.put(e.getId(), e));
         }
         return new ArrayList<>(CACHE.asMap().values());
+    }
+
+    public Map<ID, ENTITY> getMap() {
+        if(CACHE.asMap().isEmpty()) {
+            get();
+        }
+        return CACHE.asMap();
     }
 
     @Override

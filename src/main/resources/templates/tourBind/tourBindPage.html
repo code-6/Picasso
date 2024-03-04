@@ -34,6 +34,11 @@
     div.tour-select-date-range-text {
       text-align: right;
     }
+
+    td.rowspan {
+      /*text-align: center;*/
+      vertical-align: middle;
+    }
   </style>
 </head>
 <body class="sb-nav-fixed">
@@ -56,11 +61,228 @@
 
   <div class="row">
     <div class="col">
-      <div class="collapse" id="tourBindFormCollapse">
+      <div th:class="${bindFormCollapsed ? 'collapse' : 'collapse show'}" id="tourBindFormCollapse">
         <div class="card">
           <div class="card-body">
             <form th:object="${tourBind}" th:method="post" th:action="@{/bind}" th:id="tourBindForm" >
-              <div th:replace="tourBind/tourBindForm :: tourBindFormContent"></div>
+              <div class="container">
+<!--                select tour-->
+                <div class="row form-group">
+                  <div class="col-sm-2">
+                    <label for="bindFormTourSelect" th:text="#{Tour}"></label>
+                  </div>
+                  <div class="col">
+                    <select id="bindFormTourSelect"
+                            class="form-control selectpicker selectpicker-single selectpicker-single-tour show-tick"
+                            required data-show-subtext="true" data-live-search="true" data-actions-box="true"
+                            data-selected-text-format="count > 1" th:field="*{tour}" name="tour">
+
+                      <option th:value="${null}" th:data-subtext="#{tour.select.placeholder}"></option>
+
+                      <option th:each="tour, row : ${tours.values()}"
+                              th:value="${tour.id}"
+                              th:text="${tour.id + ': ' + tour.name}"
+                              th:data-subtext="${tour.getDateTimeRange()}"
+                              th:selected="${tourBind.tour.id == tour.id}"
+                              th:data-tour-row-id="${row.index}"
+                              th:data-tour-id="${tour.id}"
+                              th:data-tour-start-date="${tour.startDate}"
+                              th:data-tour-end-date="${tour.endDate}">
+                      </option>
+                    </select>
+                  </div>
+                  <div class="col-sm-2">
+                  </div>
+                </div>
+
+                <div th:class="${tourBind.tour.id == null ? 'collapse' : 'collapse show'}" id="bindFormParticipantsCollapse">
+                  <!--                tour description-->
+                  <div class="row form-group">
+                    <div class="col-sm-2">
+                      <label for="bindFormTourDescriptionTxt" th:text="#{description.cap}"></label>
+                    </div>
+                    <div class="col">
+                      <textarea id="bindFormTourDescriptionTxt" class="form-control tour-description-text-area"
+                                readonly th:text="${tourBind.tour.description}"></textarea>
+                    </div>
+                    <div class="col-sm-2"></div>
+                  </div>
+                  <div id="bindFormParticipantsFragment" th:fragment="bindFormParticipantsFragment">
+                    <!--                bound participants-->
+                    <div class="row form-group">
+                      <div class="col-sm-2">
+                        <label th:text="#{bound-tour-participants}"></label>
+                      </div>
+                      <div class="col">
+                        <table id="boundTourParticipantsTable"
+                               class="table table-sm table-bordered table-hover bound-tour-participants-table">
+                          <thead>
+                          <tr>
+                            <th scope="col">Actions</th>
+                            <th scope="col">RowNum</th>
+                            <th scope="col">ID</th>
+                            <th scope="col" th:text="#{type.cap}"></th>
+                            <th scope="col" th:text="#{name.cap}"></th>
+                            <th scope="col" colspan="3" th:text="#{date.cap.pl}"></th>
+                          </tr>
+                          </thead>
+                          <tbody id="boundTourParticipantsFragment">
+                          <th:block th:each="tp, i : ${tourBind.tourParticipants}" th:fragment="boundTourParticipantsFragment">
+                            <input type="hidden" th:field="${tourBind.tourParticipants[__${i.index}__].tourParticipant.id}">
+                            <input type="hidden" th:field="${tourBind.tourParticipants[__${i.index}__].tourParticipant.type}">
+                            <input type="hidden" th:field="${tourBind.tourParticipants[__${i.index}__].tourParticipant.name}">
+
+                            <tr>
+                              <td th:rowspan="${tp.bindIdsToDateRanges.size() + 1}"
+                                  class="rowspan">
+                                <button type="button" class="btn btn-sm btn-outline-primary btn-edit-bound-participant"
+                                        th:data-row-id="${i.index}"
+                                        th:data-participant-id="${tp?.tourParticipant?.id}">
+                                  <i class="fa-solid fa-pen-to-square"></i>
+                                </button>
+                                <button type="button" class="btn btn-sm btn-outline-primary btn-delete-bound-participant" th:data-row-id="${i.index}">
+                                  <i class="fa-solid fa-trash-can"></i>
+                                </button>
+                              </td>
+
+                              <td th:rowspan="${tp.bindIdsToDateRanges.size() + 1}"
+                                  th:text="${i.index}"
+                                  class="rowspan">
+                              </td>
+
+                              <td th:rowspan="${tp.bindIdsToDateRanges.size() + 1}"
+                                  th:text="${tp.tourParticipant?.id}"
+                                  class="rowspan">
+                              </td>
+
+                              <td th:rowspan="${tp.bindIdsToDateRanges.size() + 1}"
+                                  th:text="${tp.tourParticipant?.type}"
+                                  class="rowspan">
+                              </td>
+
+                              <td th:rowspan="${tp.bindIdsToDateRanges.size() + 1}"
+                                  th:text="${tp.tourParticipant?.name}"
+                                  class="rowspan">
+                              </td>
+                            </tr>
+
+                            <tr th:each="dr, j : ${tp.bindIdsToDateRanges}">
+                              <input type="hidden" th:field="${tourBind.tourParticipants[__${i.index}__].bindIdsToDateRanges[__${j.index}__].bindId}">
+                              <input type="hidden" th:field="${tourBind.tourParticipants[__${i.index}__].bindIdsToDateRanges[__${j.index}__].dateTimeRange}">
+
+                              <td th:text="${j.index}" class="text-center"></td>
+
+                              <td th:text="${dr.bindId}"></td>
+
+                              <td th:text="${dr.dateTimeRange}"></td>
+                            </tr>
+
+                          </th:block>
+
+                          </tbody>
+
+                        </table>
+                      </div>
+                      <div class="col-sm-2"></div>
+                    </div>
+
+                    <div id="bindParticipantFragment" >
+
+                      <div th:fragment="bindParticipantFragment">
+
+                        <!--                select participant and date-->
+                        <div class="row form-group">
+
+                          <!--                    select participant-->
+                          <div class="col-sm-2">
+                            <label for="bindFormTourParticipantSelect"
+                                   th:text="#{select-tour-participant-to-bind}"></label>
+                          </div>
+
+                          <div class="col">
+                            <select id="bindFormTourParticipantSelect"
+                                    class="form-control selectpicker selectpicker-single selectpicker-single-tour-participant show-tick"
+                                    data-show-subtext="true" data-live-search="true" data-actions-box="true"
+                                    th:field="${tourParticipantBindModel.tourParticipant}">
+
+                              <option th:value="${null}"></option>
+                              <option th:each="tp : ${tourParticipants}"
+                                      th:value="${tp.id}"
+                                      th:text="${tp.id + '. ' + tp.name}"
+                                      th:data-subtext="${tp.type}"
+                                      th:selected="${tourParticipantBindModel.tourParticipant != null and tourParticipantBindModel.tourParticipant.id == tp.id}">
+                              </option>
+                            </select>
+                          </div>
+
+                          <div class="col-sm-2"></div>
+
+                        </div>
+
+                        <!--                  bind common participant date range-->
+                        <div class="row form-group">
+
+                          <div class="col-sm-2"></div>
+
+                          <!--input date range -->
+                          <div class="col">
+                            <div id="inputTourParticipantDateRangeFragment">
+                              <th:block th:each="dateRane, i : ${tourParticipantBindModel.bindIdsToDateRanges}" th:fragment="inputTourParticipantDateRangeFragment">
+                                <div class="row">
+                                  <div class="col">
+                                    <input type="hidden" name="bindId"
+                                           th:value="${tourParticipantBindModel.bindIdsToDateRanges[__${i.index}__].bindId}">
+                                    <input type="text" required
+                                           class="form-control date-picker date-range-picker date-range-picker-tour-participant"
+                                           th:field="${tourParticipantBindModel.bindIdsToDateRanges[__${i.index}__].dateTimeRange}">
+                                  </div>
+                                  <div class="col-sm-1 pr-1">
+                                    <button th:if="${i.index > 0}"
+                                            class="btn btn-outline-primary btn-delete-participant-common-date-range"
+                                            type="button" th:data-date-range-row-id="${i.index}">
+                                      <i class="fa-solid fa-calendar-minus"></i>
+                                    </button>
+                                  </div>
+                                </div>
+                              </th:block>
+                            </div>
+                          </div>
+
+                          <div class="col-sm-2"></div>
+
+                        </div>
+
+                      </div>
+
+                    </div>
+
+                  </div>
+
+                  <div class="row form-group">
+                    <div class="col-sm-2"></div>
+
+                    <div class="col">
+                      <button class="btn btn-block btn-outline-primary btn-bind-tour-participant" type="button"
+                              th:title="#{bind.cap} + ' ' + #{tour.participant}"
+                              th:disabled="${tourParticipantBindModel.tourParticipant == null}">
+                        <i class="fa-solid fa-user-plus"></i>
+                        <span th:text="#{add.cap} + ' ' + #{to-the} + ' ' + #{tour}"></span>
+                      </button>
+                    </div>
+
+                    <div class="col">
+                      <button class="btn btn-block btn-outline-primary btn-add-participant-common-date-range" type="button"
+                              th:disabled="${tourParticipantBindModel.tourParticipant == null}">
+                        <i class="fa-solid fa-calendar-plus"></i>
+                        <span th:text="#{add.more.cap} + ' ' + #{date}"></span>
+                      </button>
+                    </div>
+
+                    <div class="col-sm-2"></div>
+                  </div>
+
+                </div>
+              </div>
             </form>
           </div>
         </div>
@@ -68,37 +290,64 @@
     </div>
   </div>
 
-  <!--            tour bind filter form (filter gantt chart)-->
   <div class="row">
     <div class="col">
-      <div class="collapse" id="tourBindFilter">
+      <div th:class="${bindFiltersCollapsed ? 'collapse' : 'collapse show'}" id="tourBindFilter">
         <div class="card">
           <div class="card-body">
-            <form th:object="${tableFilter}" th:id="tableFilterForm" th:fragment="tableFilterForm">
+            <form th:object="${ganttChartFilter}" th:id="ganttChartFilterForm" th:fragment="ganttChartFilterForm">
+
+              <input type="hidden" name="fragment" th:value="${true}">
+
               <div class="form-row align-items-end">
 
-                <th:block th:include="tour/tourPage :: filterFormContentFragment"></th:block>
+                <div class="form-group col-sm-2">
+                  <label for="filterStartDate" th:text="#{start.cap} + #{date}"></label>
+                  <input type="text" required
+                         class="form-control date-picker date-picker-single date-picker-single-tour-filter-form"
+                         id="filterStartDate"
+                         th:field="*{startDate}" name="startDate">
+                </div>
+                <div class="form-group col-sm-2">
+                  <label for="filterEndDate" th:text="#{end.cap} + #{date}"></label>
+                  <input type="text" required
+                         class="form-control date-picker date-picker-single date-picker-single-tour-filter-form"
+                         id="filterEndDate"
+                         th:field="*{endDate}" name="endDate">
+                </div>
+                <div class="form-group col">
+                  <label for="filterTourSelect" th:text="#{Tour}"></label>
+                  <select id="filterTourSelect" class="form-control selectpicker tourSelect tour-select-multiple"
+                          th:field="*{tourIds}" multiple data-show-subtext="true" data-actions-box="true"
+                          data-live-search="true" data-selected-text-format="count > 1"
+                          name="tourIds">
+                    <option th:each="tour : ${tours.values()}"
+                            th:value="${tour.id}"
+                            th:text="${tour.id + '. ' + tour.name}"
+                            th:data-subtext="${tour.dateTimeRange}"
+                            th:selected="${ganttChartFilter.tourIds.contains(tour.id)}">
+                    </option>
+                  </select>
+                </div>
 
                 <div class="form-group col">
-                  <label for="filterTourParticipantSelect" th:text="#{tour.participant.cap}"></label>
+                  <label for="filterTourParticipantSelect" th:text="#{Tour.participant}"></label>
                   <select id="filterTourParticipantSelect" class="form-control selectpicker tourParticipantSelect"
                           th:field="*{tourParticipantIds}" name="tourParticipantIds"
                           data-actions-box="true" data-show-subtext="true"
                           multiple data-live-search="true" data-selected-text-format="count > 2">
-                    <th:block th:each="tpt : ${allTourParticipantTypes}">
-                      <option th:each="tp : ${tourParticipants.get(tpt)}"
-                              th:value="${tp.id}"
-                              th:text="${tp.id + '. ' + tp.name}"
-                              th:data-subtext="${tp.type}"
-                              th:selected="${tableFilter.tourParticipantIds.contains(tp.id)}">
-                      </option>
-                    </th:block>
+                    <option th:each="tp : ${tourParticipants}"
+                            th:value="${tp.id}"
+                            th:text="${tp.id + '. ' + tp.name}"
+                            th:data-subtext="${tp.type}"
+                            th:selected="${ganttChartFilter.tourParticipantIds.contains(tp.id)}">
+                    </option>
                   </select>
                 </div>
 
                 <div class="form-group col-sm-1">
                   <button id="submitFilterBtn" type="button" class="btn btn-outline-success btn-block"
-                          th:text="#{show.cap} + #{tour.pl}"></button>
+                          th:text="#{show.cap} + #{tours}"></button>
                 </div>
               </div>
             </form>
@@ -117,7 +366,8 @@
               <div class="mr-auto p-0">
                 <span th:text="#{gantt-chart}"></span>
                 <div class="btn-group mr-2" role="group" aria-label="First group">
-                  <a class="nav-link" href="#tourBindFilter" data-target="#tourBindFilter" data-toggle="collapse" aria-controls="tourBindFilter"
+                  <a class="nav-link table-filter-toggle" href="#tourBindFilter" data-target="#tourBindFilter" data-toggle="collapse"
+                     aria-controls="tourBindFilter"
                      aria-expanded="false">
                     <i class="fas fa-filter"></i>
                     <span th:text="#{filter.cap.pl}"></span>
@@ -125,29 +375,29 @@
                 </div>
               </div>
               <div class="p-0">
-                <button type="button" class="btn btn-sm btn-outline-danger tableDeleteBtn"
+                <button type="button" class="btn btn-sm btn-outline-danger table-delete-items-btn"
                         th:title="#{delete.title}">
                   <i class="fas fa-trash-alt"></i>
-                  <span class="tableDeleteSpan">Delete</span>
+                  <span class="table-delete-items-span" th:text="#{delete.cap}"></span>
                 </button>
               </div>
               <div class="p-0">
-                <button type="button" class="btn btn-sm btn-outline-primary tableSelectDeselectAllBtn">
+                <button type="button" class="btn btn-sm btn-outline-primary table-select-deselect-all-btn">
                   <i class="fa-solid fa-square-check"></i>
-                  <span class="tableSelectDeselectAllSpan">Select all</span>
+                  <span class="table-select-deselect-all-span" th:text="#{select.cap} + ' ' + #{all}"></span>
                 </button>
               </div>
               <div class="p-0">
-                <button type="button" class="btn btn-sm btn-outline-primary tableExpandCollapseAllBtn">
+                <button type="button" class="btn btn-sm btn-outline-primary table-expand-collapse-all-btn">
                   <i class="fa-solid fa-bars-staggered"></i>
-                  <span class="tableExpandCollapseAllSpan">Expand all</span>
+                  <span class="table-expand-collapse-all-span" th:text="#{expand.cap} + ' ' + #{all}"></span>
                 </button>
               </div>
             </div>
           </div>
 
           <div class="card-body">
-            <div style="position:relative; padding-top: 1rem;" class="gantt" id="GanttChartDIV"></div>
+            <div style="position:relative; padding-top: 1rem;" class="gantt" id="GanttChartDIV" th:fragment="ganttChartContainerFragment"></div>
           </div>
 
           <div class="card-footer text-muted">
@@ -156,22 +406,22 @@
                 <span th:text="#{gantt-chart}"></span>
               </div>
               <div class="p-0">
-                <button type="button" class="btn btn-sm btn-outline-danger tableDeleteBtn"
+                <button type="button" class="btn btn-sm btn-outline-danger table-delete-items-btn"
                         th:title="#{delete.title}">
                   <i class="fas fa-trash-alt"></i>
-                  <span class="tableDeleteSpan">Delete</span>
+                  <span class="table-delete-items-span" th:text="#{delete.cap}"></span>
                 </button>
               </div>
               <div class="p-0">
-                <button type="button" class="btn btn-sm btn-outline-primary tableSelectDeselectAllBtn">
+                <button type="button" class="btn btn-sm btn-outline-primary table-select-deselect-all-btn">
                   <i class="fa-solid fa-square-check"></i>
-                  <span class="tableSelectDeselectAllSpan">Select all</span>
+                  <span class="table-select-deselect-all-span" th:text="#{select.cap} + ' ' + #{all}"></span>
                 </button>
               </div>
               <div class="p-0">
-                <button type="button" class="btn btn-sm btn-outline-primary tableExpandCollapseAllBtn">
+                <button type="button" class="btn btn-sm btn-outline-primary table-expand-collapse-all-btn">
                   <i class="fa-solid fa-bars-staggered"></i>
-                  <span class="tableExpandCollapseAllSpan">Expand all</span>
+                  <span class="table-expand-collapse-all-span" th:text="#{expand.cap} + ' ' + #{all}"></span>
                 </button>
               </div>
             </div>
@@ -196,9 +446,23 @@
 
   <script th:src="@{/vendor/popover/js/bootstrap-popover-x.min.js}"></script>
 
+  <script>
+    function getTourIconHTML() {
+      return '<i class="fa-solid fa-earth-asia"></i>';
+    }
+
+    function getDriverIconHTML() {
+      return '<i class="fa-solid fa-user-tie"></i>';
+    }
+
+    function getGuideIconHTML() {
+      return '<i class="fa-solid fa-person-hiking"></i>';
+    }
+  </script>
+
   <script type="module" th:inline="javascript">
     import * as ajaxUtil from "./js/AjaxUtil.js";
-    import {FragmentSubject} from "./js/Observer.js";
+    import {FragmentInitializer} from "./js/Observer.js";
 
     // main url stored in head tag of layout.html
     const mainUrl = $("meta[name='mainUrl']").attr("content");
@@ -211,17 +475,41 @@
 
     moment.locale(userLanguage); // to fix different locale issue in date-range picker
 
-    const bindFormFragmentSubject = new FragmentSubject()
+    const bindFormFragmentSubject = new FragmentInitializer()
             .subscribe(initBindFormTourSelect)
+    ;
+
+    const bindFormTourParticipantDateRangeFragmentSubject = new FragmentInitializer()
+            .subscribe(initDeleteCommonDateRangeButton)
+            .subscribe(initBindFormParticipantDateRangeInput)
+    ;
+
+    const bindFormParticipantsFragmentSubject = new FragmentInitializer()
+            .subscribe(initTourParticipantSelect)
+            .subscribe(initDeleteCommonDateRangeButton)
+            .subscribe(initEditBoundParticipantButton)
+            .subscribe(initDeleteBoundParticipantButton)
+    ;
+
+    const boundTourParticipantsFragmentSubject = new FragmentInitializer()
+            .subscribe(initEditBoundParticipantButton)
+            .subscribe(initDeleteBoundParticipantButton)
+    ;
+
+    const bindParticipantFragmentSubject = new FragmentInitializer()
+            .subscribe(initTourParticipantSelect)
+            .subscribe(initDeleteCommonDateRangeButton)
     ;
 
     let ganttChart = initGanttChart();
 
-    $('.tableDeleteBtn').hide();
+    $('.table-delete-items-btn').hide();
 
     $(document).ready(function () {
 
-      bindFormFragmentSubject.notifyObservers();
+      bindFormFragmentSubject.initialize()
+
+      bindFormParticipantsFragmentSubject.initialize()
 
       initSingleDatePickers();
 
@@ -229,18 +517,18 @@
 
       initFilterSubmitButton();
 
-      $('.tableExpandCollapseAllBtn').click(function(e) {
+      $('.table-expand-collapse-all-btn').click(function(e) {
         e.stopImmediatePropagation();
         e.preventDefault();
 
-        let span = $(this).find('span.tableExpandCollapseAllSpan');
+        let span = $(this).find('span.table-expand-collapse-all-span');
 
-        if ($(span).text() === 'Expand all') {
-          $('.tableExpandCollapseAllSpan').text('Collapse all');
+        if ($(span).text() === [[#{expand.cap}]] + ' ' + [[#{all}]]) {
+          $('.table-expand-collapse-all-span').text([[#{collapse.cap}]] + ' ' + [[#{all}]]);
           // expand all collapsed rows
           $('.gfoldercollapse.row-collapsed').click();
-        } else if ($(span).text() === 'Collapse all') {
-          $('.tableExpandCollapseAllSpan').text('Expand all');
+        } else if ($(span).text() === [[#{collapse.cap}]] + ' ' + [[#{all}]]) {
+          $('.table-expand-collapse-all-span').text([[#{expand.cap}]] + ' ' + [[#{all}]]);
           // collapse all expanded rows
           $('.gfoldercollapse.row-expanded').click();
         }
@@ -250,7 +538,7 @@
                 .toggleClass('fa-bars');
       });
 
-      $('.tableSelectDeselectAllBtn').click(function(e) {
+      $('.table-select-deselect-all-btn').click(function(e) {
         e.stopImmediatePropagation();
         e.preventDefault();
 
@@ -259,17 +547,17 @@
         if(checkboxes.is(':checked')) {
           checkboxes.prop("checked", false);
 
-          $('.tableSelectDeselectAllSpan').text('Select all');
+          $('.table-select-deselect-all-span').text([[#{select.cap}]] + ' ' + [[#{all}]]);
 
-          $('.tableDeleteBtn').hide();
+          $('.table-delete-items-btn').hide();
         } else {
           checkboxes.prop("checked", true);
 
-          $('.tableSelectDeselectAllSpan').text('Deselect all');
+          $('.table-select-deselect-all-span').text([[#{deselect.cap}]] + ' ' + [[#{all}]]);
 
-          $('.tableDeleteSpan').text('Delete ' + $('.bind-delete-checkbox:checked').length + ' items');
+          $('.table-delete-items-span').text([[#{delete.cap}]] + ' ' + $('.bind-delete-checkbox:checked').length + ' ' + [[#{item.pl}]]);
 
-          $('.tableDeleteBtn').show();
+          $('.table-delete-items-btn').show();
         }
 
         $(this).find('[data-fa-i2svg]')
@@ -278,32 +566,34 @@
       });
 
       // init delete buttons
-      $('.tableDeleteBtn').click(function (e) {
+      $('.table-delete-items-btn').click(function (e) {
         e.stopImmediatePropagation();
         e.preventDefault();
 
-        let bindIds = new Set();
-        let taskIds = new Set();
-
-        $('.bind-delete-checkbox:checked').each(function (i) {
-          let ids = $(this).attr('data-bind-ids').split(',');
-          ids.forEach((bindId, i) => bindIds.add(bindId));
-
-          let taskId = $(this).attr('data-task-id');
-          taskIds.add(taskId);
-        });
-
         Swal.fire({
-          title: 'Are you sure?',
-          text: "You won't be able to revert this!",
+          title: [[#{r-u-s}]],
+          text: [[#{irreversible}]],
           icon: 'warning',
           showCancelButton: true,
           confirmButtonColor: '#3085d6',
           cancelButtonColor: '#d33',
-          confirmButtonText: 'Yes, delete it!'
+          confirmButtonText: [[#{confirm.btn}]],
+          cancelButtonText: [[#{no.cap}]]
         }).then((result) => {
           if (result.isConfirmed) {
+            let bindIds = new Set();
+            let taskIds = new Set();
+
+            $('.bind-delete-checkbox:checked').each(function (i) {
+              let ids = $(this).attr('data-bind-ids').split(',');
+              ids.forEach((bindId, i) => bindIds.add(bindId));
+
+              let taskId = $(this).attr('data-task-id');
+              taskIds.add(taskId);
+            });
+
             let bindIdsArr = Array.from(bindIds);
+
             let url = mainUrl + '/api/bind/' + bindIdsArr;
 
             ajaxUtil.del(url).then(() => {
@@ -324,7 +614,7 @@
                 timer: DEFAULT_TOAST_TIME_OUT
               });
 
-              $('.tableDeleteBtn').hide();
+              $('.table-delete-items-btn').hide();
 
               ganttChart.Draw();
             }).catch((error) => {
@@ -338,12 +628,167 @@
             });
           }
         });
-      })
+      });
+
+      let tourBindFilterCollapse = $('#tourBindFilter');
+
+      tourBindFilterCollapse.on('show.bs.collapse', function () {
+        ajaxUtil.put(mainUrl + '/bind/filter-collapse/false')
+                .catch((error) => console.error('unable to remember tourBindFilter collapse false state because ' + error.responseJSON.message));
+      });
+
+      tourBindFilterCollapse.on('hide.bs.collapse', function () {
+        ajaxUtil.put(mainUrl + '/bind/filter-collapse/true')
+                .catch((error) => console.error('unable to remember tourBindFilter collapse true state because ' + error.responseJSON.message));
+      });
+
+      let tourBindFormCollapse = $('#tourBindFormCollapse');
+
+      tourBindFormCollapse.on('show.bs.collapse', function () {
+        ajaxUtil.put(mainUrl + '/bind/form-collapse/false')
+                .catch((error) => console.error('unable to remember tourBindFormCollapse collapse false state because ' + error.responseJSON.message));
+      });
+
+      tourBindFormCollapse.on('hide.bs.collapse', function () {
+        ajaxUtil.put(mainUrl + '/bind/form-collapse/true')
+                .catch((error) => console.error('unable to remember tourBindFormCollapse collapse true state because ' + error.responseJSON.message));
+      });
+
     });
+
+    $('.btn-add-participant-common-date-range').click(function (e) {
+      $(this).prop('disabled', true);
+
+      e.stopImmediatePropagation();
+      e.preventDefault();
+
+      let url = mainUrl + '/bind/add-common-date-range-row';
+      let data = $('#tourBindForm').serialize();
+
+      ajaxUtil.post(url, data).then((inputTourParticipantDateRangeFragment) => {
+        $('#inputTourParticipantDateRangeFragment').html(inputTourParticipantDateRangeFragment);
+        bindFormTourParticipantDateRangeFragmentSubject.initialize()
+      }).finally(() => $(this).prop('disabled', false));
+    });
+
+    $('.btn-bind-tour-participant').click(function(e) {
+      $(this).prop('disabled', true);
+
+      e.stopImmediatePropagation();
+      e.preventDefault();
+
+      let url = mainUrl + '/bind/bind-participant';
+      let data = $('#tourBindForm').serialize();
+
+      ajaxUtil.post(url, data).then((bindFormParticipantsFragment) => {
+
+        // update bound participants table
+        $('#bindFormParticipantsFragment').html(bindFormParticipantsFragment);
+
+        bindFormParticipantsFragmentSubject.initialize()
+
+        disableButtons();
+
+      });
+    });
+
+    function initEditBoundParticipantButton() {
+      $('.btn-edit-bound-participant').click(function (e) {
+        $(this).prop('disabled', true);
+
+        e.stopImmediatePropagation();
+        e.preventDefault();
+
+        let rowId = $(this).attr('data-row-id');
+        let participantId = $(this).attr('data-participant-id');
+        let url = mainUrl + '/bind/edit-bound-participant/' + rowId
+        let data = $('#tourBindForm').serialize();
+
+        ajaxUtil.post(url, data).then((bindParticipantFragment) => {
+          $('#bindParticipantFragment').html(bindParticipantFragment);
+          bindParticipantFragmentSubject.initialize()
+        }).finally(() => $(this).prop('disabled', false));
+      });
+    }
+
+    function initDeleteBoundParticipantButton() {
+      $('.btn-delete-bound-participant').click(function (e) {
+        $(this).prop('disabled', true);
+
+        e.stopImmediatePropagation();
+        e.preventDefault();
+
+        let rowId = $(this).attr('data-row-id');
+        let url = mainUrl + '/bind/delete-bound-participant/' + rowId
+        let data = $('#tourBindForm').serialize();
+
+        ajaxUtil.post(url, data).then((boundTourParticipantsFragment) => {
+          $('#boundTourParticipantsFragment').html(boundTourParticipantsFragment);
+          boundTourParticipantsFragmentSubject.initialize()
+        })
+      });
+    }
+
+    function initDeleteCommonDateRangeButton () {
+      $('.btn-delete-participant-common-date-range').click(function (e) {
+        $(this).prop('disabled', true);
+
+        e.stopImmediatePropagation();
+        e.preventDefault();
+
+        let rowId = $(this).attr('data-date-range-row-id');
+        let url = mainUrl + '/bind/delete-common-date-range-row/' + rowId;
+        let data = $('#tourBindForm').serialize();
+
+        ajaxUtil.post(url, data).then((inputTourParticipantDateRangeFragment) => {
+          $('#inputTourParticipantDateRangeFragment').html(inputTourParticipantDateRangeFragment);
+          bindFormTourParticipantDateRangeFragmentSubject.initialize()
+        }).finally(() => $(this).prop('disabled', false));
+      });
+    }
+
+    function initTourParticipantSelect () {
+      let participantSelect = $('#bindFormTourParticipantSelect');
+
+      participantSelect.on('changed.bs.select', function(e) {
+        let selectedOption =  $(this).find(":selected");
+        let selectedParticipantIdArr = selectedOption.map((_, e) => e.value).get();
+        if (selectedParticipantIdArr != null && selectedParticipantIdArr.length > 0 && selectedParticipantIdArr[0] !== '') {
+          // enable buttons
+          $('.btn-add-participant-common-date-range').prop('disabled', false);
+          $('.btn-bind-tour-participant').prop('disabled', false);
+        } else {
+          // disable buttons
+          $('.btn-add-participant-common-date-range').prop('disabled', true);
+          $('.btn-bind-tour-participant').prop('disabled', true);
+        }
+      });
+
+      // disable options in participant select for already bound participants
+      let boundParticipantIds = [[${tourBind.getBoundParticipantIds()}]];
+
+      if(boundParticipantIds.length > 0) {
+        $('#bindFormTourParticipantSelect option').each(function(idx) {
+          if($.inArray($(this).attr('value', boundParticipantIds))) {
+            $(this).attr('disabled', true);
+          }
+        });
+      }
+
+      participantSelect.selectpicker('refresh');
+    }
+
+    function disableButtons() {
+
+      $('.btn-add-participant-common-date-range').prop('disabled', true);
+
+      $('.btn-bind-tour-participant').prop('disabled', true);
+
+    }
 
     function initBindFormTourSelect() {
       $('#bindFormTourSelect').on('changed.bs.select', function(e) {
-        let tourDescriptionCollapse = $('#tourDescriptionCollapse');
+        let bindFormParticipantsCollapse = $('#bindFormParticipantsCollapse');
 
         let selectedOption =  $(this).find(":selected");
 
@@ -351,20 +796,30 @@
 
         if (selectedTourIdArr != null && selectedTourIdArr.length > 0 && selectedTourIdArr[0] !== '') {
           let tourRowId = selectedOption.attr('data-tour-row-id');
+          let tourId = selectedOption.attr('data-tour-id');
 
-          let tour = [[${allTours}]][tourRowId];
+          let tours = [[${tours}]];
+
+          let tour = tours[tourId];
 
           let description = tour.description;
 
-          $('#tourDescriptionTextArea').text(description);
+          $('#bindFormTourDescriptionTxt').text(description);
 
-          tourDescriptionCollapse.collapse('show');
+          bindFormParticipantsCollapse.collapse('show');
+
+          // initialize date-range picker
+          let minDate = new Date(tour.startDate);
+          let maxDate = new Date(tour.endDate);
+
+          initBindFormParticipantDateRangeInput(minDate, maxDate);
+
         } else {
-          tourDescriptionCollapse.collapse('hide');
+          bindFormParticipantsCollapse.collapse('hide');
         }
       });
 
-      $('.tour-single-selectpicker').selectpicker('refresh');
+      $('.selectpicker-single-tour').selectpicker('refresh');
     }
 
     /**
@@ -385,9 +840,37 @@
       });
     }
 
+    function initBindFormParticipantDateRangeInput(minDate, maxDate) {
+
+      let tour = [[${tourBind.tour}]];
+
+      if(!minDate) {
+        minDate = new Date(tour.startDate);
+      }
+      if(!maxDate) {
+        maxDate = new Date(tour.endDate);
+      }
+      $('.date-range-picker-tour-participant').daterangepicker({
+        showDropdowns: true,
+        timePicker: true,
+        timePicker24Hour: true,
+        timePickerIncrement: 5,
+        minDate: minDate,
+        startDate: minDate,
+        maxDate: maxDate,
+        endDate: maxDate,
+        autoApply: true,
+        autoUpdateInput: true,
+        locale: {
+          separator: ' ~ ',
+          format: dateRangePickerDateFormat,
+        }
+      })
+    }
+
     function initFilterDates() {
-      let defaultStartDate = new Date([[${tourBindFilter.getStartDateAsString()}]].toString());
-      let defaultEndDate = new Date([[${tourBindFilter.getEndDateAsString()}]].toString());
+      let defaultStartDate = new Date([[${ganttChartFilter.getStartDateAsString()}]].toString());
+      let defaultEndDate = new Date([[${ganttChartFilter.getEndDateAsString()}]].toString());
 
       $('#filterStartDate').data('daterangepicker').setStartDate(defaultStartDate);
       $('#filterEndDate').data('daterangepicker').setStartDate(defaultEndDate);
@@ -397,12 +880,15 @@
      * */
     function initFilterSubmitButton() {
       $('#submitFilterBtn').on('click', function (e) {
+
+        e.stopImmediatePropagation();
         e.preventDefault();
 
         $(this).prop('disabled', true);
 
-        let url = mainUrl + '/api/bind/gantt-tasks';
-        let formData = $('#tableFilterForm').serialize();
+        let url = mainUrl + '/bind/gantt-tasks';
+
+        let formData = $('#ganttChartFilterForm').serialize();
 
         ajaxUtil.post(url, formData)
                 .then((ganttTasks) => {
@@ -482,7 +968,7 @@
       ganttChart.setEvents({
         afterDraw: () => {
           console.log("after draw listener");
-          initChartCheckBoxes(ganttChart);
+          afterDrawGanttChart(ganttChart);
         }
       });
 
@@ -499,7 +985,7 @@
       return ganttChart;
     }
 
-    function initChartCheckBoxes(ganttChart) {
+    function afterDrawGanttChart(ganttChart) {
 
       let tasks = ganttChart.getList();
 
@@ -532,6 +1018,10 @@
 
         let taskTd = taskTr.find('td.gtasklist');
 
+        // let taskNameTd = taskTr.find('td.gtaskname');
+        //
+        // let taskNameSpan = taskNameTd.find('span')[1];
+
         taskTd.append(bindCheckBox);
       }
 
@@ -542,11 +1032,23 @@
         let size = $('.bind-delete-checkbox:checked').length;
 
         if(size < 1) {
-          $('.tableDeleteBtn').hide();
+          $('.table-delete-items-btn').hide();
         } else {
-          $('.tableDeleteSpan').text('Delete ' + size + ' items');
-          $('.tableDeleteBtn').show();
+          $('.table-delete-items-span').text('Delete ' + size + ' items');
+          $('.table-delete-items-btn').show();
         }
+      });
+    }
+
+    function initInputTourParticipantDateRangeFragment() {
+      $('#inputTourParticipantDateRangeFragment').on('change', function(e){
+        e.stopImmediatePropagation()
+        e.preventDefault();
+
+        // re-initialize fragment components and events when content of fragment is replaced
+        initDeleteCommonDateRangeButton();
+
+        initBindFormParticipantDateRangeInput();
       });
     }
 

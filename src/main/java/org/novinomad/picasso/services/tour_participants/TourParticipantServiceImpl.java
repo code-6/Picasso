@@ -31,7 +31,9 @@ public class TourParticipantServiceImpl extends AbstractCrudCacheService<Long, T
 
     @Override
     public List<TourParticipant> get() {
-        return super.get().stream().filter(tp -> !tp.getDeleted()).collect(Collectors.toList());
+        return super.get().stream()
+                .sorted()
+                .toList();
     }
 
     @Override
@@ -45,22 +47,8 @@ public class TourParticipantServiceImpl extends AbstractCrudCacheService<Long, T
             } else {
                 tourParticipants = new ArrayList<>(CACHE.asMap().values());
             }
-            return tourParticipants.stream().filter(tp -> !tp.getDeleted() && tourParticipantTypes.contains(tp.getType())).toList();
+            return tourParticipants.stream().filter(tp -> tourParticipantTypes.contains(tp.getType())).toList();
 //            return tourParticipantRepository.findAllByTypeIn(tourParticipantTypes);
         }
-    }
-
-    @Override
-    @Transactional
-    public void deleteSoft(Long id) {
-        tourParticipantRepository.softDeleteById(id);
-        CACHE.invalidate(id);
-    }
-
-    @Override
-    @Transactional
-    public void deleteSoft(Collection<Long> ids) {
-        tourParticipantRepository.softDeleteById(ids);
-        CACHE.invalidateAll(ids);
     }
 }

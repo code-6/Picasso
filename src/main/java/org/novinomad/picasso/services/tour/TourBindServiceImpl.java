@@ -111,8 +111,7 @@ public class TourBindServiceImpl extends AbstractCrudCacheService<Long, TourBind
     @Override
     public List<TourBind> get(TourBindFilter tourBindFilter) {
         return get().parallelStream()
-                .filter(t -> !t.getDeleted()
-                        && t.getDateTimeRange().between(tourBindFilter.getLocalDateTimeRange())
+                .filter(t -> t.getDateTimeRange().between(tourBindFilter.getLocalDateTimeRange())
                         && (tourBindFilter.getTourIds().isEmpty() || tourBindFilter.getTourIds().contains(t.getId()))
                         && (tourBindFilter.getTourParticipantIds().isEmpty() || (t.getTourParticipant() != null && t.getTourParticipant().getId() != null && tourBindFilter.getTourParticipantIds().contains(t.getTourParticipant().getId())))
                 )

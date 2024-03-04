@@ -18,7 +18,7 @@ import java.time.LocalDateTime;
 
 @SpringBootTest
 @ActiveProfiles("test")
-@TestPropertySource(locations = {"classpath:application.yml", "classpath:application-test.yml"})
+@TestPropertySource(locations = {"classpath:application.yml"})
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class TourBindServiceTest {

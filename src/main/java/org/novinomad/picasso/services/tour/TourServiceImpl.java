@@ -105,14 +105,13 @@ public class TourServiceImpl extends AbstractCrudCacheService<Long, Tour> implem
 
     @Override
     public List<Tour> get() {
-        return super.get().parallelStream().filter(t -> !t.getDeleted()).toList();
+        return super.get();
     }
 
     @Override
     public List<Tour> get(TourFilter tourFilter) {
         return get().parallelStream()
-                .filter(t -> !t.getDeleted()
-                        && t.getDateTimeRange().between(tourFilter.getLocalDateTimeRange())
+                .filter(t -> t.getDateTimeRange().between(tourFilter.getLocalDateTimeRange())
                         && (tourFilter.getTourIds().isEmpty() || tourFilter.getTourIds().contains(t.getId())))
                 .sorted(Comparator.reverseOrder())
                 .toList();
@@ -171,20 +170,6 @@ public class TourServiceImpl extends AbstractCrudCacheService<Long, Tour> implem
     public Resource getTourFile(Long tourId, String fileName) throws StorageException {
         String filePath = rootLocation.toString() + PATH_SEPARATOR + tourId + PATH_SEPARATOR + fileName;
         return fileSystemStorageService.loadAsResource(filePath);
-    }
-
-    @Override
-    @Transactional
-    public void deleteSoft(Long id) {
-        tourRepository.softDeleteById(id);
-        CACHE.invalidate(id);
-    }
-
-    @Override
-    @Transactional
-    public void deleteSoft(Collection<Long> ids) {
-        tourRepository.softDeleteById(ids);
-        CACHE.invalidateAll(ids);
     }
 
     public void deleteAllTourFiles(Tour tour) {

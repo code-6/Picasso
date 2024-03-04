@@ -40,8 +40,7 @@ import static org.novinomad.picasso.commons.utils.CommonDateUtils.localDateTimeT
 @Slf4j
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @RequiredArgsConstructor
-@Profile({"dev", "test"})
-@ConditionalOnProperty(name = "initialize-test-data", havingValue = "true")
+@ConditionalOnProperty(name = "app.initialize-test-data", havingValue = "true")
 @DependsOn("userServiceImpl")
 public class DevEnvInitializerImpl implements DevEnvInitializer {
     static final LocalDate CURRENT_DATE = LocalDate.now();
